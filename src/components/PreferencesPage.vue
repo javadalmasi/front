@@ -14,12 +14,6 @@
             <option v-t="'actions.light'" value="light" />
         </select>
     </label>
-    <label class="pref" for="ddlLanguageSelection">
-        <strong v-t="'actions.language_selection'" />
-        <select id="ddlLanguageSelection" v-model="selectedLanguage" class="select w-auto" @change="onChange($event)">
-            <option v-for="language in languages" :key="language.code" :value="language.code" v-text="language.name" />
-        </select>
-    </label>
     <label class="pref" for="ddlCountrySelection">
         <strong v-t="'actions.country_selection'" />
         <select id="ddlCountrySelection" v-model="countrySelected" class="select w-50" @change="onChange($event)">
@@ -457,58 +451,6 @@ export default {
             watchHistory: false,
             searchHistory: false,
             hideWatched: false,
-            selectedLanguage: "en",
-            languages: [
-                { code: "ar", name: "Arabic" },
-                { code: "az", name: "Azərbaycan" },
-                { code: "bg", name: "Български" },
-                { code: "bn", name: "বাংলা" },
-                { code: "bs", name: "Bosanski" },
-                { code: "ca", name: "Català" },
-                { code: "cs", name: "Čeština" },
-                { code: "da", name: "Dansk" },
-                { code: "de", name: "Deutsch" },
-                { code: "el", name: "Ελληνικά" },
-                { code: "es", name: "Español" },
-                { code: "en", name: "English" },
-                { code: "eo", name: "Esperanto" },
-                { code: "et", name: "Eesti" },
-                { code: "fa", name: "فارسی" },
-                { code: "fi", name: "Suomi" },
-                { code: "fr", name: "Français" },
-                { code: "he", name: "עברית" },
-                { code: "hi", name: "हिंदी" },
-                { code: "id", name: "Indonesia" },
-                { code: "is", name: "Íslenska" },
-                { code: "kab", name: "Taqbaylit" },
-                { code: "hr", name: "Hrvatski" },
-                { code: "it", name: "Italiano" },
-                { code: "ja", name: "日本語" },
-                { code: "ko", name: "한국어" },
-                { code: "lt", name: "Lietuvių kalba" },
-                { code: "ml", name: "മലയാളം" },
-                { code: "nb_NO", name: "Norwegian Bokmål" },
-                { code: "nl", name: "Nederlands" },
-                { code: "oc", name: "Occitan" },
-                { code: "or", name: "ଓଡ଼ିଆ" },
-                { code: "pl", name: "Polski" },
-                { code: "pt", name: "Português" },
-                { code: "pt_PT", name: "Português (Portugal)" },
-                { code: "pt_BR", name: "Português (Brasil)" },
-                { code: "ro", name: "Română" },
-                { code: "ru", name: "Русский" },
-                { code: "si", name: "සිංහල" },
-                { code: "sl", name: "Slovenian" },
-                { code: "sr", name: "Српски" },
-                { code: "sv", name: "Svenska" },
-                { code: "ta", name: "தமிழ்" },
-                { code: "th", name: "ไทย" },
-                { code: "tr", name: "Türkçe" },
-                { code: "uk", name: "Українська" },
-                { code: "vi", name: "Tiếng Việt" },
-                { code: "zh_Hant", name: "繁體中文" },
-                { code: "zh_Hans", name: "简体中文" },
-            ],
             enabledCodecs: ["vp9", "avc"],
             disableLBRY: false,
             proxyLBRY: false,
@@ -574,21 +516,18 @@ export default {
             this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
             this.watchHistory = this.getPreferenceBoolean("watchHistory", false);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
-            this.selectedLanguage = this.getPreferenceString("hl", await this.defaultLanguage);
+            // Persian (fa) is the default language, no need to save in local storage
             this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
             this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
             this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
             this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
-            if (this.selectedLanguage != "en") {
-                try {
-                    this.CountryMap = await import(`../utils/CountryMaps/${this.selectedLanguage}.json`).then(
-                        val => val.default,
-                    );
-                } catch (e) {
-                    console.error("Countries not translated into " + this.selectedLanguage);
-                }
+            // Load Persian country map
+            try {
+                this.CountryMap = await import(`../utils/CountryMaps/fa.json`).then(val => val.default);
+            } catch (e) {
+                console.error("Countries not translated into fa");
             }
         }
     },
@@ -600,7 +539,6 @@ export default {
                 if (
                     this.getPreferenceString("theme", "dark") !== this.selectedTheme ||
                     this.getPreferenceBoolean("watchHistory", false) != this.watchHistory ||
-                    this.getPreferenceString("hl", await this.defaultLanguage) !== this.selectedLanguage ||
                     this.getPreferenceString("enabledCodecs", "vp9,avc") !== this.enabledCodecs.join(",")
                 )
                     shouldReload = true;
@@ -638,7 +576,6 @@ export default {
                 localStorage.setItem("watchHistory", this.watchHistory);
                 localStorage.setItem("searchHistory", this.searchHistory);
                 if (!this.searchHistory) localStorage.removeItem("search_history");
-                localStorage.setItem("hl", this.selectedLanguage);
                 localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
                 localStorage.setItem("disableLBRY", this.disableLBRY);
                 localStorage.setItem("proxyLBRY", this.proxyLBRY);

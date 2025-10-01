@@ -621,9 +621,10 @@ export default {
 
                     let lang = "en";
                     if (!isSafari) {
-                        // Set the audio language
-                        const prefLang = this.getPreferenceString("hl", "en").substr(0, 2);
+                        // Set the audio language to Persian as default
+                        const prefLang = "fa".substr(0, 2);
                         if (player.getAudioLanguages().includes(prefLang)) lang = prefLang;
+                        else if (player.getAudioLanguages().includes("en")) lang = "en"; // fallback to English
                         player.selectAudioLanguage(lang);
                     }
 

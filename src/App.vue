@@ -90,8 +90,7 @@ export default {
         const App = this;
 
         (async function () {
-            const defaultLang = await App.defaultLanguage;
-            const locale = App.getPreferenceString("hl", defaultLang);
+            const locale = "fa"; // Always use Persian
             if (locale !== App.TimeAgoConfig.locale) {
                 const localeTime = await import(`../node_modules/javascript-time-ago/locale/${locale}.json`)
                     .catch(() => null)

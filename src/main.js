@@ -9,7 +9,7 @@ import en from "javascript-time-ago/locale/en";
 TimeAgo.addDefaultLocale(en);
 
 import { createI18n } from "vue-i18n";
-import enLocale from "@/locales/en.json";
+import faLocale from "@/locales/fa.json";
 import "@unocss/reset/tailwind.css";
 import "uno.css";
 
@@ -38,12 +38,12 @@ const mixin = {
             return str;
         },
         numberFormat(num) {
-            var loc = `${this.getPreferenceString("hl")}-${this.getPreferenceString("region")}`;
+            var loc = `fa-${this.getPreferenceString("region")}`;
 
             try {
                 Intl.getCanonicalLocales(loc);
             } catch {
-                loc = undefined;
+                loc = "fa"; // fallback to Persian
             }
 
             const formatter = Intl.NumberFormat(loc, {
@@ -603,14 +603,37 @@ const mixin = {
         async defaultLanguage() {
             const languages = window.navigator.languages;
             for (let i = 0; i < languages.length; i++) {
-                try {
-                    await import(`./locales/${languages[i]}.json`);
-                    return languages[i];
-                } catch {
-                    continue;
+                if (languages[i].startsWith("fa")) {
+                    try {
+                        await import(`./locales/${languages[i]}.json`);
+                        return languages[i];
+                    } catch {
+                        continue;
+                    }
                 }
             }
-            return "en";
+            // Check for VITE_DEFAULT_LANGUAGE environment variable
+            if (import.meta.env.VITE_DEFAULT_LANGUAGE) {
+                try {
+                    await import(`./locales/${import.meta.env.VITE_DEFAULT_LANGUAGE}.json`);
+                    return import.meta.env.VITE_DEFAULT_LANGUAGE;
+                } catch {
+                    // If the env variable language doesn't exist, fall back to fa
+                    try {
+                        await import(`./locales/fa.json`);
+                        return "fa";
+                    } catch {
+                        // If fa doesn't exist, fall back to en
+                        return "en";
+                    }
+                }
+            }
+            try {
+                await import(`./locales/fa.json`);
+                return "fa";
+            } catch {
+                return "en";
+            }
         },
     },
     data() {
@@ -624,10 +647,10 @@ const mixin = {
 const i18n = createI18n({
     globalInjection: true,
     legacy: false,
-    locale: "en",
-    fallbackLocale: "en",
+    locale: "fa",
+    fallbackLocale: "fa",
     messages: {
-        en: enLocale,
+        fa: faLocale,
     },
 });
 
