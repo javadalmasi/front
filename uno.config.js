@@ -11,6 +11,7 @@ export default defineConfig({
     presets: [
         presetUno({
             dark: "media",
+            rtl: true, // Enable RTL support
         }),
         presetIcons({
             extraProperties: {
@@ -19,9 +20,10 @@ export default defineConfig({
             },
         }),
         presetWebFonts({
-            provider: "none",
+            provider: "none", // Changed back to none since we're using local font
             fonts: {
                 sans: [
+                    "Vazirmatn",
                     "-apple-system",
                     "BlinkMacSystemFont",
                     "Segoe UI",

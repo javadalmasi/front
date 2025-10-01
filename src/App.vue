@@ -136,6 +136,20 @@ export default {
 </script>
 
 <style>
+/* RTL support */
+:root {
+    direction: rtl;
+}
+
+/* LTR elements that should remain LTR (like video player) */
+.video-player,
+.shaka-player-container,
+.video-container,
+.video-controls,
+.shaka-text-container,
+.shaka-bottom-controls {
+    direction: ltr !important;
+}
 h1,
 p,
 a,

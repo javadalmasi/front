@@ -10,6 +10,7 @@ TimeAgo.addDefaultLocale(en);
 
 import { createI18n } from "vue-i18n";
 import faLocale from "@/locales/fa.json";
+import "vazirmatn/Vazirmatn-font-face.css";
 import "@unocss/reset/tailwind.css";
 import "uno.css";
 
