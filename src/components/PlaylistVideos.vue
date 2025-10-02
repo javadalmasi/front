@@ -44,11 +44,11 @@
                     <div class="flex-1">
                         <router-link
                             v-if="related.uploaderUrl && related.uploaderName && !hideChannel"
-                            class="link-secondary block overflow-hidden text-xs"
+                            class="link-secondary block overflow-hidden text-xs no-underline hover:underline-dashed"
                             :to="related.uploaderUrl"
                             :title="related.uploaderName"
                         >
-                            <span v-text="related.uploaderName" />
+                            <span v-text="getTruncatedUploaderName(related.uploaderName)" />
                             <i v-if="related.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
                         </router-link>
                     </div>
@@ -61,6 +61,8 @@
 <script>
 import { nextTick } from "vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
+import { truncateString } from "../utils/Misc";
+
 export default {
     components: { VideoThumbnail },
     props: {
@@ -77,6 +79,10 @@ export default {
             required: true,
         },
         preferListen: {
+            type: Boolean,
+            default: false,
+        },
+        hideChannel: {
             type: Boolean,
             default: false,
         },
@@ -103,6 +109,12 @@ export default {
             if (index < elems.length)
                 this.$refs.scrollable.scrollTop =
                     elems[this.selectedIndex - 1].offsetTop - this.$refs.scrollable.offsetTop;
+        },
+        getTruncatedUploaderName(uploaderName) {
+            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
+                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
+                : 16;
+            return truncateString(uploaderName, limit);
         },
     },
 };

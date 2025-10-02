@@ -27,3 +27,8 @@ export const parseTimeParam = time => {
     }
     return start;
 };
+
+export const truncateString = (str, maxLength) => {
+    if (!str) return str;
+    return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
+};

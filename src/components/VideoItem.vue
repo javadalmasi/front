@@ -46,11 +46,11 @@
             <div class="flex-1 px-2">
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
-                    class="link-secondary overflow-hidden text-sm"
+                    class="link-secondary overflow-hidden text-sm no-underline hover:underline-dashed"
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
-                    <span v-text="item.uploaderName" />
+                    <span v-text="truncatedUploaderName" />
                 </router-link>
 
                 <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
@@ -138,6 +138,7 @@ import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
+import { truncateString } from "../utils/Misc";
 
 export default {
     components: { PlaylistAddModal, ConfirmModal, ShareModal, VideoThumbnail },
@@ -176,6 +177,12 @@ export default {
         },
         thumbnail() {
             return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
+        },
+        truncatedUploaderName() {
+            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
+                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
+                : 16;
+            return truncateString(this.item.uploaderName, limit);
         },
     },
     mounted() {

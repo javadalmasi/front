@@ -8,13 +8,13 @@
         </router-link>
         <p v-if="props.item.description" v-text="props.item.description" />
 
-        <router-link v-if="props.item.uploaderUrl" class="link-secondary text-sm" :to="props.item.uploaderUrl">
+        <router-link v-if="props.item.uploaderUrl" class="link-secondary text-sm no-underline hover:underline-dashed" :to="props.item.uploaderUrl">
             <p>
-                <span v-text="props.item.uploaderName" />
+                <span v-text="truncatedUploaderName" />
                 <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
-        <a v-else-if="props.item.uploaderName" class="link" v-text="props.item.uploaderName" />
+        <a v-else-if="props.item.uploaderName" class="link no-underline hover:underline-dashed" v-text="truncatedUploaderName" />
 
         <template v-if="props.item.videos >= 0">
             <br v-if="props.item.uploaderName" />
@@ -26,10 +26,18 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { truncateString } from "../utils/Misc";
+
 const props = defineProps({
     item: {
         type: Object,
         required: true,
     },
+});
+
+const truncatedUploaderName = computed(() => {
+    const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT) : 16;
+    return truncateString(props.item.uploaderName, limit);
 });
 </script>

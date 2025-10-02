@@ -32,7 +32,7 @@
             </p>
         </router-link>
 
-        <a v-if="item.uploaderName" class="link" v-text="item.uploaderName" />
+        <a v-if="item.uploaderName" class="link no-underline hover:underline-dashed" v-text="truncatedUploaderName" />
         <template v-if="item.videos >= 0">
             <br v-if="item.uploaderName" />
             <strong v-text="`${item.videos} ${$t('video.videos')}`" />
@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { truncateString } from "../utils/Misc";
+
 export default {
     props: {
         item: {
@@ -67,6 +69,12 @@ export default {
     computed: {
         channelId(_this) {
             return _this.item.url.substr(-24);
+        },
+        truncatedUploaderName(_this) {
+            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
+                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
+                : 16;
+            return truncateString(_this.item.uploaderName, limit);
         },
     },
     mounted() {
