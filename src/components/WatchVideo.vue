@@ -139,7 +139,11 @@
                         />
                         <div class="mr-auto flex flex-wrap gap-1">
                             <!-- Subscribe Button -->
-                            <button class="btn flex items-center gap-1 <md:hidden" @click="downloadCurrentFrame">
+                            <button
+                                v-if="!isDownloadThumbnailDisabled"
+                                class="btn flex items-center gap-1 <md:hidden"
+                                @click="downloadCurrentFrame"
+                            >
                                 {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
                             </button>
                             <button class="btn flex items-center" @click="showModal = !showModal">
@@ -426,6 +430,10 @@ export default {
         commentsEnabled() {
             // Check if comments are disabled via environment variable
             return !import.meta.env.VITE_DISABLE_COMMENTS || import.meta.env.VITE_DISABLE_COMMENTS === "false";
+        },
+        isDownloadThumbnailDisabled() {
+            // Check if download thumbnail button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_DOWNLOAD_THUMBNAIL === "true";
         },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
