@@ -25,7 +25,12 @@
             class="thumbnail-overlay thumbnail-right px-0.5"
             v-text="timeFormat(item.duration)"
         />
-        <i18n-t v-else keypath="video.live" class="thumbnail-overlay thumbnail-right !bg-red-600" tag="div">
+        <i18n-t
+            v-else-if="!isLiveStreamDisabled() && isLivestream(item)"
+            keypath="video.live"
+            class="thumbnail-overlay thumbnail-right !bg-red-600"
+            tag="div"
+        >
             <i class="i-fa6-solid:tower-broadcast w-3" />
         </i18n-t>
         <span v-if="item.watched" v-t="'video.watched'" class="thumbnail-overlay bottom-5px left-5px" />
@@ -53,6 +58,21 @@ export default {
         },
         thumbnail() {
             return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
+        },
+    },
+    methods: {
+        isLiveStreamDisabled() {
+            return import.meta.env.VITE_DISABLE_LIVESTREAMS === "true";
+        },
+        isLivestream(item) {
+            // Check various properties that might indicate a livestream
+            return (
+                item.livestream === true ||
+                (item.duration !== undefined && item.duration <= 0) ||
+                (item.duration === undefined && item.isLive === true) ||
+                (item.duration !== undefined && item.duration === -1) ||
+                item.uploadedDate === null
+            );
         },
     },
 };

@@ -145,6 +145,10 @@ export default {
                 .then(() => {
                     if (!this.channel.error) {
                         document.title = this.channel.name + " - Piped";
+                        // Filter livestreams if they are disabled
+                        if (this.filterLivestreams) {
+                            this.channel.relatedStreams = this.filterLivestreams(this.channel.relatedStreams);
+                        }
                         this.contentItems = this.channel.relatedStreams;
                         this.fetchSubscribedStatus();
                         this.updateWatched(this.channel.relatedStreams);
@@ -155,6 +159,8 @@ export default {
                         const tabQuery = this.$route.query.tab;
                         for (let i = 0; i < this.channel.tabs.length; i++) {
                             let tab = this.channel.tabs[i];
+                            // Skip livestreams tab if livestreams are disabled
+                            if (this.isLiveStreamDisabled && tab.name === "livestreams") continue;
                             tab.translatedName = this.getTranslatedTabName(tab.name);
                             this.tabs.push(tab);
                             if (tab.name === tabQuery) this.loadTab(i + 1);
@@ -185,6 +191,10 @@ export default {
             }).then(json => {
                 this.channel.nextpage = json.nextpage;
                 this.loading = false;
+                // Filter livestreams if they are disabled
+                if (this.filterLivestreams) {
+                    json.relatedStreams = this.filterLivestreams(json.relatedStreams);
+                }
                 this.updateWatched(json.relatedStreams);
                 this.contentItems.push(...json.relatedStreams);
                 this.fetchDeArrowContent(json.relatedStreams);
@@ -197,6 +207,10 @@ export default {
             }).then(json => {
                 this.tabs[this.selectedTab].tabNextPage = json.nextpage;
                 this.loading = false;
+                // Filter livestreams if they are disabled
+                if (this.filterLivestreams) {
+                    json.content = this.filterLivestreams(json.content);
+                }
                 this.contentItems.push(...json.content);
                 this.fetchDeArrowContent(json.content);
                 this.tabs[this.selectedTab].content = this.contentItems;
@@ -248,6 +262,10 @@ export default {
             this.fetchJson(this.apiUrl() + "/channels/tabs", {
                 data: this.tabs[index].data,
             }).then(tab => {
+                // Filter livestreams if they are disabled
+                if (this.filterLivestreams) {
+                    tab.content = this.filterLivestreams(tab.content);
+                }
                 this.contentItems = this.tabs[index].content = tab.content;
                 this.fetchDeArrowContent(tab.content);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;

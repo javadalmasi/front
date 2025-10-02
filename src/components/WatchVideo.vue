@@ -1,5 +1,8 @@
 <template>
-    <div v-if="video && isEmbed" class="absolute left-0 top-0 z-50 h-full w-full bg-black">
+    <div
+        v-if="video && isEmbed && !checkIfLivestreamDisabled(video)"
+        class="absolute left-0 top-0 z-50 h-full w-full bg-black"
+    >
         <VideoPlayer
             ref="videoPlayer"
             :video="video"
@@ -9,17 +12,23 @@
             :is-embed="isEmbed"
         />
     </div>
+    <div
+        v-else-if="video && isEmbed && checkIfLivestreamDisabled(video)"
+        class="absolute left-0 top-0 z-50 h-full w-full flex items-center justify-center bg-black"
+    >
+        <PageNotFound />
+    </div>
     <div id="theaterModeSpot" class="-mx-1vw"></div>
-    <LoadingIndicatorPage :show-content="video && !isEmbed" class="w-full">
-        <ErrorHandler v-if="video && video.error" :message="video.message" :error="video.error" />
+    <PageNotFound v-if="video && checkIfLivestreamDisabled(video)" />
+    <LoadingIndicatorPage v-else :show-content="video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
         <Transition>
             <ToastComponent v-if="shouldShowToast" @dismissed="dismiss">
                 <i18n-t keypath="info.next_video_countdown">{{ counter }}</i18n-t>
             </ToastComponent>
         </Transition>
-        <div class="flex gap-5">
+        <div v-if="video && !checkIfLivestreamDisabled(video)" class="flex gap-5">
             <div class="flex-auto">
-                <div v-show="!video.error">
+                <div>
                     <Teleport defer to="#theaterModeSpot" :disabled="!theaterMode">
                         <div class="flex flex-row">
                             <keep-alive>
@@ -350,7 +359,6 @@
 <script>
 import VideoPlayer from "./VideoPlayer.vue";
 import ContentItem from "./ContentItem.vue";
-import ErrorHandler from "./ErrorHandler.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
 import PlaylistAddModal from "./PlaylistAddModal.vue";
@@ -359,6 +367,7 @@ import PlaylistVideos from "./PlaylistVideos.vue";
 import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
+import PageNotFound from "./PageNotFound.vue";
 import { parseTimeParam } from "@/utils/Misc";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
 
@@ -370,7 +379,6 @@ export default {
     components: {
         VideoPlayer,
         ContentItem,
-        ErrorHandler,
         CommentItem,
         ChaptersBar,
         PlaylistAddModal,
@@ -379,6 +387,7 @@ export default {
         WatchOnButton,
         LoadingIndicatorPage,
         ToastComponent,
+        PageNotFound,
     },
     data() {
         const smallViewQuery = window.matchMedia("(max-width: 640px)");
@@ -532,6 +541,16 @@ export default {
         this.dismiss();
     },
     methods: {
+        checkIfLivestreamDisabled(video) {
+            return (
+                this.isLiveStreamDisabled &&
+                (video.livestream === true ||
+                    (video.duration !== undefined && video.duration <= 0) ||
+                    (video.duration === undefined && video.isLive === true) ||
+                    (video.duration !== undefined && video.duration === -1) ||
+                    video.uploadedDate === null)
+            );
+        },
         fetchVideo() {
             return this.fetchJson(this.apiUrl() + "/streams/" + this.getVideoId());
         },
@@ -589,9 +608,39 @@ export default {
                 })
                 .then(() => {
                     if (!this.video.error) {
-                        document.title = this.video.title + " - Piped";
-                        this.channelId = this.video.uploaderUrl.split("/")[2];
-                        if (!this.isEmbed) this.fetchSubscribedStatus();
+                        // Check if video is a livestream and if livestreams are disabled
+                        if (
+                            this.isLiveStreamDisabled &&
+                            (this.video.livestream === true ||
+                                (this.video.duration !== undefined && this.video.duration <= 0) ||
+                                (this.video.duration === undefined && this.video.isLive === true) ||
+                                (this.video.duration !== undefined && this.video.duration === -1) ||
+                                this.video.uploadedDate === null)
+                        ) {
+                            this.video.error = true;
+                            this.video.message = this.$t("info.livestreams_disabled");
+                            document.title = this.$t("info.livestreams_disabled") + " - Piped";
+                        } else {
+                            document.title = this.video.title + " - Piped";
+                            this.channelId = this.video.uploaderUrl.split("/")[2];
+                            if (!this.isEmbed) this.fetchSubscribedStatus();
+
+                            const parser = new DOMParser();
+                            const xmlDoc = parser.parseFromString(this.video.description, "text/html");
+                            xmlDoc.querySelectorAll("a").forEach(elem => {
+                                if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/))
+                                    elem.outerHTML = elem.getAttribute("href");
+                            });
+                            xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
+                            this.video.description = rewriteDescription(xmlDoc.querySelector("body").innerHTML);
+                            // Filter livestreams from related streams if they are disabled
+                            if (this.filterLivestreams) {
+                                this.video.relatedStreams = this.filterLivestreams(this.video.relatedStreams);
+                            }
+                            this.updateWatched(this.video.relatedStreams);
+
+                            this.fetchDeArrowContent(this.video.relatedStreams);
+                        }
 
                         const parser = new DOMParser();
                         const xmlDoc = parser.parseFromString(this.video.description, "text/html");
@@ -601,6 +650,10 @@ export default {
                         });
                         xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
                         this.video.description = rewriteDescription(xmlDoc.querySelector("body").innerHTML);
+                        // Filter livestreams from related streams if they are disabled
+                        if (this.filterLivestreams) {
+                            this.video.relatedStreams = this.filterLivestreams(this.video.relatedStreams);
+                        }
                         this.updateWatched(this.video.relatedStreams);
 
                         this.fetchDeArrowContent(this.video.relatedStreams);

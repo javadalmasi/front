@@ -113,6 +113,10 @@ export default {
                 .then(() => {
                     this.updateTitle();
                     this.updateTotalDuration();
+                    // Filter livestreams from playlist if they are disabled
+                    if (this.filterLivestreams) {
+                        this.playlist.relatedStreams = this.filterLivestreams(this.playlist.relatedStreams);
+                    }
                     this.updateWatched(this.playlist.relatedStreams);
                     this.fetchDeArrowContent(this.playlist.relatedStreams);
                 });
@@ -129,6 +133,10 @@ export default {
                 }).then(json => {
                     this.playlist.nextpage = json.nextpage;
                     this.loading = false;
+                    // Filter livestreams from new items if they are disabled
+                    if (this.filterLivestreams) {
+                        json.relatedStreams = this.filterLivestreams(json.relatedStreams);
+                    }
                     this.playlist.relatedStreams.push(...json.relatedStreams);
                     this.updateTotalDuration();
                     this.fetchDeArrowContent(json.relatedStreams);

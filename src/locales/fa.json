@@ -285,7 +285,8 @@
         "error": "خطا",
         "skipped": "رد شده",
         "selected_subscriptions": "اشتراک های انتخاب شده",
-        "found_n_items": "تعداد {0} مورد پیدا شد"
+        "found_n_items": "تعداد {0} مورد پیدا شد",
+        "livestreams_disabled": "پخش زنده پشتیبانی نمی شود"
     },
     "subscriptions": {
         "subscribed_channels_count": "مشترک شده: {0}"

@@ -82,6 +82,10 @@ export default {
             document.title = this.$route.query.search_query + " - Piped";
             this.results = this.fetchResults().then(json => {
                 this.results = json;
+                // Filter out livestreams if they are disabled
+                if (this.filterLivestreams) {
+                    this.results.items = this.filterLivestreams(this.results.items);
+                }
                 this.updateWatched(this.results.items);
             });
         },
@@ -105,7 +109,9 @@ export default {
                     this.results.nextpage = json.nextpage;
                     this.results.id = json.id;
                     this.loading = false;
-                    json.items.map(stream => this.results.items.push(stream));
+                    // Filter livestreams from the new items before adding them
+                    const filteredItems = this.filterLivestreams ? this.filterLivestreams(json.items) : json.items;
+                    filteredItems.map(stream => this.results.items.push(stream));
                 });
             }
         },

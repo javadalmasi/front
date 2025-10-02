@@ -101,6 +101,16 @@ export default {
             }
 
             this.videosStore = resp;
+            // Filter out livestreams if they are disabled
+            if (this.isLiveStreamDisabled()) {
+                this.videosStore = this.videosStore.filter(video => {
+                    return !(
+                        video.livestream === true ||
+                        (video.duration !== undefined && video.duration <= 0) ||
+                        (video.duration === undefined && video.isLive === true)
+                    );
+                });
+            }
             this.loadMoreVideos();
             this.updateWatched(this.videos);
         });

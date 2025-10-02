@@ -520,6 +520,28 @@ const mixin = {
                     return undefined;
             }
         },
+        isLiveStreamDisabled() {
+            return import.meta.env.VITE_DISABLE_LIVESTREAMS === "true";
+        },
+        filterLivestreams(items) {
+            if (this.isLiveStreamDisabled()) {
+                return items.filter(item => {
+                    // Check if it's a stream item and is a livestream
+                    if (item.type === "stream") {
+                        // Check various properties that might indicate a livestream
+                        return !(
+                            item.livestream === true ||
+                            (item.duration !== undefined && item.duration <= 0) ||
+                            (item.duration === undefined && item.isLive === true) ||
+                            (item.duration !== undefined && item.duration === -1) ||
+                            item.uploadedDate === null
+                        );
+                    }
+                    return true; // Keep non-stream items
+                });
+            }
+            return items;
+        },
         fetchDeArrowContent(content) {
             if (!this.getPreferenceBoolean("dearrow", false)) return;
 

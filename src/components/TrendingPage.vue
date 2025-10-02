@@ -32,7 +32,12 @@ export default {
         let region = this.getPreferenceString("region", "US");
 
         this.fetchTrending(region).then(videos => {
-            this.videos = videos;
+            // Filter livestreams if they are disabled
+            if (this.filterLivestreams) {
+                this.videos = this.filterLivestreams(videos);
+            } else {
+                this.videos = videos;
+            }
             this.updateWatched(this.videos);
             this.fetchDeArrowContent(this.videos);
         });
