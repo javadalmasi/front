@@ -147,7 +147,24 @@ export default {
 .video-container,
 .video-controls,
 .shaka-text-container,
-.shaka-bottom-controls {
+.shaka-bottom-controls,
+.shaka-video-container,
+.shaka-video-cast-button,
+.shaka-overflow-menu,
+.shaka-current-time,
+.shaka-seek-bar,
+.shaka-play-button,
+.shaka-volume-bar,
+.shaka-fullscreen-button,
+.shaka-captions-button,
+.shaka-quality-button,
+.shaka-playback-rate-button,
+.shaka-airplay-button,
+.shaka-seek-live,
+.shaka-mute-button,
+.skip-segment-button,
+#preview-container,
+#preview {
     direction: ltr !important;
 }
 h1,

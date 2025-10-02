@@ -2,41 +2,47 @@
     <div
         ref="container"
         data-shaka-player-container
-        class="relative max-h-screen w-full flex justify-center"
+        class="relative max-h-screen w-full flex justify-center direction-ltr"
         :class="{ 'player-container': !isEmbed }"
+        dir="ltr"
     >
         <video
             ref="videoEl"
-            class="w-full"
+            class="w-full direction-ltr"
             data-shaka-player
             :autoplay="shouldAutoPlay"
             :loop="selectedAutoLoop"
             playsinline
+            dir="ltr"
         />
         <span
             id="preview-container"
             ref="previewContainer"
-            class="absolute bottom-0 z-[2000] mb-[3.5%] hidden flex-col items-center"
+            class="absolute bottom-0 z-[2000] mb-[3.5%] hidden flex-col items-center direction-ltr"
+            dir="ltr"
         >
-            <canvas id="preview" ref="preview" class="rounded-sm" />
+            <canvas id="preview" ref="preview" class="rounded-sm direction-ltr" dir="ltr" />
             <span
                 v-if="(video?.chapters?.length ?? 0) > 1"
-                class="mt-2 text-sm drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black]"
+                class="mt-2 text-sm drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black] direction-ltr"
+                dir="ltr"
             >
                 {{ video.chapters.findLast(chapter => chapter.start < currentTime)?.title }}
             </span>
             <span
-                class="mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm .dark:bg-dark-700"
+                class="mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm .dark:bg-dark-700 direction-ltr"
+                dir="ltr"
                 v-text="timeFormat(currentTime)"
             />
         </span>
         <button
             v-if="inSegment"
-            class="skip-segment-button"
+            class="skip-segment-button direction-ltr"
             type="button"
             :aria-label="$t('actions.skip_segment')"
             aria-pressed="false"
             @click="onClickSkipSegment"
+            dir="ltr"
         >
             <span v-t="'actions.skip_segment'" />
             <i class="material-icons-round">skip_next</i>
@@ -44,18 +50,21 @@
         <span
             v-if="error > 0"
             v-t="{ path: 'player.failed', args: [error] }"
-            class="absolute top-8 rounded bg-black/80 p-2 text-lg backdrop-blur-sm"
+            class="absolute top-8 rounded bg-black/80 p-2 text-lg backdrop-blur-sm direction-ltr"
+            dir="ltr"
         />
         <div
             v-if="showCurrentSpeed"
-            class="text-l absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80"
+            class="text-l absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80 direction-ltr"
+            dir="ltr"
         >
             <i class="i-fa6-solid:gauge-high h-25 w-25 p-5" />
             <span v-text="$refs.videoEl.playbackRate" />
         </div>
         <div
             v-if="showCurrentVolume"
-            class="text-l absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80"
+            class="text-l absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80 direction-ltr"
+            dir="ltr"
         >
             <i v-if="$refs.videoEl.volume > 0" class="i-fa6-solid:volume-high h-25 w-25 p-5" />
             <i v-else class="i-fa6-solid:volume-xmark h-25 w-25 p-5" />
@@ -1000,5 +1009,10 @@ export default {
 .skip-segment-button .material-icons-round {
     font-size: 1.6em !important;
     line-height: inherit !important;
+}
+
+.direction-ltr {
+    direction: ltr !important;
+    text-align: left !important;
 }
 </style>
