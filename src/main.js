@@ -39,7 +39,7 @@ const mixin = {
             return str;
         },
         numberFormat(num) {
-            var loc = `fa-${this.getPreferenceString("region")}`;
+            var loc = `fa-${import.meta.env.VITE_COUNTRY_REGION || "US"}`;
 
             try {
                 Intl.getCanonicalLocales(loc);

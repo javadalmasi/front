@@ -14,12 +14,6 @@
             <option v-t="'actions.light'" value="light" />
         </select>
     </label>
-    <label class="pref" for="ddlCountrySelection">
-        <strong v-t="'actions.country_selection'" class="tooltip-hover" :title="$t('tooltips.country_selection')" />
-        <select id="ddlCountrySelection" v-model="countrySelected" class="select w-50" @change="onChange($event)">
-            <option v-for="country in countryMap" :key="country.code" :value="country.code" v-text="country.name" />
-        </select>
-    </label>
     <label class="pref" for="ddlDefaultHomepage">
         <strong v-t="'actions.default_homepage'" class="tooltip-hover" :title="$t('tooltips.default_homepage')" />
         <select id="ddlDefaultHomepage" v-model="defaultHomepage" class="select w-auto" @change="onChange($event)">
@@ -259,6 +253,10 @@
             @change="onChange($event)"
         />
     </label>
+    <label class="pref" for="chkShowAds">
+        <strong v-t="'actions.show_ads'" class="tooltip-hover" :title="$t('tooltips.show_ads')" />
+        <input id="chkShowAds" v-model="showAds" class="checkbox" type="checkbox" @change="onChange($event)" />
+    </label>
 
     <h2 class="text-center">SponsorBlock</h2>
     <p class="text-center">
@@ -364,7 +362,6 @@
 </template>
 
 <script>
-import CountryMap from "@/utils/CountryMaps/en.json";
 import ConfirmModal from "./ConfirmModal.vue";
 export default {
     components: {
@@ -396,9 +393,7 @@ export default {
             resolutions: [144, 240, 360, 480, 720, 1080, 1440, 2160, 4320],
             preferHls: false,
             defaultQuality: 0,
-            bufferingGoal: 10,
-            countryMap: CountryMap,
-            countrySelected: "US",
+            bufferingGoal: import.meta.env.VITE_BUFFERING_GOAL || 10,
             defaultHomepage: "trending",
             minimizeComments: false,
             minimizeDescription: true,
@@ -413,6 +408,7 @@ export default {
             disableLBRY: false,
             proxyLBRY: false,
             prefetchLimit: 2,
+            showAds: true,
             password: null,
             showConfirmResetPrefsDialog: false,
         };
@@ -454,8 +450,10 @@ export default {
             this.autoPlayNextCountdown = this.getPreferenceNumber("autoPlayNextCountdown", 5);
             this.listen = this.getPreferenceBoolean("listen", false);
             this.defaultQuality = Number(localStorage.getItem("quality"));
-            this.bufferingGoal = Math.max(Number(localStorage.getItem("bufferGoal")), 10);
-            this.countrySelected = this.getPreferenceString("region", "US");
+            this.bufferingGoal = Math.max(
+                Number(localStorage.getItem("bufferGoal")),
+                import.meta.env.VITE_BUFFERING_GOAL || 10,
+            );
             this.defaultHomepage = this.getPreferenceString("homepage", "trending");
             this.minimizeComments = this.getPreferenceBoolean("minimizeComments", false);
             this.minimizeDescription = this.getPreferenceBoolean("minimizeDescription", true);
@@ -470,6 +468,7 @@ export default {
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
             this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
+            this.showAds = this.getPreferenceBoolean("showAds", true);
             this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
             this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
             // Load Persian country map
@@ -511,7 +510,6 @@ export default {
                 localStorage.setItem("preferHls", this.preferHls);
                 localStorage.setItem("quality", this.defaultQuality);
                 localStorage.setItem("bufferGoal", this.bufferingGoal);
-                localStorage.setItem("region", this.countrySelected);
                 localStorage.setItem("homepage", this.defaultHomepage);
                 localStorage.setItem("minimizeComments", this.minimizeComments);
                 localStorage.setItem("minimizeDescription", this.minimizeDescription);
@@ -528,6 +526,7 @@ export default {
                 localStorage.setItem("prefetchLimit", this.prefetchLimit);
                 localStorage.setItem("hideWatched", this.hideWatched);
                 localStorage.setItem("mobileChapterLayout", this.mobileChapterLayout);
+                localStorage.setItem("showAds", this.showAds);
 
                 if (shouldReload) window.location.reload();
             }

@@ -29,7 +29,7 @@ export default {
         ) {
             return;
         }
-        let region = this.getPreferenceString("region", "US");
+        let region = import.meta.env.VITE_COUNTRY_REGION || "US";
 
         this.fetchTrending(region).then(videos => {
             // Filter livestreams if they are disabled

@@ -60,7 +60,7 @@
 
         <!-- Embed code section (only on desktop) -->
         <div v-if="!isMobile" class="border-t border-gray-200 pt-3 dark:border-gray-700">
-            <div v-t="'actions.embed_video'" class="mb-2 font-bold text-lg" />
+            <div v-t="'actions.embed_video'" class="mb-2 text-lg font-bold" />
             <div class="mb-2 overflow-x-auto rounded bg-gray-100 p-2 dark:bg-dark-700">
                 <code class="break-all text-xs">{{ generatedEmbedCode }}</code>
             </div>
