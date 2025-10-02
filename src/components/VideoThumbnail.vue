@@ -66,6 +66,10 @@ export default {
         },
         isLivestream(item) {
             // Check various properties that might indicate a livestream
+            // Don't consider short videos as livestreams
+            if (item.isShort === true) {
+                return false; // Short videos are not livestreams
+            }
             return (
                 item.livestream === true ||
                 (item.duration !== undefined && item.duration <= 0) ||

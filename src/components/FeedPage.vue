@@ -104,6 +104,10 @@ export default {
             // Filter out livestreams if they are disabled
             if (this.isLiveStreamDisabled()) {
                 this.videosStore = this.videosStore.filter(video => {
+                    // Don't filter out short videos, only livestreams
+                    if (video.isShort === true) {
+                        return true; // Keep short videos
+                    }
                     return !(
                         video.livestream === true ||
                         (video.duration !== undefined && video.duration <= 0) ||

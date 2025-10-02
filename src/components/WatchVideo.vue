@@ -542,6 +542,10 @@ export default {
     },
     methods: {
         checkIfLivestreamDisabled(video) {
+            // Don't consider short videos as livestreams to be disabled
+            if (video.isShort === true) {
+                return false; // Short videos should not be disabled
+            }
             return (
                 this.isLiveStreamDisabled &&
                 (video.livestream === true ||
@@ -609,8 +613,10 @@ export default {
                 .then(() => {
                     if (!this.video.error) {
                         // Check if video is a livestream and if livestreams are disabled
+                        // Don't consider short videos as livestreams to be disabled
                         if (
                             this.isLiveStreamDisabled &&
+                            this.video.isShort !== true && // Don't disable short videos
                             (this.video.livestream === true ||
                                 (this.video.duration !== undefined && this.video.duration <= 0) ||
                                 (this.video.duration === undefined && this.video.isLive === true) ||

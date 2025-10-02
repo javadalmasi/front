@@ -528,6 +528,10 @@ const mixin = {
                 return items.filter(item => {
                     // Check if it's a stream item and is a livestream
                     if (item.type === "stream") {
+                        // Don't filter out short videos, only livestreams
+                        if (item.isShort === true) {
+                            return true; // Keep short videos
+                        }
                         // Check various properties that might indicate a livestream
                         return !(
                             item.livestream === true ||
