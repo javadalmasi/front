@@ -7,7 +7,7 @@
                     src="/img/icons/logo.svg"
                     height="32"
                     width="32"
-                    class="mr-[-0.6rem] w-10 bold"
+                    class="bold mr-[-0.6rem] w-10"
                 />ویدیو</router-link
             >
         </div>

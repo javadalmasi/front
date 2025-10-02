@@ -7,7 +7,7 @@
     <h1 v-t="'titles.preferences'" class="text-center font-bold" />
     <hr />
     <label for="ddlTheme" class="pref">
-        <strong v-t="'actions.theme'" />
+        <strong v-t="'actions.theme'" class="tooltip-hover" :title="$t('tooltips.theme')" />
         <select id="ddlTheme" v-model="selectedTheme" class="select w-auto" @change="onChange($event)">
             <option v-t="'actions.auto'" value="auto" />
             <option v-t="'actions.dark'" value="dark" />
@@ -15,13 +15,13 @@
         </select>
     </label>
     <label class="pref" for="ddlCountrySelection">
-        <strong v-t="'actions.country_selection'" />
+        <strong v-t="'actions.country_selection'" class="tooltip-hover" :title="$t('tooltips.country_selection')" />
         <select id="ddlCountrySelection" v-model="countrySelected" class="select w-50" @change="onChange($event)">
             <option v-for="country in countryMap" :key="country.code" :value="country.code" v-text="country.name" />
         </select>
     </label>
     <label class="pref" for="ddlDefaultHomepage">
-        <strong v-t="'actions.default_homepage'" />
+        <strong v-t="'actions.default_homepage'" class="tooltip-hover" :title="$t('tooltips.default_homepage')" />
         <select id="ddlDefaultHomepage" v-model="defaultHomepage" class="select w-auto" @change="onChange($event)">
             <option v-t="'titles.trending'" value="trending" />
             <option v-t="'titles.feed'" value="feed" />
@@ -30,7 +30,7 @@
 
     <h2 v-t="'titles.player'" class="text-center" />
     <label class="pref" for="chkAutoPlayVideo">
-        <strong v-t="'actions.autoplay_video'" />
+        <strong v-t="'actions.autoplay_video'" class="tooltip-hover" :title="$t('tooltips.autoplay_video')" />
         <input
             id="chkAutoPlayVideo"
             v-model="autoPlayVideo"
@@ -40,7 +40,11 @@
         />
     </label>
     <label class="pref" for="chkAutoDisplayCaptions">
-        <strong v-t="'actions.auto_display_captions'" />
+        <strong
+            v-t="'actions.auto_display_captions'"
+            class="tooltip-hover"
+            :title="$t('tooltips.auto_display_captions')"
+        />
         <input
             id="chkAutoDisplayCaptions"
             v-model="autoDisplayCaptions"
@@ -50,7 +54,11 @@
         />
     </label>
     <label class="pref" for="chkAutoPlayNextCountdown">
-        <strong v-t="'actions.autoplay_next_countdown'" />
+        <strong
+            v-t="'actions.autoplay_next_countdown'"
+            class="tooltip-hover"
+            :title="$t('tooltips.autoplay_next_countdown')"
+        />
         <input
             id="chkAutoPlayNextCountdown"
             v-model="autoPlayNextCountdown"
@@ -60,22 +68,22 @@
         />
     </label>
     <label class="pref" for="chkAudioOnly">
-        <strong v-t="'actions.audio_only'" />
+        <strong v-t="'actions.audio_only'" class="tooltip-hover" :title="$t('tooltips.audio_only')" />
         <input id="chkAudioOnly" v-model="listen" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
     <label class="pref" for="chkPreferHls">
-        <strong v-t="'actions.prefer_hls'" />
+        <strong v-t="'actions.prefer_hls'" class="tooltip-hover" :title="$t('tooltips.prefer_hls')" />
         <input id="chkPreferHls" v-model="preferHls" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
     <label class="pref" for="ddlDefaultQuality">
-        <strong v-t="'actions.default_quality'" />
+        <strong v-t="'actions.default_quality'" class="tooltip-hover" :title="$t('tooltips.default_quality')" />
         <select id="ddlDefaultQuality" v-model="defaultQuality" class="select w-auto" @change="onChange($event)">
             <option v-t="'actions.auto'" value="0" />
             <option v-for="resolution in resolutions" :key="resolution" :value="resolution" v-text="`${resolution}p`" />
         </select>
     </label>
     <label class="pref" for="txtBufferingGoal">
-        <strong v-t="'actions.buffering_goal'" />
+        <strong v-t="'actions.buffering_goal'" class="tooltip-hover" :title="$t('tooltips.buffering_goal')" />
         <input
             id="txtBufferingGoal"
             v-model="bufferingGoal"
@@ -85,7 +93,11 @@
         />
     </label>
     <label class="pref" for="chkMinimizeComments">
-        <strong v-t="'actions.minimize_comments_default'" />
+        <strong
+            v-t="'actions.minimize_comments_default'"
+            class="tooltip-hover"
+            :title="$t('tooltips.minimize_comments_default')"
+        />
         <input
             id="chkMinimizeComments"
             v-model="minimizeComments"
@@ -95,7 +107,11 @@
         />
     </label>
     <label class="pref" for="chkMinimizeDescription">
-        <strong v-t="'actions.minimize_description_default'" />
+        <strong
+            v-t="'actions.minimize_description_default'"
+            class="tooltip-hover"
+            :title="$t('tooltips.minimize_description_default')"
+        />
         <input
             id="chkMinimizeDescription"
             v-model="minimizeDescription"
@@ -105,7 +121,11 @@
         />
     </label>
     <label class="pref" for="chkMinimizeRecommendations">
-        <strong v-t="'actions.minimize_recommendations_default'" />
+        <strong
+            v-t="'actions.minimize_recommendations_default'"
+            class="tooltip-hover"
+            :title="$t('tooltips.minimize_recommendations_default')"
+        />
         <input
             id="chkMinimizeRecommendations"
             v-model="minimizeRecommendations"
@@ -115,7 +135,11 @@
         />
     </label>
     <label class="pref" for="chkMinimizeChapters">
-        <strong v-t="'actions.minimize_chapters_default'" />
+        <strong
+            v-t="'actions.minimize_chapters_default'"
+            class="tooltip-hover"
+            :title="$t('tooltips.minimize_chapters_default')"
+        />
         <input
             id="chkMinimizeChapters"
             v-model="minimizeChapters"
@@ -126,7 +150,11 @@
     </label>
     <!-- chapters layout on mobile -->
     <label class="pref lg:invisible" for="chkMinimizeChapters">
-        <strong v-t="'actions.chapters_layout_mobile'" />
+        <strong
+            v-t="'actions.chapters_layout_mobile'"
+            class="tooltip-hover"
+            :title="$t('tooltips.chapters_layout_mobile')"
+        />
 
         <select id="ddlDefaultHomepage" v-model="mobileChapterLayout" class="select w-auto" @change="onChange($event)">
             <option v-t="'video.chapters_horizontal'" value="Horizontal" />
@@ -134,7 +162,11 @@
         </select>
     </label>
     <label class="pref" for="chkShowWatchOnYouTube">
-        <strong v-t="'actions.show_watch_on_youtube'" />
+        <strong
+            v-t="'actions.show_watch_on_youtube'"
+            class="tooltip-hover"
+            :title="$t('tooltips.show_watch_on_youtube')"
+        />
         <input
             id="chkShowWatchOnYouTube"
             v-model="showWatchOnYouTube"
@@ -144,7 +176,11 @@
         />
     </label>
     <label class="pref" for="chkShowSearchSuggestions">
-        <strong v-t="'actions.show_search_suggestions'" />
+        <strong
+            v-t="'actions.show_search_suggestions'"
+            class="tooltip-hover"
+            :title="$t('tooltips.show_search_suggestions')"
+        />
         <input
             id="chkShowSearchSuggestions"
             v-model="searchSuggestions"
@@ -154,7 +190,11 @@
         />
     </label>
     <label class="pref" for="chkStoreSearchHistory">
-        <strong v-t="'actions.store_search_history'" />
+        <strong
+            v-t="'actions.store_search_history'"
+            class="tooltip-hover"
+            :title="$t('tooltips.store_search_history')"
+        />
         <input
             id="chkStoreSearchHistory"
             v-model="searchHistory"
@@ -164,7 +204,7 @@
         />
     </label>
     <label class="pref" for="chkStoreWatchHistory">
-        <strong v-t="'actions.store_watch_history'" />
+        <strong v-t="'actions.store_watch_history'" class="tooltip-hover" :title="$t('tooltips.store_watch_history')" />
         <input
             id="chkStoreWatchHistory"
             v-model="watchHistory"
@@ -174,11 +214,11 @@
         />
     </label>
     <label v-if="watchHistory" class="pref" for="chkHideWatched">
-        <strong v-t="'actions.hide_watched'" />
+        <strong v-t="'actions.hide_watched'" class="tooltip-hover" :title="$t('tooltips.hide_watched')" />
         <input id="chkHideWatched" v-model="hideWatched" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
     <label class="pref" for="ddlEnabledCodecs">
-        <strong v-t="'actions.enabled_codecs'" />
+        <strong v-t="'actions.enabled_codecs'" class="tooltip-hover" :title="$t('tooltips.enabled_codecs')" />
         <select
             id="ddlEnabledCodecs"
             v-model="enabledCodecs"
@@ -192,11 +232,11 @@
         </select>
     </label>
     <label class="pref" for="chkDisableLBRY">
-        <strong v-t="'actions.disable_lbry'" />
+        <strong v-t="'actions.disable_lbry'" class="tooltip-hover" :title="$t('tooltips.disable_lbry')" />
         <input id="chkDisableLBRY" v-model="disableLBRY" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
     <label class="pref" for="chkEnableLBRYProxy">
-        <strong v-t="'actions.enable_lbry_proxy'" />
+        <strong v-t="'actions.enable_lbry_proxy'" class="tooltip-hover" :title="$t('tooltips.enable_lbry_proxy')" />
         <input
             id="chkEnableLBRYProxy"
             v-model="proxyLBRY"
@@ -206,7 +246,11 @@
         />
     </label>
     <label class="pref" for="txtPrefetchLimit">
-        <strong v-t="'actions.concurrent_prefetch_limit'" />
+        <strong
+            v-t="'actions.concurrent_prefetch_limit'"
+            class="tooltip-hover"
+            :title="$t('tooltips.concurrent_prefetch_limit')"
+        />
         <input
             id="txtPrefetchLimit"
             v-model="prefetchLimit"
@@ -221,7 +265,7 @@
         <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
     </p>
     <label class="pref" for="chkEnableSponsorblock">
-        <strong v-t="'actions.enable_sponsorblock'" />
+        <strong v-t="'actions.enable_sponsorblock'" class="tooltip-hover" :title="$t('tooltips.enable_sponsorblock')" />
         <input
             id="chkEnableSponsorblock"
             v-model="sponsorBlock"
@@ -232,7 +276,7 @@
     </label>
     <div v-if="sponsorBlock">
         <label v-for="[name, item] in skipOptions" :key="name" class="pref" :for="'ddlSkip_' + name">
-            <strong v-t="item.label" />
+            <strong v-t="item.label" class="tooltip-hover" :title="getTooltipByActionLabel(item.label)" />
             <select :id="'ddlSkip_' + name" v-model="item.value" class="select w-auto" @change="onChange($event)">
                 <option v-t="'actions.no'" value="no" />
                 <option v-t="'actions.skip_button_only'" value="button" />
@@ -240,7 +284,7 @@
             </select>
         </label>
         <label class="pref" for="chkShowMarkers">
-            <strong v-t="'actions.show_markers'" />
+            <strong v-t="'actions.show_markers'" class="tooltip-hover" :title="$t('tooltips.show_markers')" />
             <input
                 id="chkShowMarkers"
                 v-model="showMarkers"
@@ -250,7 +294,11 @@
             />
         </label>
         <label class="pref" for="txtMinSegmentLength">
-            <strong v-t="'actions.min_segment_length'" />
+            <strong
+                v-t="'actions.min_segment_length'"
+                class="tooltip-hover"
+                :title="$t('tooltips.min_segment_length')"
+            />
             <input
                 id="txtMinSegmentLength"
                 v-model="minSegmentLength"
@@ -266,7 +314,7 @@
         <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
     </p>
     <label class="pref" for="chkDeArrow">
-        <strong v-t="'actions.enable_dearrow'" />
+        <strong v-t="'actions.enable_dearrow'" class="tooltip-hover" :title="$t('tooltips.enable_dearrow')" />
         <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
 
@@ -274,7 +322,7 @@
     <div v-if="authenticated">
         <h2 v-t="'titles.account'" class="text-center"></h2>
         <label class="pref" for="txtDeleteAccountPassword">
-            <strong v-t="'actions.delete_account'" />
+            <strong v-t="'actions.delete_account'" class="tooltip-hover" :title="$t('tooltips.delete_account')" />
             <div class="flex items-center">
                 <input
                     id="txtDeleteAccountPassword"
@@ -523,6 +571,18 @@ export default {
                 window.location.reload();
             });
         },
+        getTooltipByActionLabel(label) {
+            // Extract the action key from the label (removing 'actions.' prefix)
+            const actionKey = label.replace("actions.", "");
+            // Try to get the specific tooltip for the action
+            const specificTooltip = this.$t("tooltips." + actionKey);
+            // If the specific tooltip exists and is different from the key, return it
+            if (specificTooltip && specificTooltip !== actionKey) {
+                return specificTooltip;
+            }
+            // Fallback to the action label itself if no specific tooltip exists
+            return this.$t(label);
+        },
     },
 };
 </script>
@@ -536,5 +596,22 @@ export default {
 }
 .dark .pref:nth-child(odd) {
     @apply bg-dark-800;
+}
+
+.tooltip-hover {
+    @apply relative inline-block border-b border-dotted border-current cursor-help align-middle;
+}
+
+.tooltip-hover:hover::after {
+    @apply absolute bottom-full left-1/2 z-50 px-4 py-1.5 text-sm font-normal text-white bg-[#333] rounded shadow-lg -translate-x-1/2 mb-2 min-w-[200px] max-w-[350px] text-center break-words border border-gray-500;
+    content: attr(title);
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Tooltip indicator */
+.tooltip-hover:hover::before {
+    @apply absolute bottom-full left-1/2 z-50 w-0 h-0 border-4 border-transparent -translate-x-1/2 border-t-[#333] mb-1;
+    content: "";
 }
 </style>

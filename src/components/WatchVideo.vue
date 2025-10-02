@@ -277,7 +277,7 @@
                     <hr class="" />
                 </div>
 
-                <div class="flex flex-col">
+                <div v-if="commentsEnabled" class="flex flex-col">
                     <div class="">
                         <button
                             v-if="!comments?.disabled"
@@ -305,6 +305,7 @@
                             :uploader="video.uploader"
                             :uploader-avatar-url="video.uploaderAvatar"
                             :video-id="getVideoId()"
+                            :comments-disabled="!commentsEnabled"
                         />
                     </div>
                 </div>
@@ -361,6 +362,9 @@ import ToastComponent from "./ToastComponent.vue";
 import { parseTimeParam } from "@/utils/Misc";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
 
+// Import Jalali moment for date conversion
+import moment from "jalali-moment";
+
 export default {
     name: "App",
     components: {
@@ -410,6 +414,10 @@ export default {
         isListening(_this) {
             return _this.getPreferenceBoolean("listen", false);
         },
+        commentsEnabled() {
+            // Check if comments are disabled via environment variable
+            return !import.meta.env.VITE_DISABLE_COMMENTS || import.meta.env.VITE_DISABLE_COMMENTS === "false";
+        },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
             url.searchParams.set("listen", _this.isListening ? "0" : "1");
@@ -420,11 +428,22 @@ export default {
             return String(_this.$route.path).indexOf("/embed/") == 0;
         },
         uploadDate(_this) {
-            return new Date(_this.video.uploadDate).toLocaleString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            });
+            if (!_this.video) return "";
+
+            const date = new Date(_this.video.uploadDate);
+
+            // Check if we should use Jalali calendar based on environment variable
+            if (import.meta.env.VITE_CALENDAR_TYPE === "jalali") {
+                // Convert Gregorian date to Jalali
+                return moment(date).locale("fa").format("jYYYY/jMM/jDD");
+            } else {
+                // Use Gregorian calendar (default)
+                return date.toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                });
+            }
         },
         defaultCounter(_this) {
             return _this.getPreferenceNumber("autoPlayNextCountdown", 5);
@@ -478,7 +497,7 @@ export default {
         this.index = Number(this.$route.query.index);
         this.getPlaylistData();
         this.getSponsors();
-        if (!this.isEmbed && this.showComments) this.getComments();
+        if (!this.isEmbed && this.showComments && this.commentsEnabled) this.getComments();
         if (this.isEmbed) document.querySelector("html").style.overflow = "hidden";
         window.addEventListener("click", this.handleClick);
         window.addEventListener("resize", () => {
@@ -546,12 +565,17 @@ export default {
             return sponsors;
         },
         toggleComments() {
+            if (!this.commentsEnabled) return; // Don't allow toggling if comments are disabled
             this.showComments = !this.showComments;
             if (this.showComments && this.comments === null) {
                 this.fetchComments();
             }
         },
         fetchComments() {
+            if (!this.commentsEnabled) {
+                // Return a disabled state instead of making API call
+                return Promise.resolve({ disabled: true, comments: [] });
+            }
             return this.fetchJson(this.apiUrl() + "/comments/" + this.getVideoId());
         },
         onChange() {
@@ -618,6 +642,11 @@ export default {
                 this.fetchSponsors().then(data => (this.sponsors = data));
         },
         async getComments() {
+            if (!this.commentsEnabled) {
+                // If comments are disabled, set comments to disabled state
+                this.comments = { disabled: true, comments: [] };
+                return;
+            }
             this.comments = await this.fetchComments();
         },
         async fetchSubscribedStatus() {
@@ -660,7 +689,7 @@ export default {
             return false;
         },
         handleScroll() {
-            if (this.loading || !this.comments || !this.comments.nextpage) return;
+            if (this.loading || !this.commentsEnabled || !this.comments || !this.comments.nextpage) return;
             if (window.innerHeight + window.scrollY >= this.$refs.comments?.offsetHeight - window.innerHeight) {
                 this.loading = true;
                 this.fetchJson(this.apiUrl() + "/nextpage/comments/" + this.getVideoId(), {

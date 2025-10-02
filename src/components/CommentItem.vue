@@ -41,7 +41,7 @@
                     :title="$t('actions.creator_replied')"
                 />
             </div>
-            <template v-if="comment.repliesPage && (!loadingReplies || !showingReplies)">
+            <template v-if="comment.repliesPage && (!loadingReplies || !showingReplies) && !commentsDisabled">
                 <div class="cursor-pointer" @click="loadReplies">
                     <a v-text="`${$t('actions.reply_count', comment.replyCount)}`" />
                     <i class="i-fa6-solid:level-down-alt mr-1.5" />
@@ -56,7 +56,12 @@
             <div v-show="showingReplies" v-if="replies" class="replies">
                 <div v-for="reply in replies" :key="reply.commentId" class="w-full">
                     <!-- eslint-disable-next-line vue/no-undef-components -->
-                    <CommentItem :comment="reply" :uploader="uploader" :video-id="videoId" />
+                    <CommentItem
+                        :comment="reply"
+                        :uploader="uploader"
+                        :video-id="videoId"
+                        :comments-disabled="commentsDisabled"
+                    />
                 </div>
                 <div v-if="nextpage" class="cursor-pointer" @click="loadReplies">
                     <a v-t="'actions.load_more_replies'" />
@@ -82,6 +87,7 @@ export default {
         uploader: { type: String, default: null },
         uploaderAvatarUrl: { type: String, default: null },
         videoId: { type: String, default: null },
+        commentsDisabled: { type: Boolean, default: false },
     },
     data() {
         return {
@@ -99,6 +105,12 @@ export default {
             }
             this.loadingReplies = true;
             this.showingReplies = true;
+            // Check if comments are globally disabled via a prop passed from parent
+            if (this.commentsDisabled) {
+                this.replies = [];
+                this.nextpage = null;
+                return;
+            }
             this.fetchJson(this.apiUrl() + "/nextpage/comments/" + this.videoId, {
                 nextpage: this.nextpage || this.comment.repliesPage,
             }).then(json => {
