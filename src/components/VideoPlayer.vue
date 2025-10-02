@@ -73,7 +73,7 @@
                 :placeholder="$t('actions.playback_speed')"
                 @keyup.enter="setSpeedFromInput()"
             />
-            <button v-t="'actions.okay'" class="btn ml-auto w-min" @click="setSpeedFromInput()" />
+            <button v-t="'actions.okay'" class="btn mr-auto w-min" @click="setSpeedFromInput()" />
         </div>
     </ModalComponent>
 </template>

@@ -11,7 +11,7 @@
         <router-link v-if="props.item.uploaderUrl" class="link-secondary text-sm" :to="props.item.uploaderUrl">
             <p>
                 <span v-text="props.item.uploaderName" />
-                <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
+                <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
         <a v-else-if="props.item.uploaderName" class="link" v-text="props.item.uploaderName" />

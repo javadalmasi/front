@@ -7,8 +7,8 @@
                     src="/img/icons/logo.svg"
                     height="32"
                     width="32"
-                    class="mr-[-0.6rem] w-10"
-                />iped</router-link
+                    class="mr-[-0.6rem] w-10 bold"
+                />ویدیو</router-link
             >
         </div>
         <div class="search-container lt-md:hidden">
@@ -37,7 +37,7 @@
             <span class="line"></span>
         </button>
         <!-- navigation bar for large screen devices -->
-        <ul class="md:text-1xl hidden list-none md:(flex flex flex-1 justify-end children:pl-3)">
+        <ul class="md:text-1xl hidden list-none md:(flex flex flex-1 justify-end children:pr-3)">
             <li v-if="shouldShowTrending">
                 <router-link v-t="'titles.trending'" to="/trending" class="nav-link" />
             </li>

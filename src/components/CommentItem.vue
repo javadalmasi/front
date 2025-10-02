@@ -9,7 +9,7 @@
             alt="Avatar"
         />
 
-        <div class="comment-content pl-2">
+        <div class="comment-content pr-2">
             <div class="comment-header">
                 <div v-if="comment.pinned" class="comment-pinned">
                     <i class="i-fa6-solid:thumbtack" />
@@ -18,13 +18,13 @@
                             path: 'comment.pinned_by',
                             args: { author: uploader },
                         }"
-                        class="ml-1.5"
+                        class="mr-1.5"
                     />
                 </div>
 
                 <div class="comment-author">
                     <router-link class="link font-bold" :to="comment.commentorUrl">{{ comment.author }}</router-link>
-                    <i v-if="comment.verified" class="i-fa6-solid:check ml-1.5" />
+                    <i v-if="comment.verified" class="i-fa6-solid:check mr-1.5" />
                 </div>
                 <div class="comment-meta mb-1.5 text-sm" v-text="comment.commentedTime" />
             </div>
@@ -44,13 +44,13 @@
             <template v-if="comment.repliesPage && (!loadingReplies || !showingReplies)">
                 <div class="cursor-pointer" @click="loadReplies">
                     <a v-text="`${$t('actions.reply_count', comment.replyCount)}`" />
-                    <i class="i-fa6-solid:level-down-alt ml-1.5" />
+                    <i class="i-fa6-solid:level-down-alt mr-1.5" />
                 </div>
             </template>
             <template v-if="showingReplies">
                 <div class="cursor-pointer" @click="hideReplies">
                     <a v-t="'actions.hide_replies'" />
-                    <i class="i-fa6-solid:level-up-alt ml-1.5" />
+                    <i class="i-fa6-solid:level-up-alt mr-1.5" />
                 </div>
             </template>
             <div v-show="showingReplies" v-if="replies" class="replies">
@@ -60,7 +60,7 @@
                 </div>
                 <div v-if="nextpage" class="cursor-pointer" @click="loadReplies">
                     <a v-t="'actions.load_more_replies'" />
-                    <i class="i-fa6-solid:level-down-alt ml-1.5" />
+                    <i class="i-fa6-solid:level-down-alt mr-1.5" />
                 </div>
             </div>
         </div>

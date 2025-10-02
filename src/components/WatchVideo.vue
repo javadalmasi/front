@@ -36,7 +36,7 @@
                             </keep-alive>
                             <button
                                 v-if="!isMobile"
-                                :class="theaterMode ? '-ml-5' : '-mr-5'"
+                                :class="theaterMode ? '-mr-5' : '-mr-5'"
                                 class="z-10"
                                 @click="
                                     theaterMode = !theaterMode;
@@ -79,12 +79,12 @@
                             <template v-if="video.likes >= 0">
                                 <div class="flex items-center">
                                     <div class="i-fa6-solid:thumbs-up" />
-                                    <strong class="ml-1" v-text="addCommas(video.likes)" />
+                                    <strong class="mr-1" v-text="addCommas(video.likes)" />
                                 </div>
                                 <div class="flex items-center">
                                     <div class="i-fa6-solid:thumbs-down" />
                                     <strong
-                                        class="ml-1"
+                                        class="mr-1"
                                         v-text="video.dislikes >= 0 ? addCommas(video.dislikes) : '?'"
                                     />
                                 </div>
@@ -108,11 +108,11 @@
                                 alt=""
                                 class="rounded-full"
                             />
-                            <router-link v-if="video.uploaderUrl" class="link ml-1.5" :to="video.uploaderUrl">{{
+                            <router-link v-if="video.uploaderUrl" class="link mr-1.5" :to="video.uploaderUrl">{{
                                 video.uploader
                             }}</router-link>
                             <!-- Verified Badge -->
-                            <i v-if="video.uploaderVerified" class="i-fa6-solid:check ml-1" />
+                            <i v-if="video.uploaderVerified" class="i-fa6-solid:check mr-1" />
                         </div>
                         <PlaylistAddModal
                             v-if="showModal"
@@ -128,13 +128,13 @@
                             :playlist-index="index"
                             @close="showShareModal = !showShareModal"
                         />
-                        <div class="ml-auto flex flex-wrap gap-1">
+                        <div class="mr-auto flex flex-wrap gap-1">
                             <!-- Subscribe Button -->
                             <button class="btn flex items-center gap-1 <md:hidden" @click="downloadCurrentFrame">
                                 {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
                             </button>
                             <button class="btn flex items-center" @click="showModal = !showModal">
-                                {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus ml-1" />
+                                {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
                             </button>
                             <button
                                 class="btn"
@@ -207,9 +207,9 @@
                         @click="showDesc = !showDesc"
                     />
 
-                    <span v-show="video?.chapters?.length > 0" class="btn ml-2">
+                    <span v-show="video?.chapters?.length > 0" class="btn mr-2">
                         <input id="showChapters" v-model="showChapters" type="checkbox" />
-                        <label v-t="'actions.show_chapters'" class="ml-2" for="showChapters" />
+                        <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
                     </span>
 
                     <template v-if="showDesc">
@@ -243,13 +243,13 @@
                 <input
                     id="chkAutoLoop"
                     v-model="selectedAutoLoop"
-                    class="ml-1.5"
+                    class="mr-1.5"
                     type="checkbox"
                     @change="onChange($event)"
                 />
                 <br />
                 <label for="chkAutoPlay"><strong v-text="`${$t('actions.auto_play_next_video')}:`" /></label>
-                <select id="chkAutoPlay" v-model="selectedAutoPlay" class="select ml-1.5" @change="onChange($event)">
+                <select id="chkAutoPlay" v-model="selectedAutoPlay" class="select mr-1.5" @change="onChange($event)">
                     <option v-t="'actions.never'" value="0" />
                     <option v-t="'actions.playlists_only'" value="1" />
                     <option v-t="'actions.always'" value="2" />

@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
         <button @click="$router.go(-1) || $router.push('/')">
-            <i class="i-fa6-solid:chevron-left" /><span v-t="'actions.back'" class="ml-1.5" />
+            <i class="i-fa6-solid:chevron-left" /><span v-t="'actions.back'" class="mr-1.5" />
         </button>
     </div>
     <h1 v-t="'titles.preferences'" class="text-center font-bold" />
@@ -270,53 +270,6 @@
         <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
 
-    <h2 v-t="'titles.instance'" class="text-center" />
-    <p v-t="'actions.instances_not_shown'" class="text-center" />
-    <label class="pref" for="ddlInstanceSelection">
-        <strong v-text="`${$t('actions.instance_selection')}:`" />
-        <select id="ddlInstanceSelection" v-model="selectedInstance" class="select w-auto" @change="onChange($event)">
-            <option
-                v-for="instance in instances"
-                :key="instance.name"
-                :value="instance.api_url"
-                v-text="instance.name"
-            />
-        </select>
-    </label>
-    <label class="pref" for="chkAuthInstance">
-        <strong v-text="`${$t('actions.different_auth_instance')}:`" />
-        <input
-            id="chkAuthInstance"
-            v-model="authInstance"
-            class="checkbox"
-            type="checkbox"
-            @change="onChange($event)"
-        />
-    </label>
-    <template v-if="authInstance">
-        <label class="pref" for="ddlAuthInstanceSelection">
-            <strong v-text="`${$t('actions.instance_auth_selection')}:`" />
-            <select
-                id="ddlAuthInstanceSelection"
-                v-model="selectedAuthInstance"
-                class="select w-auto"
-                @change="onChange($event)"
-            >
-                <option
-                    v-for="instance in instances"
-                    :key="instance.name"
-                    :value="instance.api_url"
-                    v-text="instance.name"
-                />
-            </select>
-        </label>
-    </template>
-    <div class="pref">
-        <span v-t="'titles.custom_instances'" class="w-max" />
-        <button v-t="'actions.customize'" class="btn" @click="showCustomInstancesModal = true" />
-    </div>
-    <br />
-
     <!-- options that are visible only when logged in -->
     <div v-if="authenticated">
         <h2 v-t="'titles.account'" class="text-center"></h2>
@@ -347,35 +300,6 @@
         </div>
         <br />
     </div>
-    <h2 id="instancesList" v-t="'actions.instances_list'" />
-    <table class="table">
-        <thead>
-            <tr>
-                <th v-t="'preferences.instance_name'" />
-                <th v-t="'preferences.instance_locations'" />
-                <th v-t="'preferences.has_cdn'" />
-                <th v-t="'preferences.registered_users'" />
-                <th v-t="'preferences.version'" class="lt-md:hidden" />
-                <th v-t="'preferences.up_to_date'" />
-                <th v-t="'preferences.uptime_30d'" />
-                <th v-t="'preferences.ssl_score'" />
-            </tr>
-        </thead>
-        <tbody v-for="instance in publicInstances" :key="instance.name">
-            <tr>
-                <td v-text="instance.name" />
-                <td v-text="instance.locations" />
-                <td v-text="`${instance.cdn ? '&#9989;' : '&#10060;'}`" />
-                <td v-text="instance.registered" />
-                <td class="lt-md:hidden" v-text="instance.version" />
-                <td v-text="`${instance.up_to_date ? '&#9989;' : '&#10060;'}`" />
-                <td v-text="`${Number.parseFloat(instance.uptime_30d.toFixed(2))}%`" />
-                <td>
-                    <a v-t="'actions.view_ssl_score'" :href="sslScore(instance.api_url)" target="_blank" />
-                </td>
-            </tr>
-        </tbody>
-    </table>
     <br />
     <p v-t="'info.preferences_note'" />
     <br />
@@ -389,32 +313,18 @@
         @close="showConfirmResetPrefsDialog = false"
         @confirm="resetPreferences()"
     />
-    <CustomInstanceModal
-        v-if="showCustomInstancesModal"
-        @close="
-            showCustomInstancesModal = false;
-            fetchInstances();
-        "
-    />
 </template>
 
 <script>
 import CountryMap from "@/utils/CountryMaps/en.json";
 import ConfirmModal from "./ConfirmModal.vue";
-import CustomInstanceModal from "./CustomInstanceModal.vue";
 export default {
     components: {
         ConfirmModal,
-        CustomInstanceModal,
     },
     data() {
         return {
             mobileChapterLayout: "Vertical",
-            selectedInstance: null,
-            authInstance: false,
-            selectedAuthInstance: null,
-            customInstances: [],
-            publicInstances: [],
             sponsorBlock: true,
             skipOptions: new Map([
                 ["sponsor", { value: "auto", label: "actions.skip_sponsors" }],
@@ -457,13 +367,10 @@ export default {
             prefetchLimit: 2,
             password: null,
             showConfirmResetPrefsDialog: false,
-            showCustomInstancesModal: false,
         };
     },
     computed: {
-        instances() {
-            return [...this.publicInstances, ...this.customInstances];
-        },
+        // instances are removed as we're using a fixed custom instance
     },
     activated() {
         document.title = this.$t("titles.preferences") + " - Piped";
@@ -471,13 +378,7 @@ export default {
     async mounted() {
         if (Object.keys(this.$route.query).length > 0) this.$router.replace({ query: {} });
 
-        this.fetchInstances();
-
         if (this.testLocalStorage) {
-            this.selectedInstance = this.getPreferenceString("instance", import.meta.env.VITE_PIPED_API);
-            this.authInstance = this.getPreferenceBoolean("authInstance", false);
-            this.selectedAuthInstance = this.getPreferenceString("auth_instance_url", this.selectedInstance);
-
             this.sponsorBlock = this.getPreferenceBoolean("sponsorblock", true);
             var skipOptions, skipList;
             if ((skipOptions = this.getPreferenceJSON("skipOptions")) !== undefined) {
@@ -543,9 +444,6 @@ export default {
                 )
                     shouldReload = true;
 
-                localStorage.setItem("instance", this.selectedInstance);
-                localStorage.setItem("authInstance", this.authInstance);
-                localStorage.setItem("auth_instance_url", this.selectedAuthInstance);
                 localStorage.setItem("sponsorblock", this.sponsorBlock);
 
                 var skipOptions = {};
@@ -585,39 +483,6 @@ export default {
 
                 if (shouldReload) window.location.reload();
             }
-        },
-        async fetchInstances() {
-            this.customInstances = this.getCustomInstances();
-
-            this.fetchJson(import.meta.env.VITE_PIPED_INSTANCES).then(resp => {
-                this.publicInstances = resp;
-                if (!this.publicInstances.some(instance => instance.api_url == this.apiUrl()))
-                    this.publicInstances.push({
-                        name: "Selected Instance",
-                        api_url: this.apiUrl(),
-                        locations: "Unknown",
-                        cdn: false,
-                        uptime_30d: 100,
-                    });
-            });
-        },
-        sslScore(url) {
-            return "https://www.ssllabs.com/ssltest/analyze.html?d=" + new URL(url).host + "&latest";
-        },
-        async deleteAccount() {
-            this.fetchJson(this.authApiUrl() + "/user/delete", null, {
-                method: "POST",
-                headers: {
-                    Authorization: this.getAuthToken(),
-                },
-                body: JSON.stringify({
-                    password: this.password,
-                }),
-            }).then(resp => {
-                if (!resp.error) {
-                    this.logout();
-                } else alert(resp.error);
-            });
         },
         logout() {
             // reset the auth token

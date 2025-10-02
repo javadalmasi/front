@@ -118,12 +118,12 @@ const mixin = {
             } else return defaultVal;
         },
         apiUrl() {
-            return this.getPreferenceString("instance", import.meta.env.VITE_PIPED_API);
+            // Fixed to always use the custom instance
+            return import.meta.env.VITE_PIPED_API;
         },
         authApiUrl() {
-            if (this.getPreferenceBoolean("authInstance", false)) {
-                return this.getPreferenceString("auth_instance_url", this.apiUrl());
-            } else return this.apiUrl();
+            // Fixed to always use the custom instance for authentication
+            return import.meta.env.VITE_PIPED_API;
         },
         getAuthToken() {
             return this.getPreferenceString("authToken" + this.hashCode(this.authApiUrl()));

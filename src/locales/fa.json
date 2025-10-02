@@ -1,7 +1,7 @@
 {
     "actions": {
         "enabled_codecs": "کدک‌های فعال (چندتا)",
-        "instances_list": "لیست نمونه‌ها",
+        "instances_list": "لیست نمونه‌ها (غیرفعال)",
         "language_selection": "انتخاب زبان",
         "store_watch_history": "ذخیره سابقه تماشا",
         "minimize_description_default": "بستن توضیحات به صورت پیش فرض",
@@ -29,7 +29,7 @@
         "minimize_recommendations": "بستن توصیه ها",
         "show_recommendations": "نمایش توصیه ها",
         "uses_api_from": "با استفاده از APIای از ",
-        "instance_selection": "انتخاب سرویس دهنده",
+        "instance_selection": "انتخاب سرویس دهنده (غیرفعال)",
         "show_more": "نمایش بیشتر",
         "yes": "بله",
         "no": "خیر",
@@ -126,7 +126,7 @@
         "no_valid_playlists": "داخل فایل فهرست‌پخش معتبری وجود ندارد!",
         "clone_playlist": "تکثیر فهرست‌پخش",
         "playlist_bookmarked": "نشان‌دار شد",
-        "instances_not_shown": "سرویس‌دهنده‌های عمومی که این جا نشان داده نشده‌اند در حال حاضر در دسترس نیستند.",
+        "instances_not_shown": "این نسخه از Piped تنها با نمونه شخصی ما کار می‌کند و امکان انتخاب نمونه دیگر وجود ندارد.",
         "bookmark_playlist": "نشان‌دار",
         "concurrent_prefetch_limit": "محدودیت پیش‌دریافت همزمان استریم",
         "creator_replied": "سازنده پاسخ داد",
@@ -168,7 +168,7 @@
         "channel_groups": "گروه‌های کانال",
         "dearrow": "DeArrow",
         "albums": "آلبوم ها",
-        "custom_instances": "نمونه های درخواستی"
+        "custom_instances": "نمونه های درخواستی (غیرفعال)"
     },
     "player": {
         "watch_on": "تماشا روی {0}",

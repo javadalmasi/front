@@ -3,7 +3,7 @@
         <h2 v-t="'actions.create_group'" />
         <div class="flex flex-col">
             <input v-model="groupName" class="input my-4" type="text" :placeholder="$t('actions.group_name')" />
-            <button v-t="'actions.create_group'" class="btn ml-auto w-max" @click="createGroup()" />
+            <button v-t="'actions.create_group'" class="btn mr-auto w-max" @click="createGroup()" />
         </div>
     </ModalComponent>
 </template>

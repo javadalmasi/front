@@ -13,10 +13,10 @@
             <SortingSelector by-key="watchedAt" @apply="order => videos.sort(order)" />
         </div>
 
-        <div class="ml-4 flex items-center">
+        <div class="mr-4 flex items-center">
             <input id="autoDelete" v-model="autoDeleteHistory" type="checkbox" @change="onChange" />
-            <label v-t="'actions.delete_automatically'" class="ml-2" for="autoDelete" />
-            <select v-model="autoDeleteDelayHours" class="select ml-3 pl-3" @change="onChange">
+            <label v-t="'actions.delete_automatically'" class="mr-2" for="autoDelete" />
+            <select v-model="autoDeleteDelayHours" class="select mr-3 pr-3" @change="onChange">
                 <option v-t="{ path: 'info.hours', args: { amount: '1' } }" value="1" />
                 <option v-t="{ path: 'info.hours', args: { amount: '3' } }" value="3" />
                 <option v-t="{ path: 'info.hours', args: { amount: '6' } }" value="6" />

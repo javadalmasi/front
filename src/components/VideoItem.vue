@@ -44,21 +44,21 @@
                     :title="item.uploaderName"
                 >
                     <span v-text="item.uploaderName" />
-                    <i v-if="item.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
+                    <i v-if="item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
                 </router-link>
 
                 <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
                     <span v-if="item.views >= 0">
                         <i class="i-fa6-solid:eye" />
-                        <span class="pl-1" v-text="`${numberFormat(item.views)} •`" />
+                        <span class="pr-1" v-text="`${numberFormat(item.views)} •`" />
                     </span>
                     <span
                         v-if="item.uploaded > 0"
-                        class="pl-0.5"
+                        class="pr-0.5"
                         :title="new Date(item.uploaded).toLocaleString()"
                         v-text="timeAgo(item.uploaded)"
                     />
-                    <span v-else-if="item.uploadedDate" class="pl-0.5" v-text="item.uploadedDate" />
+                    <span v-else-if="item.uploadedDate" class="pr-0.5" v-text="item.uploadedDate" />
                 </div>
             </div>
 

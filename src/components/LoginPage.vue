@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center">
         <h1 v-t="'titles.login'" class="my-4 text-center font-bold" />
-        <i class="i-fa6-solid:circle-info ml-2 mt-6 cursor-pointer" :title="$t('info.login_note')" />
+        <i class="i-fa6-solid:circle-info mr-2 mt-6 cursor-pointer" :title="$t('info.login_note')" />
     </div>
     <hr />
     <div class="w-full flex items-center justify-center text-center">

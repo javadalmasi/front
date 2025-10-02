@@ -25,8 +25,8 @@
         <QrCode v-if="showQrCode" :text="generatedLink" />
         <div class="mt-4 flex justify-end">
             <button v-t="'actions.generate_qrcode'" class="btn" @click="showQrCode = !showQrCode" />
-            <button v-t="'actions.follow_link'" class="btn ml-3" @click="followLink()" />
-            <button v-t="'actions.copy_link'" class="btn ml-3" @click="copyLink()" />
+            <button v-t="'actions.follow_link'" class="btn mr-3" @click="followLink()" />
+            <button v-t="'actions.copy_link'" class="btn mr-3" @click="copyLink()" />
         </div>
     </ModalComponent>
 </template>

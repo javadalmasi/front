@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center">
         <h1 v-t="'titles.register'" class="my-4 text-center font-bold" />
-        <i class="i-fa6-solid:circle-info ml-2 mt-6 cursor-pointer" :title="$t('info.register_note')" />
+        <i class="i-fa6-solid:circle-info mr-2 mt-6 cursor-pointer" :title="$t('info.register_note')" />
     </div>
     <hr />
     <div class="flex flex-col items-center justify-center text-center">
@@ -27,7 +27,7 @@
                     :aria-label="$t('login.password')"
                     @keyup.enter="register"
                 />
-                <button type="button" class="btn ml-2" @click="showPassword = !showPassword">
+                <button type="button" class="btn mr-2" @click="showPassword = !showPassword">
                     <div class="i-fa6-solid:eye" />
                 </button>
             </div>
@@ -41,7 +41,7 @@
                     :aria-label="$t('login.password_confirm')"
                     @keyup.enter="register"
                 />
-                <button type="button" class="btn ml-2" @click="showConfirmPassword = !showConfirmPassword">
+                <button type="button" class="btn mr-2" @click="showConfirmPassword = !showConfirmPassword">
                     <div class="i-fa6-solid:eye" />
                 </button>
             </div>

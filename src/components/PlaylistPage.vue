@@ -2,7 +2,7 @@
     <ErrorHandler v-if="playlist && playlist.error" :message="playlist.message" :error="playlist.error" />
 
     <LoadingIndicatorPage v-show="!playlist?.error" :show-content="playlist">
-        <h1 class="mb-1 ml-1 mt-4 text-3xl!" v-text="playlist.name" />
+        <h1 class="mb-1 mr-1 mt-4 text-3xl!" v-text="playlist.name" />
 
         <CollapsableText v-if="playlist?.description" :text="playlist.description" />
 
@@ -21,10 +21,10 @@
                 />
                 <button v-if="!isPipedPlaylist" class="btn mx-1" @click="bookmarkPlaylist">
                     {{ $t(`actions.${isBookmarked ? "playlist_bookmarked" : "bookmark_playlist"}`)
-                    }}<i class="i-fa6-solid:bookmark ml-3" />
+                    }}<i class="i-fa6-solid:bookmark mr-3" />
                 </button>
                 <button v-if="authenticated && !isPipedPlaylist" class="btn mr-1" @click="clonePlaylist">
-                    {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone ml-3" />
+                    {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone mr-3" />
                 </button>
                 <button class="btn mr-1" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}

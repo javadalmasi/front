@@ -5,7 +5,7 @@
             <form>
                 <br />
                 <div>
-                    <input ref="fileSelector" class="btn mb-2 ml-2" type="file" @change="fileChange" />
+                    <input ref="fileSelector" class="btn mb-2 mr-2" type="file" @change="fileChange" />
                 </div>
                 <div>
                     <strong

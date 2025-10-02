@@ -39,7 +39,7 @@
                     <VideoThumbnail :item="related" :small="true" />
                 </div>
 
-                <div class="ml-2 flex flex-col">
+                <div class="mr-2 flex flex-col">
                     <span class="link" :title="related.title" v-text="related.title" />
                     <div class="flex-1">
                         <router-link
@@ -49,7 +49,7 @@
                             :title="related.uploaderName"
                         >
                             <span v-text="related.uploaderName" />
-                            <i v-if="related.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
+                            <i v-if="related.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
                         </router-link>
                     </div>
                 </div>

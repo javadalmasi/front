@@ -32,7 +32,7 @@
             </select>
         </span>
 
-        <span class="md:ml-auto">
+        <span class="md:mr-auto">
             <SortingSelector by-key="uploaded" @apply="order => videos.sort(order)" />
         </span>
     </div>

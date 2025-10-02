@@ -6,14 +6,14 @@
             </div>
             <p>
                 <span v-text="item.name" />
-                <i v-if="item.verified" class="i-fa6-solid:check ml-1.5" />
+                <i v-if="item.verified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
         <p v-if="item.description" class="pt-1 text-sm" v-text="item.description" />
         <router-link v-if="item.uploaderUrl" class="link" :to="item.uploaderUrl">
             <p>
                 <span v-text="item.uploader" />
-                <i v-if="item.uploaderVerified" class="i-fa6-solid:check ml-1.5" />
+                <i v-if="item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
 

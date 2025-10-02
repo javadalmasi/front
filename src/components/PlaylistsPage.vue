@@ -13,7 +13,7 @@
                 multiple="multiple"
                 @change="importPlaylists"
             />
-            <label v-t="'actions.import_from_json_csv'" for="fileSelector" class="btn ml-2" />
+            <label v-t="'actions.import_from_json_csv'" for="fileSelector" class="btn mr-2" />
         </div>
     </div>
 
@@ -35,7 +35,7 @@
                 />
             </router-link>
             <button v-t="'actions.edit_playlist'" class="btn h-auto" @click="showPlaylistEditModal(playlist)" />
-            <button v-t="'actions.delete_playlist'" class="btn ml-2 h-auto" @click="playlistToDelete = playlist.id" />
+            <button v-t="'actions.delete_playlist'" class="btn mr-2 h-auto" @click="playlistToDelete = playlist.id" />
             <ModalComponent v-if="playlist.id == playlistToEdit" @close="playlistToEdit = null">
                 <div class="flex flex-col gap-2">
                     <h2 v-t="'actions.edit_playlist'" />
@@ -51,7 +51,7 @@
                         type="text"
                         :placeholder="$t('actions.playlist_description')"
                     />
-                    <button v-t="'actions.okay'" class="btn ml-auto" @click="editPlaylist(playlist)" />
+                    <button v-t="'actions.okay'" class="btn mr-auto" @click="editPlaylist(playlist)" />
                 </div>
             </ModalComponent>
             <ConfirmModal
@@ -76,7 +76,7 @@
             <div class="relative text-sm">
                 <span class="thumbnail-overlay thumbnail-right" v-text="`${playlist.videos} ${$t('video.videos')}`" />
                 <div class="absolute bottom-100px right-5px z-100 px-5px" @click.prevent="removeBookmark(index)">
-                    <i class="i-fa6-solid:bookmark ml-3" />
+                    <i class="i-fa6-solid:bookmark mr-3" />
                 </div>
             </div>
             <p
@@ -87,7 +87,7 @@
             />
             <a :href="playlist.uploaderUrl" class="flex items-center">
                 <img class="h-32px w-32px rounded-full" :src="playlist.uploaderAvatar" />
-                <span class="ml-3 hover:underline" v-text="playlist.uploader" />
+                <span class="mr-3 hover:underline" v-text="playlist.uploader" />
             </a>
         </router-link>
     </div>

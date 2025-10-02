@@ -106,7 +106,7 @@
                 <div class="mr-3 flex items-center justify-between">
                     <a :href="subscription.url" target="_blank" class="flex items-center overflow-hidden">
                         <img :src="subscription.avatar" class="h-8 w-8 rounded-full" />
-                        <span class="ml-2">{{ subscription.name }}</span>
+                        <span class="mr-2">{{ subscription.name }}</span>
                     </a>
                     <input
                         type="checkbox"
