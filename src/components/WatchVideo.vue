@@ -161,7 +161,7 @@
                             <div class="flex flex-wrap gap-1">
                                 <!-- RSS Feed button -->
                                 <a
-                                    v-if="video.uploaderUrl"
+                                    v-if="video.uploaderUrl && !isRssFeedDisabled"
                                     aria-label="RSS feed"
                                     title="RSS feed"
                                     role="button"
@@ -434,6 +434,10 @@ export default {
         isDownloadThumbnailDisabled() {
             // Check if download thumbnail button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_DOWNLOAD_THUMBNAIL === "true";
+        },
+        isRssFeedDisabled() {
+            // Check if RSS feed button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
         },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
