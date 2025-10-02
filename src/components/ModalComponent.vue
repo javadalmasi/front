@@ -46,13 +46,20 @@ export default {
 }
 
 .modal-container {
-    @apply w-min m-auto bg-white p-5 rounded-xl min-w-[20vw] relative;
+    @apply w-2/5 m-auto bg-white p-5 rounded-xl min-w-[40vw] relative max-w-[800px] max-h-[90vh] overflow-y-auto;
 }
 .dark .modal-container {
     @apply bg-dark-700;
 }
 
 .modal-container > button {
-    @apply absolute right-2.5 top-1;
+    @apply absolute left-2.5 top-1;
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+    .modal-container {
+        @apply w-[90vw] min-w-[90vw] max-w-[90vw];
+    }
 }
 </style>
