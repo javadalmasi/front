@@ -83,8 +83,8 @@
                             <span> | </span>
                             <span :title="new Date(video.uploadDate).toLocaleString()" v-text="uploadDate" />
                         </div>
-                        <!-- Likes/dilikes -->
-                        <div class="flex gap-2">
+                        <!-- Likes/disilikes -->
+                        <div v-if="likesDislikesEnabled" class="flex gap-2">
                             <template v-if="video.likes >= 0">
                                 <div class="flex items-center">
                                     <div class="i-fa6-solid:thumbs-up" />
@@ -438,6 +438,12 @@ export default {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+        likesDislikesEnabled() {
+            // Check if likes/dislikes are disabled via environment variable
+            return (
+                !import.meta.env.VITE_DISABLE_LIKES_DISLIKES || import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "false"
+            );
         },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);

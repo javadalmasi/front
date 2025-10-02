@@ -31,8 +31,8 @@
             <!-- eslint-disable-next-line vue/no-v-html -->
             <CollapsableText :text="comment.commentText" :visible-limit="500" />
             <div class="comment-footer my-1 flex items-center gap-3">
-                <div class="i-fa6-solid:thumbs-up" />
-                <span v-text="numberFormat(comment.likeCount)" />
+                <div v-if="likesDislikesEnabled" class="i-fa6-solid:thumbs-up" />
+                <span v-if="likesDislikesEnabled" v-text="numberFormat(comment.likeCount)" />
                 <i v-if="comment.hearted" class="i-fa6-solid:heart" :title="$t('actions.creator_liked')" />
                 <img
                     v-if="comment.creatorReplied"
@@ -96,6 +96,14 @@ export default {
             replies: [],
             nextpage: null,
         };
+    },
+    computed: {
+        likesDislikesEnabled() {
+            // Check if likes/dislikes are disabled via environment variable
+            return (
+                !import.meta.env.VITE_DISABLE_LIKES_DISLIKES || import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "false"
+            );
+        },
     },
     methods: {
         async loadReplies() {
