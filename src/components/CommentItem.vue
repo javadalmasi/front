@@ -1,13 +1,21 @@
 <template>
     <div class="comment mt-1.5 flex">
-        <img
-            loading="lazy"
-            :src="comment.thumbnail"
-            class="comment-avatar h-12 w-12 rounded-full"
-            height="48"
-            width="48"
-            alt="Avatar"
-        />
+        <div class="relative inline-block">
+            <img
+                loading="lazy"
+                :src="comment.thumbnail"
+                :class="{ 'border-2 border-blue-700': comment.verified, 'rounded-full': true }"
+                class="comment-avatar h-12 w-12"
+                width="48"
+                height="48"
+            />
+            <div
+                v-if="comment.verified"
+                class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+            >
+                <i class="i-fa6-solid:check text-[8px] text-white" />
+            </div>
+        </div>
 
         <div class="comment-content pr-2">
             <div class="comment-header">

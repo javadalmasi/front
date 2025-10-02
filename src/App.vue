@@ -236,7 +236,7 @@ b {
 }
 
 .btn {
-    @apply py-2 lt-md:px-2 md:px-4 rounded cursor-pointer inline-block hover:bg-gray-500 hover:text-white;
+    @apply py-2 lt-md:px-2 md:px-4 rounded-3xl cursor-pointer inline-block hover:bg-gray-500 hover:text-white;
 }
 
 .reset {
@@ -273,7 +273,7 @@ b {
 }
 
 .input {
-    @apply px-2.5 rounded-md;
+    @apply px-2.5 rounded-3xl;
 }
 
 .input:focus {

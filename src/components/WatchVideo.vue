@@ -109,14 +109,24 @@
                     <div class="flex flex-wrap gap-1">
                         <!-- Channel Image & Info -->
                         <div class="flex items-center">
-                            <img
-                                loading="lazy"
-                                height="48"
-                                width="48"
-                                :src="video.uploaderAvatar"
-                                alt=""
-                                class="rounded-full"
-                            />
+                            <div class="relative inline-block">
+                                <img
+                                    loading="lazy"
+                                    :src="video.uploaderAvatar"
+                                    :class="{
+                                        'border-2 border-blue-700': video.uploaderVerified,
+                                        'rounded-full': true,
+                                    }"
+                                    width="48"
+                                    height="48"
+                                />
+                                <div
+                                    v-if="video.uploaderVerified"
+                                    class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                                >
+                                    <i class="i-fa6-solid:check text-[8px] text-white" />
+                                </div>
+                            </div>
                             <router-link v-if="video.uploaderUrl" class="link mr-1.5" :to="video.uploaderUrl">{{
                                 video.uploader
                             }}</router-link>

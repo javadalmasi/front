@@ -86,7 +86,19 @@
                 v-text="playlist.name"
             />
             <a :href="playlist.uploaderUrl" class="flex items-center">
-                <img class="h-32px w-32px rounded-full" :src="playlist.uploaderAvatar" />
+                <div class="relative inline-block">
+                    <img
+                        :src="playlist.uploaderAvatar"
+                        :class="{ 'border-2 border-blue-700': playlist.uploaderVerified, 'rounded-full': true }"
+                        class="h-32px w-32px"
+                    />
+                    <div
+                        v-if="playlist.uploaderVerified"
+                        class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                    >
+                        <i class="i-fa6-solid:check text-[8px] text-white" />
+                    </div>
+                </div>
                 <span class="mr-3 hover:underline" v-text="playlist.uploader" />
             </a>
         </router-link>

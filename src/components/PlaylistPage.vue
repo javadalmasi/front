@@ -9,7 +9,22 @@
         <div class="mt-1 flex justify-between <md:flex-col md:items-center">
             <div>
                 <router-link class="link flex items-center gap-3" :to="playlist.uploaderUrl || '/'">
-                    <img loading="lazy" :src="playlist.uploaderAvatar" class="h-12 rounded-full" />
+                    <div class="relative inline-block">
+                        <img
+                            loading="lazy"
+                            :src="playlist.uploaderAvatar"
+                            :class="{ 'border-2 border-blue-700': playlist.uploaderVerified, 'rounded-full': true }"
+                            class="h-32px w-32px"
+                            width="68"
+                            height="68"
+                        />
+                        <div
+                            v-if="playlist.uploaderVerified"
+                            class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                        >
+                            <i class="i-fa6-solid:check text-[8px] text-white" />
+                        </div>
+                    </div>
                     <strong v-text="playlist.uploader" />
                 </router-link>
             </div>

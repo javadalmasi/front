@@ -15,7 +15,7 @@
             <input
                 ref="videoSearch"
                 v-model="searchText"
-                class="input h-10 w-72 pl-20"
+                class="input h-10 w-100 pl-20"
                 type="text"
                 role="search"
                 :title="$t('actions.search')"

@@ -2,7 +2,22 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="item.url" class="link font-bold">
             <div class="my-4 flex justify-center">
-                <img loading="lazy" class="aspect-square w-[50%] rounded-full" :src="item.thumbnail" />
+                <div class="relative inline-block">
+                    <img
+                        loading="lazy"
+                        :src="item.thumbnail"
+                        :class="{ 'border-2 border-blue-700': item.verified, 'rounded-full': true }"
+                        class="aspect-square w-[50%] h-auto"
+                        width="68"
+                        height="68"
+                    />
+                    <div
+                        v-if="item.verified"
+                        class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                    >
+                        <i class="i-fa6-solid:check text-[8px] text-white" />
+                    </div>
+                </div>
             </div>
             <p>
                 <span v-text="item.name" />
