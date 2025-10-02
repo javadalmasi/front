@@ -53,7 +53,7 @@
                                 "
                             >
                                 <div
-                                    :class="theaterMode ? 'i-fa6-solid:chevron-left' : 'i-fa6-solid:chevron-right'"
+                                    :class="theaterMode ? 'i-fa6-solid:chevron-right' : 'i-fa6-solid:chevron-left'"
                                 ></div>
                             </button>
                         </div>
