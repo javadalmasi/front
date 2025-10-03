@@ -8,13 +8,21 @@
         </router-link>
         <p v-if="props.item.description" v-text="props.item.description" />
 
-        <router-link v-if="props.item.uploaderUrl" class="link-secondary text-sm no-underline hover:underline-dashed" :to="props.item.uploaderUrl">
+        <router-link
+            v-if="props.item.uploaderUrl"
+            class="link-secondary text-sm no-underline hover:underline-dashed"
+            :to="props.item.uploaderUrl"
+        >
             <p>
                 <span v-text="truncatedUploaderName" />
                 <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
-        <a v-else-if="props.item.uploaderName" class="link no-underline hover:underline-dashed" v-text="truncatedUploaderName" />
+        <a
+            v-else-if="props.item.uploaderName"
+            class="link no-underline hover:underline-dashed"
+            v-text="truncatedUploaderName"
+        />
 
         <template v-if="props.item.videos >= 0">
             <br v-if="props.item.uploaderName" />

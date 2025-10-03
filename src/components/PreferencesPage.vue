@@ -253,10 +253,6 @@
             @change="onChange($event)"
         />
     </label>
-    <label class="pref" for="chkShowAds">
-        <strong v-t="'actions.show_ads'" class="tooltip-hover" :title="$t('tooltips.show_ads')" />
-        <input id="chkShowAds" v-model="showAds" class="checkbox" type="checkbox" @change="onChange($event)" />
-    </label>
 
     <h2 class="text-center">SponsorBlock</h2>
     <p class="text-center">
@@ -408,7 +404,6 @@ export default {
             disableLBRY: false,
             proxyLBRY: false,
             prefetchLimit: 2,
-            showAds: true,
             password: null,
             showConfirmResetPrefsDialog: false,
         };
@@ -468,7 +463,6 @@ export default {
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
             this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
-            this.showAds = this.getPreferenceBoolean("showAds", true);
             this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
             this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
             // Load Persian country map
@@ -526,7 +520,6 @@ export default {
                 localStorage.setItem("prefetchLimit", this.prefetchLimit);
                 localStorage.setItem("hideWatched", this.hideWatched);
                 localStorage.setItem("mobileChapterLayout", this.mobileChapterLayout);
-                localStorage.setItem("showAds", this.showAds);
 
                 if (shouldReload) window.location.reload();
             }

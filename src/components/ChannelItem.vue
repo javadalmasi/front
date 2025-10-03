@@ -7,7 +7,7 @@
                         loading="lazy"
                         :src="item.thumbnail"
                         :class="{ 'border-2 border-blue-700': item.verified, 'rounded-full': true }"
-                        class="aspect-square w-[50%] h-auto"
+                        class="aspect-square h-auto w-[50%]"
                         width="68"
                         height="68"
                     />
