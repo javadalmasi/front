@@ -8,7 +8,7 @@
                     aria-label="Toggle sidebar"
                     @click="toggleSidebar"
                 >
-                    <div class="i-fa6-solid:bars text-xl" />
+                    <div class="i-fa6-solid:bars text-2xl" />
                 </button>
                 <router-link class="ml-4 flex items-center font-sans text-3xl font-bold" :to="homePagePath">
                     <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
