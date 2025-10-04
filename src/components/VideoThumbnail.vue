@@ -2,7 +2,7 @@
     <div class="w-full">
         <img
             loading="lazy"
-            class="aspect-video w-full rounded-2xl object-contain"
+            class="aspect-video w-full rounded-lg object-contain"
             :src="item.thumbnail"
             :alt="item.title"
             :class="{ 'shorts-img': item.isShort, 'opacity-75': item.watched }"
