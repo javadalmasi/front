@@ -10,7 +10,7 @@ export default defineConfig({
     transformers: [transformerDirective(), transformerVariantGroup()],
     presets: [
         presetUno({
-            dark: "media",
+            dark: "class",
             rtl: true, // Enable RTL support
         }),
         presetIcons({

@@ -1,15 +1,21 @@
 <template>
     <div class="reset min-h-screen w-full flex flex-col px-1vw py-5 antialiased" :class="[theme]">
         <div class="flex-1">
-            <NavBar :sidebar-state="sidebarState" />
+            <NavBar :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
             <div class="flex">
-                <app-sidebar class="lt-md:hidden" />
+                <app-sidebar
+                    :sidebar-state="sidebarState"
+                    :is-watch-page="isWatchPage"
+                    :theme="theme"
+                    class="lt-md:hidden"
+                    @toggle-theme="toggleTheme"
+                />
                 <div
                     class="flex-1"
                     :class="{
-                        'md:pr-20 lg:pr-64': sidebarState === 'open',
-                        'md:pr-20': sidebarState === 'semi-open',
-                        'pr-0': sidebarState === 'closed',
+                        'md:pr-64': sidebarState === 'open' && !isWatchPage,
+                        'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,
+                        'pr-0': sidebarState === 'closed' || isWatchPage,
                     }"
                 >
                     <router-view v-slot="{ Component }">
@@ -23,9 +29,9 @@
 
         <FooterComponent
             :class="{
-                'md:pr-20 lg:pr-64': sidebarState === 'open',
-                'md:pr-20': sidebarState === 'semi-open',
-                'pr-0': sidebarState === 'closed',
+                'md:pr-64': sidebarState === 'open' && !isWatchPage,
+                'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,
+                'pr-0': sidebarState === 'closed' || isWatchPage,
             }"
         />
     </div>
@@ -47,16 +53,33 @@ export default {
     data() {
         return {
             theme: "dark",
-            sidebarState: "semi-open", // Default sidebar state
+            sidebarState: "semi-open",
+            isWatchPage: false,
+            isMobile: false,
         };
     },
+    watch: {
+        $route(to) {
+            this.isWatchPage = to.name === "WatchVideo";
+            if (this.isWatchPage) {
+                this.sidebarState = "closed";
+            } else if (this.sidebarState === "closed" && !this.isMobile) {
+                this.sidebarState = "semi-open";
+            }
+        },
+    },
     mounted() {
-        // Listen for sidebar state changes
         window.addEventListener("sidebarStateChanged", this.updateSidebarState);
         this.setTheme();
-        darkModePreference.addEventListener("change", () => {
-            this.setTheme();
-        });
+        darkModePreference.addEventListener("change", this.setTheme);
+
+        this.checkIsMobile();
+        window.addEventListener("resize", this.checkIsMobile);
+
+        this.isWatchPage = this.$route.name === "WatchVideo";
+        if (this.isWatchPage) {
+            this.sidebarState = "closed";
+        }
 
         if ("indexedDB" in window) {
             const request = indexedDB.open("piped-db", 6);
@@ -134,31 +157,50 @@ export default {
     },
     beforeUnmount() {
         window.removeEventListener("sidebarStateChanged", this.updateSidebarState);
+        darkModePreference.removeEventListener("change", this.setTheme);
+        window.removeEventListener("resize", this.checkIsMobile);
     },
     methods: {
+        checkIsMobile() {
+            this.isMobile = window.innerWidth < 768;
+            if (this.isMobile) {
+                this.sidebarState = "closed";
+            }
+        },
+        toggleSidebar() {
+            if (this.isMobile || this.isWatchPage) {
+                this.sidebarState = this.sidebarState === "closed" ? "open" : "closed";
+            } else {
+                const states = ["open", "semi-open", "closed"];
+                const currentIndex = states.indexOf(this.sidebarState);
+                this.sidebarState = states[(currentIndex + 1) % states.length];
+            }
+        },
         updateSidebarState(event) {
             this.sidebarState = event.detail.state;
         },
+        toggleTheme() {
+            const newTheme = this.theme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", newTheme);
+            this.setTheme();
+        },
         setTheme() {
-            let themePref = this.getPreferenceString("theme", "dark"); // dark, light or auto
-            const themes = {
-                dark: "dark",
-                light: "light",
-                auto: darkModePreference.matches ? "dark" : "light",
-            };
+            // Default to 'dark' if no theme is saved in localStorage
+            this.theme = localStorage.getItem("theme") || "dark";
 
-            this.theme = themes[themePref];
-
+            if (this.theme === "dark") {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
             this.changeTitleBarColor();
-
-            // Used for the scrollbar
-            const root = document.querySelector(":root");
-            this.theme === "dark" ? root.classList.add("dark") : root.classList.remove("dark");
         },
         changeTitleBarColor() {
             const currentColor = { dark: "#0F0F0F", light: "#FFF" };
             const themeColor = document.querySelector("meta[name='theme-color']");
-            themeColor.setAttribute("content", currentColor[this.theme]);
+            if (themeColor) {
+                themeColor.setAttribute("content", currentColor[this.theme]);
+            }
         },
     },
 };
