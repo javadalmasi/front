@@ -1,21 +1,40 @@
 <template>
     <div class="reset min-h-screen w-full flex flex-col px-1vw py-5 antialiased" :class="[theme]">
         <div class="flex-1">
-            <NavBar />
-            <router-view v-slot="{ Component }">
-                <keep-alive :max="5">
-                    <component :is="Component" :key="$route.fullPath" />
-                </keep-alive>
-            </router-view>
+            <NavBar :sidebar-state="sidebarState" />
+            <div class="flex">
+                <app-sidebar class="lt-md:hidden" />
+                <div
+                    class="flex-1"
+                    :class="{
+                        'md:pr-20 lg:pr-64': sidebarState === 'open',
+                        'md:pr-20': sidebarState === 'semi-open',
+                        'pr-0': sidebarState === 'closed',
+                    }"
+                >
+                    <router-view v-slot="{ Component }">
+                        <keep-alive :max="5">
+                            <component :is="Component" :key="$route.fullPath" />
+                        </keep-alive>
+                    </router-view>
+                </div>
+            </div>
         </div>
 
-        <FooterComponent />
+        <FooterComponent
+            :class="{
+                'md:pr-20 lg:pr-64': sidebarState === 'open',
+                'md:pr-20': sidebarState === 'semi-open',
+                'pr-0': sidebarState === 'closed',
+            }"
+        />
     </div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar.vue";
 import FooterComponent from "./components/FooterComponent.vue";
+import AppSidebar from "./components/Sidebar.vue";
 
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -23,13 +42,17 @@ export default {
     components: {
         NavBar,
         FooterComponent,
+        AppSidebar,
     },
     data() {
         return {
             theme: "dark",
+            sidebarState: "semi-open", // Default sidebar state
         };
     },
     mounted() {
+        // Listen for sidebar state changes
+        window.addEventListener("sidebarStateChanged", this.updateSidebarState);
         this.setTheme();
         darkModePreference.addEventListener("change", () => {
             this.setTheme();
@@ -109,7 +132,13 @@ export default {
             }
         })();
     },
+    beforeUnmount() {
+        window.removeEventListener("sidebarStateChanged", this.updateSidebarState);
+    },
     methods: {
+        updateSidebarState(event) {
+            this.sidebarState = event.detail.state;
+        },
         setTheme() {
             let themePref = this.getPreferenceString("theme", "dark"); // dark, light or auto
             const themes = {

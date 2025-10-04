@@ -38,24 +38,21 @@
                                     :sponsors="sponsors"
                                     :selected-auto-play="selectedAutoPlay"
                                     :selected-auto-loop="selectedAutoLoop"
+                                    :theater-mode="theaterMode"
                                     @timeupdate="onTimeUpdate"
                                     @ended="onVideoEnded"
                                     @navigate-next="navigateNext"
+                                    @toggle-theater="
+                                        theaterMode = !theaterMode;
+                                        setPreference('theaterMode', theaterMode);
+                                    "
+                                    @toggle-loop="selectedAutoLoop = !selectedAutoLoop"
+                                    @cycle-autoplay="
+                                        selectedAutoPlay = (selectedAutoPlay + 1) % 3;
+                                        setPreference('autoplay', selectedAutoPlay, true);
+                                    "
                                 />
                             </keep-alive>
-                            <button
-                                v-if="!isMobile"
-                                :class="theaterMode ? '-mr-5' : '-mr-5'"
-                                class="z-10"
-                                @click="
-                                    theaterMode = !theaterMode;
-                                    setPreference('theaterMode', theaterMode);
-                                "
-                            >
-                                <div
-                                    :class="theaterMode ? 'i-fa6-solid:chevron-right' : 'i-fa6-solid:chevron-left'"
-                                ></div>
-                            </button>
                         </div>
                     </Teleport>
                     <div v-if="video && isMobile">
@@ -259,24 +256,6 @@
                         </div>
                     </template>
                 </div>
-
-                <hr />
-
-                <label for="chkAutoLoop"><strong v-text="`${$t('actions.loop_this_video')}:`" /></label>
-                <input
-                    id="chkAutoLoop"
-                    v-model="selectedAutoLoop"
-                    class="mr-1.5"
-                    type="checkbox"
-                    @change="onChange($event)"
-                />
-                <br />
-                <label for="chkAutoPlay"><strong v-text="`${$t('actions.auto_play_next_video')}:`" /></label>
-                <select id="chkAutoPlay" v-model="selectedAutoPlay" class="select mr-1.5" @change="onChange($event)">
-                    <option v-t="'actions.never'" value="0" />
-                    <option v-t="'actions.playlists_only'" value="1" />
-                    <option v-t="'actions.always'" value="2" />
-                </select>
 
                 <hr />
                 <div v-if="isMobile">
@@ -628,9 +607,6 @@ export default {
                 return Promise.resolve({ disabled: true, comments: [] });
             }
             return this.fetchJson(this.apiUrl() + "/comments/" + this.getVideoId());
-        },
-        onChange() {
-            this.setPreference("autoplay", this.selectedAutoPlay, true);
         },
         async getVideoData() {
             await this.fetchVideo()

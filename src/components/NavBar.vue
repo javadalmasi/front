@@ -1,6 +1,18 @@
 <template>
     <nav class="relative w-full flex flex-wrap items-center justify-center px-2 pb-2.5 sm:px-4">
         <div class="flex flex-1 justify-start">
+            <!-- Menu toggle button before the logo -->
+            <button class="mr-3 flex flex-col justify-end md:hidden" @click="showTopNav = !showTopNav">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </button>
+            <!-- Desktop sidebar toggle - available on all devices -->
+            <button class="mr-3 flex flex-col justify-end" @click="toggleDesktopSidebar">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </button>
             <router-link class="flex items-center text-3xl font-bold font-sans" :to="homePagePath"
                 ><img
                     alt="logo"
@@ -11,11 +23,11 @@
                 />ویدیو</router-link
             >
         </div>
-        <div class="search-container lt-md:hidden">
+        <div class="search-container mx-4 max-w-2xl flex-1 lt-md:hidden">
             <input
                 ref="videoSearch"
                 v-model="searchText"
-                class="input h-10 w-100 pl-20"
+                class="input h-10 w-full pl-20"
                 type="text"
                 role="search"
                 :title="$t('actions.search')"
@@ -36,65 +48,7 @@
             <span class="line"></span>
             <span class="line"></span>
         </button>
-        <!-- navigation bar for large screen devices -->
-        <ul class="md:text-1xl hidden list-none md:(flex flex flex-1 justify-end children:pr-3)">
-            <li v-if="shouldShowTrending">
-                <router-link v-t="'titles.trending'" to="/trending" class="nav-link" />
-            </li>
-            <li>
-                <router-link v-t="'titles.preferences'" to="/preferences" class="nav-link" />
-            </li>
-            <li v-if="shouldShowLogin">
-                <router-link v-t="'titles.login'" to="/login" class="nav-link" />
-            </li>
-            <li v-if="shouldShowRegister">
-                <router-link v-t="'titles.register'" to="/register" class="nav-link" />
-            </li>
-            <li v-if="shouldShowHistory">
-                <router-link v-t="'titles.history'" to="/history" class="nav-link" />
-            </li>
-            <li>
-                <router-link v-t="'titles.playlists'" to="/playlists" class="nav-link" />
-            </li>
-            <li v-if="!shouldShowTrending">
-                <router-link v-t="'titles.feed'" to="/feed" class="nav-link" />
-            </li>
-        </ul>
     </nav>
-    <!-- navigation bar for mobile devices -->
-    <div
-        v-if="showTopNav"
-        class="mobile-nav mb-4 flex flex-col children:(w-full flex items-center gap-1 border-b border-dark-100 p-1)"
-    >
-        <router-link v-if="shouldShowTrending" to="/trending">
-            <div class="i-fa6-solid:fire"></div>
-            <i18n-t keypath="titles.trending"></i18n-t>
-        </router-link>
-        <router-link to="/preferences">
-            <div class="i-fa6-solid:gear"></div>
-            <i18n-t keypath="titles.preferences"></i18n-t>
-        </router-link>
-        <router-link v-if="shouldShowLogin" to="/login">
-            <div class="i-fa6-solid:user"></div>
-            <i18n-t keypath="titles.login"></i18n-t>
-        </router-link>
-        <router-link v-if="shouldShowLogin" to="/register">
-            <div class="i-fa6-solid:user-plus"></div>
-            <i18n-t keypath="titles.register"></i18n-t>
-        </router-link>
-        <router-link v-if="shouldShowHistory" to="/history">
-            <div class="i-fa6-solid:clock-rotate-left"></div>
-            <i18n-t keypath="titles.history"></i18n-t>
-        </router-link>
-        <router-link to="/playlists">
-            <div class="i-fa6-solid:list"></div>
-            <i18n-t keypath="titles.playlists"></i18n-t>
-        </router-link>
-        <router-link v-if="!shouldShowTrending" to="/feed">
-            <div class="i-fa6-solid:play"></div>
-            <i18n-t keypath="titles.feed"></i18n-t>
-        </router-link>
-    </div>
     <!-- search suggestions for mobile devices -->
     <div class="search-container mb-2 w-full md:hidden">
         <input
@@ -125,6 +79,12 @@ import hotkeys from "hotkeys-js";
 export default {
     components: {
         SearchSuggestions,
+    },
+    props: {
+        sidebarState: {
+            type: String,
+            default: "closed",
+        },
     },
     data() {
         return {
@@ -217,6 +177,11 @@ export default {
                 this.$router.push("/");
             }
             return;
+        },
+        toggleDesktopSidebar() {
+            // Use a global event or Vuex store to communicate with the sidebar
+            // For now, we'll dispatch a custom event that the Sidebar component will listen for
+            window.dispatchEvent(new CustomEvent("toggleDesktopSidebar"));
         },
     },
 };

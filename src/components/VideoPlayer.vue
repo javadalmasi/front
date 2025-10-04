@@ -110,11 +110,15 @@ export default {
                 return {};
             },
         },
-        selectedAutoPlay: Boolean,
+        selectedAutoPlay: {
+            type: Number,
+            default: 1,
+        },
         selectedAutoLoop: Boolean,
         isEmbed: Boolean,
+        theaterMode: Boolean,
     },
-    emits: ["timeupdate", "ended", "navigateNext"],
+    emits: ["timeupdate", "ended", "navigateNext", "toggle-theater", "toggle-loop", "cycle-autoplay"],
     data() {
         return {
             lastUpdate: new Date().getTime(),
@@ -155,6 +159,17 @@ export default {
                 preferredVideoCodecs.push("avc1");
 
             return preferredVideoCodecs;
+        },
+    },
+    watch: {
+        theaterMode() {
+            this.updateTheaterButton();
+        },
+        selectedAutoLoop() {
+            this.updateLoopButton();
+        },
+        selectedAutoPlay() {
+            this.updateAutoPlayButton();
         },
     },
     mounted() {
@@ -319,6 +334,52 @@ export default {
         this.destroy(true);
     },
     methods: {
+        updateAutoPlayButton() {
+            const button = this.$refs.container.querySelector("[data-shaka-autoplay]");
+            if (!button) return;
+
+            const icon = button.querySelector("i");
+            const span = button.querySelector("span");
+            const states = ["Never", "Playlists Only", "Always"];
+
+            span.textContent = `Autoplay: ${states[this.selectedAutoPlay]}`;
+
+            if (this.selectedAutoPlay > 0) {
+                icon.textContent = "playlist_play";
+            } else {
+                icon.textContent = "playlist_remove";
+            }
+        },
+        updateLoopButton() {
+            const button = this.$refs.container.querySelector("[data-shaka-loop]");
+            if (!button) return;
+
+            const icon = button.querySelector("i");
+            const span = button.querySelector("span");
+
+            if (this.selectedAutoLoop) {
+                icon.textContent = "repeat_one";
+                span.textContent = "Looping";
+            } else {
+                icon.textContent = "repeat";
+                span.textContent = "Loop";
+            }
+        },
+        updateTheaterButton() {
+            const button = this.$refs.container.querySelector("[data-shaka-theater-mode]");
+            if (!button) return;
+
+            const icon = button.querySelector("i");
+            const span = button.querySelector("span");
+
+            if (this.theaterMode) {
+                icon.textContent = "fullscreen_exit";
+                span.textContent = "Exit Theater Mode";
+            } else {
+                icon.textContent = "fullscreen";
+                span.textContent = "Enter Theater Mode";
+            }
+        },
         async loadVideo() {
             this.updateSponsors();
 
@@ -474,6 +535,18 @@ export default {
                 videoEl.addEventListener("ended", () => {
                     this.$emit("ended");
                 });
+
+                videoEl.addEventListener("toggle-theater", () => {
+                    this.$emit("toggle-theater");
+                });
+
+                videoEl.addEventListener("toggle-loop", () => {
+                    this.$emit("toggle-loop");
+                });
+
+                videoEl.addEventListener("cycle-autoplay", () => {
+                    this.$emit("cycle-autoplay");
+                });
             }
             //TODO: Add sponsors on seekbar: https://github.com/ajayyy/SponsorBlock/blob/e39de9fd852adb9196e0358ed827ad38d9933e29/src/js-components/previewBar.ts#L12
         },
@@ -536,9 +609,132 @@ export default {
 
                 shaka.ui.OverflowMenu.registerElement("open_new_tab", new OpenButton.Factory());
 
+                const TheaterModeButton = class extends shaka.ui.Element {
+                    constructor(parent, controls) {
+                        super(parent, controls);
+
+                        this.button = document.createElement("button");
+                        this.button.classList.add("shaka-cast-button");
+                        this.button.classList.add("shaka-tooltip");
+                        this.button.setAttribute("data-shaka-theater-mode", "true");
+
+                        this.icon = document.createElement("i");
+                        this.icon.classList.add("material-icons-round");
+                        this.icon.textContent = "fullscreen";
+                        this.button.appendChild(this.icon);
+
+                        const label = document.createElement("label");
+                        label.classList.add("shaka-overflow-button-label");
+                        label.classList.add("shaka-overflow-menu-only");
+                        this.span = document.createElement("span");
+                        this.span.textContent = "Enter Theater Mode";
+                        label.appendChild(this.span);
+
+                        this.button.appendChild(label);
+                        this.parent.appendChild(this.button);
+
+                        this.eventManager.listen(this.button, "click", () => {
+                            this.video.dispatchEvent(new Event("toggle-theater"));
+                        });
+                    }
+                };
+
+                TheaterModeButton.Factory = class {
+                    create(rootElement, controls) {
+                        return new TheaterModeButton(rootElement, controls);
+                    }
+                };
+
+                shaka.ui.OverflowMenu.registerElement("theater_mode", new TheaterModeButton.Factory());
+
+                const LoopButton = class extends shaka.ui.Element {
+                    constructor(parent, controls) {
+                        super(parent, controls);
+
+                        this.button = document.createElement("button");
+                        this.button.classList.add("shaka-cast-button");
+                        this.button.classList.add("shaka-tooltip");
+                        this.button.setAttribute("data-shaka-loop", "true");
+
+                        this.icon = document.createElement("i");
+                        this.icon.classList.add("material-icons-round");
+                        this.icon.textContent = "repeat";
+                        this.button.appendChild(this.icon);
+
+                        const label = document.createElement("label");
+                        label.classList.add("shaka-overflow-button-label");
+                        label.classList.add("shaka-overflow-menu-only");
+                        this.span = document.createElement("span");
+                        this.span.textContent = "Loop";
+                        label.appendChild(this.span);
+
+                        this.button.appendChild(label);
+                        this.parent.appendChild(this.button);
+
+                        this.eventManager.listen(this.button, "click", () => {
+                            this.video.dispatchEvent(new Event("toggle-loop"));
+                        });
+                    }
+                };
+
+                LoopButton.Factory = class {
+                    create(rootElement, controls) {
+                        return new LoopButton(rootElement, controls);
+                    }
+                };
+
+                shaka.ui.OverflowMenu.registerElement("loop", new LoopButton.Factory());
+
+                const AutoPlayButton = class extends shaka.ui.Element {
+                    constructor(parent, controls) {
+                        super(parent, controls);
+
+                        this.button = document.createElement("button");
+                        this.button.classList.add("shaka-cast-button");
+                        this.button.classList.add("shaka-tooltip");
+                        this.button.setAttribute("data-shaka-autoplay", "true");
+
+                        this.icon = document.createElement("i");
+                        this.icon.classList.add("material-icons-round");
+                        this.icon.textContent = "playlist_play";
+                        this.button.appendChild(this.icon);
+
+                        const label = document.createElement("label");
+                        label.classList.add("shaka-overflow-button-label");
+                        label.classList.add("shaka-overflow-menu-only");
+                        this.span = document.createElement("span");
+                        this.span.textContent = "Autoplay";
+                        label.appendChild(this.span);
+
+                        this.button.appendChild(label);
+                        this.parent.appendChild(this.button);
+
+                        this.eventManager.listen(this.button, "click", () => {
+                            this.video.dispatchEvent(new Event("cycle-autoplay"));
+                        });
+                    }
+                };
+
+                AutoPlayButton.Factory = class {
+                    create(rootElement, controls) {
+                        return new AutoPlayButton(rootElement, controls);
+                    }
+                };
+
+                shaka.ui.OverflowMenu.registerElement("autoplay", new AutoPlayButton.Factory());
+
                 this.$ui = new shaka.ui.Overlay(localPlayer, this.$refs.container, videoEl);
 
-                const overflowMenuButtons = ["quality", "captions", "picture_in_picture", "playback_rate", "airplay"];
+                const overflowMenuButtons = [
+                    "theater_mode",
+                    "loop",
+                    "autoplay",
+                    "quality",
+                    "captions",
+                    "picture_in_picture",
+                    "playback_rate",
+                    "airplay",
+                ];
 
                 if (this.isEmbed) {
                     overflowMenuButtons.push("open_new_tab");
@@ -554,6 +750,9 @@ export default {
                 };
 
                 this.$ui.configure(config);
+                this.updateTheaterButton();
+                this.updateLoopButton();
+                this.updateAutoPlayButton();
             }
 
             this.updateMarkers();
@@ -604,9 +803,13 @@ export default {
                 // Additional ABR configurations for optimal performance
                 this.$player.configure({
                     abr: {
-                        maxBandwidth: Infinity, // Allow highest bandwidth when ABR is active
-                        minBandwidth: 0, // Allow lowest bandwidth when ABR is active
-                        useNetworkInformation: true, // Use browser's Network Information API if available
+                        restrictions: {
+                            maxBandwidth: Infinity, // Allow highest bandwidth when ABR is active
+                            minBandwidth: 0, // Allow lowest bandwidth when ABR is active
+                        },
+                        advanced: {
+                            useNetworkInformation: true, // Use browser's Network Information API if available
+                        },
                     },
                 });
             }

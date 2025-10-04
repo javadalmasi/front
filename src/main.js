@@ -683,6 +683,9 @@ const i18n = createI18n({
 
 window.i18n = i18n;
 
+// Make the mixin globally available
+window.appMixin = mixin;
+
 const app = createApp(App);
 app.use(i18n);
 app.use(router);
