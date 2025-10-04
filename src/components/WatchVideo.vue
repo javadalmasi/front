@@ -252,7 +252,7 @@
                             <router-link
                                 v-for="tag in video.tags"
                                 :key="tag"
-                                class="btn line-clamp-1 rounded-s px-2 py-1"
+                                class="btn line-clamp-1 rounded-2xl px-5 py-1"
                                 :to="`/results?search_query=${encodeURIComponent(tag)}`"
                                 >{{ tag }}</router-link
                             >
