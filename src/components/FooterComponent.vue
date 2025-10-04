@@ -1,6 +1,6 @@
 <template>
     <footer
-        class="mt-10 w-full border-t border-gray-200 bg-gray-50 py-4 text-center dark:border-dark-100 dark:bg-dark-800 children:(mx-3)"
+        class="mt-10 w-full border-t border-gray-200 bg-gray-50 py-4 text-center children:(mx-3) dark:border-dark-100 dark:bg-dark-800"
     >
         <a aria-label="GitHub" href="https://github.com/TeamPiped/Piped" target="_blank">
             <i class="i-fa6-brands:github" />

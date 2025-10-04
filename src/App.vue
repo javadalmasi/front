@@ -1,9 +1,10 @@
 <template>
     <div class="reset min-h-screen w-full flex flex-col antialiased" :class="[theme]">
         <div class="flex-1">
-            <NavBar :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
+            <NavBar v-if="!isEmbedPage" :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
             <div class="flex">
                 <app-sidebar
+                    v-if="!isEmbedPage"
                     :sidebar-state="sidebarState"
                     :is-watch-page="isWatchPage"
                     :theme="theme"
@@ -11,11 +12,12 @@
                     @toggle-theme="toggleTheme"
                 />
                 <div
-                    class="flex-1 px-1vw py-5"
+                    class="flex-1"
                     :class="{
-                        'md:pr-64': sidebarState === 'open' && !isWatchPage,
-                        'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,
-                        'pr-0': sidebarState === 'closed' || isWatchPage,
+                        'md:pl-1vw md:pt-1 md:pb-5 p-0 m-0': !isEmbedPage,
+                        'md:pr-64 mr-1vw': sidebarState === 'open' && !isWatchPage,
+                        'md:pr-20 mr-1vw': sidebarState === 'semi-open' && !isWatchPage,
+                        'pr-1vw': sidebarState === 'closed' || isWatchPage,
                     }"
                 >
                     <router-view v-slot="{ Component }">
@@ -28,6 +30,7 @@
         </div>
 
         <FooterComponent
+            v-if="!isEmbedPage"
             :class="{
                 'md:pr-64': sidebarState === 'open' && !isWatchPage,
                 'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,
@@ -57,6 +60,11 @@ export default {
             isWatchPage: false,
             isMobile: false,
         };
+    },
+    computed: {
+        isEmbedPage() {
+            return this.$route.path.startsWith("/embed");
+        },
     },
     watch: {
         $route(to) {

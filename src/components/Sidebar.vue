@@ -210,6 +210,17 @@ export default {
         authenticated() {
             return this.getAuthToken() !== undefined;
         },
+        isRssFeedDisabled() {
+            // Check if RSS feed button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+        filteredPublicItems() {
+            // Filter out the RSS feed item if RSS is disabled
+            if (this.isRssFeedDisabled) {
+                return this.publicItems.filter(item => item.route !== "/feed");
+            }
+            return this.publicItems;
+        },
         visibleCategories() {
             if (this.showMoreCategories || this.sidebarState === "semi-open") {
                 return this.categories;

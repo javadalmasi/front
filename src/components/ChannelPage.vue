@@ -51,7 +51,7 @@
 
                 <!-- RSS Feed button -->
                 <a
-                    v-if="channel.id"
+                    v-if="channel.id && !isRssFeedDisabled"
                     aria-label="RSS feed"
                     title="RSS feed"
                     role="button"
@@ -140,6 +140,12 @@ export default {
     },
     unmounted() {
         window.removeEventListener("scroll", this.handleScroll);
+    },
+    computed: {
+        isRssFeedDisabled() {
+            // Check if RSS feed button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
     },
     methods: {
         async fetchSubscribedStatus() {

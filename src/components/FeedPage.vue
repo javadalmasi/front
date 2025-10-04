@@ -40,7 +40,7 @@
 
     <span class="flex gap-2">
         <router-link v-t="'titles.subscriptions'" class="btn" to="/subscriptions" />
-        <a :href="getRssUrl" class="btn">
+        <a v-if="!isRssFeedDisabled" :href="getRssUrl" class="btn">
             <i class="i-fa6-solid:rss" />
         </a>
     </span>
@@ -80,6 +80,10 @@ export default {
         getRssUrl(_this) {
             if (_this.authenticated) return _this.authApiUrl() + "/feed/rss?authToken=" + _this.getAuthToken();
             else return _this.authApiUrl() + "/feed/unauthenticated/rss?channels=" + _this.getUnauthenticatedChannels();
+        },
+        isRssFeedDisabled() {
+            // Check if RSS feed button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
         },
         filteredVideos(_this) {
             const selectedGroup = _this.channelGroups.filter(group => group.groupName == _this.selectedGroupName);

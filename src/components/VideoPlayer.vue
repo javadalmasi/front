@@ -725,16 +725,22 @@ export default {
 
                 this.$ui = new shaka.ui.Overlay(localPlayer, this.$refs.container, videoEl);
 
-                const overflowMenuButtons = [
-                    "theater_mode",
+                // Set the UI language to the application's current locale
+                this.$ui.getControls().getLocalization().changeLocale([this.$i18n.locale]);
+
+                var overflowMenuButtons = [
                     "loop",
-                    "autoplay",
                     "quality",
                     "captions",
                     "picture_in_picture",
                     "playback_rate",
                     "airplay",
                 ];
+
+                if (!this.isEmbed) {
+                    overflowMenuButtons = ["theater_mode", ...overflowMenuButtons];
+                    overflowMenuButtons = ["autoplay", ...overflowMenuButtons];
+                }
 
                 if (this.isEmbed) {
                     overflowMenuButtons.push("open_new_tab");
@@ -849,8 +855,8 @@ export default {
 
                     let lang = "en";
                     if (!isSafari) {
-                        // Set the audio language to Persian as default
-                        const prefLang = "fa".substr(0, 2);
+                        // Set the audio language to the application's current locale
+                        const prefLang = this.$i18n.locale.substr(0, 2);
                         if (player.getAudioLanguages().includes(prefLang)) lang = prefLang;
                         else if (player.getAudioLanguages().includes("en")) lang = "en"; // fallback to English
                         player.selectAudioLanguage(lang);
@@ -1233,5 +1239,11 @@ export default {
 .direction-ltr {
     direction: ltr !important;
     text-align: left !important;
+}
+
+@media (max-width: 1024px) {
+    [data-shaka-theater-mode] {
+        display: none !important;
+    }
 }
 </style>

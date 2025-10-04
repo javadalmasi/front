@@ -44,7 +44,7 @@
                 <button class="btn mr-1" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}
                 </button>
-                <a class="btn mr-1" :href="getRssUrl">
+                <a v-if="!isRssFeedDisabled" class="btn mr-1" :href="getRssUrl">
                     <i class="i-fa6-solid:rss" />
                 </a>
                 <WatchOnButton :link="`https://www.youtube.com/playlist?list=${$route.query.list}`" />
@@ -96,6 +96,11 @@ export default {
         getRssUrl: _this => {
             return _this.authApiUrl() + "/rss/playlists/" + _this.$route.query.list;
         },
+        isRssFeedDisabled() {
+            // Check if RSS feed button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+
         isPipedPlaylist: _this => {
             // regex to determine whether it's a Piped plalylist
             return /[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}/.test(
