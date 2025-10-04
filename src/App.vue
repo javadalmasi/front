@@ -1,5 +1,5 @@
 <template>
-    <div class="reset min-h-screen w-full flex flex-col px-1vw py-5 antialiased" :class="[theme]">
+    <div class="reset min-h-screen w-full flex flex-col antialiased" :class="[theme]">
         <div class="flex-1">
             <NavBar :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
             <div class="flex">
@@ -11,7 +11,7 @@
                     @toggle-theme="toggleTheme"
                 />
                 <div
-                    class="flex-1"
+                    class="flex-1 px-1vw py-5"
                     :class="{
                         'md:pr-64': sidebarState === 'open' && !isWatchPage,
                         'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,

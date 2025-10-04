@@ -1,5 +1,7 @@
 <template>
-    <footer class="mt-10 w-full rounded-xl py-4 text-center children:(mx-3)">
+    <footer
+        class="mt-10 w-full border-t border-gray-200 bg-gray-50 py-4 text-center dark:border-dark-100 dark:bg-dark-800 children:(mx-3)"
+    >
         <a aria-label="GitHub" href="https://github.com/TeamPiped/Piped" target="_blank">
             <i class="i-fa6-brands:github" />
             <span v-t="'actions.source_code'" class="mr-2 hover:underline" />
@@ -50,12 +52,3 @@ export default {
     },
 };
 </script>
-
-<style>
-footer {
-    @apply bg-light-900;
-}
-.dark footer {
-    @apply bg-dark-800;
-}
-</style>

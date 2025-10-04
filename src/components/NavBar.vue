@@ -1,46 +1,48 @@
 <template>
-    <nav class="relative z-60 w-full flex items-center justify-between px-2 pb-2.5 sm:px-4">
-        <!-- Left side: Menu button and Logo -->
-        <div class="flex items-center">
-            <button
-                class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
-                aria-label="Toggle sidebar"
-                @click="toggleSidebar"
-            >
-                <div class="i-fa6-solid:bars text-xl" />
-            </button>
-            <router-link class="ml-4 flex items-center font-sans text-3xl font-bold" :to="homePagePath">
-                <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
-                <span class="hidden sm:inline">ویدیو</span>
-            </router-link>
-        </div>
-
-        <!-- Center: Search bar -->
-        <div class="mx-4 flex-1 max-w-2xl">
-            <div class="search-container w-full">
-                <input
-                    ref="videoSearch"
-                    v-model="searchText"
-                    class="input h-10 w-full pl-10"
-                    type="text"
-                    role="search"
-                    :title="$t('actions.search')"
-                    :placeholder="$t('actions.search')"
-                    @blur="onInputBlur"
-                    @focus="onInputFocus"
-                    @keypress="onKeyPress"
-                    @keyup="onKeyUp"
-                />
-                <span v-if="searchText" class="delete-search" @click="searchText = ''">⨉</span>
-                <button id="search-btn" class="btn absolute right-0 top-0 h-10 w-10" @click="onSearchClick">
-                    <div class="i-fa6-solid:magnifying-glass" />
+    <nav class="relative z-60 h-16 w-full border-b border-gray-200 bg-gray-50 dark:border-dark-100 dark:bg-dark-800">
+        <div class="mx-auto flex h-full items-center justify-between px-2 sm:px-4">
+            <!-- Left side: Menu button and Logo -->
+            <div class="flex items-center">
+                <button
+                    class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                    aria-label="Toggle sidebar"
+                    @click="toggleSidebar"
+                >
+                    <div class="i-fa6-solid:bars text-xl" />
                 </button>
+                <router-link class="ml-4 flex items-center font-sans text-3xl font-bold" :to="homePagePath">
+                    <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
+                    <span class="hidden sm:inline">ویدیو</span>
+                </router-link>
             </div>
-        </div>
 
-        <!-- Right side: User actions (placeholder) -->
-        <div class="flex items-center">
-            <!-- Future icons like notifications, user profile, etc. -->
+            <!-- Center: Search bar -->
+            <div class="mx-4 max-w-2xl flex-1">
+                <div class="search-container w-full">
+                    <input
+                        ref="videoSearch"
+                        v-model="searchText"
+                        class="input h-10 w-full pl-10"
+                        type="text"
+                        role="search"
+                        :title="$t('actions.search')"
+                        :placeholder="$t('actions.search')"
+                        @blur="onInputBlur"
+                        @focus="onInputFocus"
+                        @keypress="onKeyPress"
+                        @keyup="onKeyUp"
+                    />
+                    <span v-if="searchText" class="delete-search" @click="searchText = ''">⨉</span>
+                    <button id="search-btn" class="btn absolute right-0 top-0 h-10 w-10" @click="onSearchClick">
+                        <div class="i-fa6-solid:magnifying-glass" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right side: User actions (placeholder) -->
+            <div class="flex items-center">
+                <!-- Future icons like notifications, user profile, etc. -->
+            </div>
         </div>
     </nav>
     <SearchSuggestions

@@ -14,7 +14,7 @@
         :style="{ height: 'calc(100vh - 4rem)', direction: 'rtl' }"
     >
         <!-- Scrollable content area -->
-        <div class="overflow-y-auto h-full">
+        <div class="h-full overflow-y-auto">
             <!-- Public items section -->
             <div class="mt-4">
                 <div v-if="sidebarState === 'open'" class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
@@ -27,7 +27,7 @@
                     @click="navigateTo(item.route)"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div :class="item.icon" />
@@ -50,7 +50,7 @@
                     @click="searchCategory(category.name)"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div :class="getIconForCategory(category.name)" />
@@ -65,7 +65,7 @@
                     @click="toggleShowMoreCategories"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[
                             sidebarState === 'open' ? 'text-xl' : 'text-2xl',
                             showMoreCategories ? 'i-fa6-solid:chevron-up' : 'i-fa6-solid:chevron-down',
@@ -86,7 +86,7 @@
                     @click="emitToggleTheme"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div :class="theme === 'light' ? 'i-fa6-solid:moon' : 'i-fa6-solid:sun'" />
@@ -108,7 +108,7 @@
                     @click="navigateTo('/login')"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div class="i-fa6-solid:right-to-bracket" />
@@ -121,7 +121,7 @@
                     @click="navigateTo('/register')"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div class="i-fa6-solid:user-plus" />
@@ -134,7 +134,7 @@
                     @click="logout"
                 >
                     <div
-                        class="flex w-10 items-center justify-center"
+                        class="w-10 flex items-center justify-center"
                         :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
                     >
                         <div class="i-fa6-solid:right-from-bracket" />
