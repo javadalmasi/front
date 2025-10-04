@@ -807,9 +807,6 @@ export default {
                             maxBandwidth: Infinity, // Allow highest bandwidth when ABR is active
                             minBandwidth: 0, // Allow lowest bandwidth when ABR is active
                         },
-                        advanced: {
-                            useNetworkInformation: true, // Use browser's Network Information API if available
-                        },
                     },
                 });
             }
