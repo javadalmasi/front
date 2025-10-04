@@ -30,7 +30,7 @@
             <div class="flex-auto">
                 <div>
                     <Teleport defer to="#theaterModeSpot" :disabled="!theaterMode">
-                        <div class="flex flex-row">
+                        <div class="flex flex-row" :class="{ 'desktop-player-container': !theaterMode && !isMobile }">
                             <keep-alive>
                                 <VideoPlayer
                                     ref="videoPlayer"
@@ -871,5 +871,9 @@ export default {
 .description a {
     text-decoration: underline;
     filter: brightness(0.75);
+}
+
+.desktop-player-container {
+    @apply rounded-xl overflow-hidden;
 }
 </style>

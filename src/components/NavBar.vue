@@ -3,20 +3,20 @@
         <!-- Left side: Menu button and Logo -->
         <div class="flex items-center">
             <button
-                class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
                 aria-label="Toggle sidebar"
                 @click="toggleSidebar"
             >
                 <div class="i-fa6-solid:bars text-xl" />
             </button>
-            <router-link class="ml-4 flex items-center font-sans text-3xl font-bold" :to="homePagePath">
+            <router-link class="ml-4 flex items-center text-3xl font-bold font-sans" :to="homePagePath">
                 <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
                 <span class="hidden sm:inline">ویدیو</span>
             </router-link>
         </div>
 
         <!-- Center: Search bar -->
-        <div class="mx-4 flex-1 max-w-2xl">
+        <div class="mx-4 max-w-2xl flex-1">
             <div class="search-container w-full">
                 <input
                     ref="videoSearch"

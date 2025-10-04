@@ -2,33 +2,28 @@
     <div class="w-full">
         <img
             loading="lazy"
-            class="aspect-video w-full rounded-lg object-contain"
+            class="aspect-video w-full rounded-xl object-contain"
             :src="item.thumbnail"
             :alt="item.title"
             :class="{ 'shorts-img': item.isShort, 'opacity-75': item.watched }"
         />
         <!-- progress bar -->
-        <div class="relative h-1 w-full">
-            <div
-                v-if="item.watched && item.duration > 0"
-                class="absolute bottom-0 left-0 h-1 bg-red-600"
-                :style="{ width: `clamp(0%, ${(item.currentTime / item.duration) * 100}%, 100%` }"
-            />
-        </div>
-    </div>
-
-    <div class="relative" :class="small ? 'text-xs' : 'text-sm'">
+        <div
+            v-if="item.watched && item.duration > 0"
+            class="absolute bottom-0 left-0 h-1 w-full rounded-b-xl bg-red-600/75"
+            :style="{ width: `clamp(0%, ${(item.currentTime / item.duration) * 100}%, 100%` }"
+        />
         <!-- shorts thumbnail -->
-        <span v-if="item.isShort" v-t="'video.shorts'" class="thumbnail-overlay thumbnail-left" />
+        <span v-if="item.isShort" v-t="'video.shorts'" class="thumbnail-overlay bottom-5px left-5px" />
         <span
             v-if="item.duration > 0 || (item.duration == 0 && item.isShort)"
-            class="thumbnail-overlay thumbnail-right px-0.5"
+            class="thumbnail-overlay bottom-5px right-5px px-0.5"
             v-text="timeFormat(item.duration)"
         />
         <i18n-t
             v-else-if="!isLiveStreamDisabled() && isLivestream(item)"
             keypath="video.live"
-            class="thumbnail-overlay thumbnail-right !bg-red-600"
+            class="thumbnail-overlay bottom-5px right-5px !bg-red-600"
             tag="div"
         >
             <i class="i-fa6-solid:tower-broadcast w-3" />

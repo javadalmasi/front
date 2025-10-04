@@ -85,7 +85,7 @@
 
         <hr />
 
-        <div class="video-grid">
+        <div class="video-grid" :class="{ 'shorts-grid': isShortsTab }">
             <ContentItem
                 v-for="item in contentItems"
                 :key="item.url"
@@ -126,6 +126,11 @@ export default {
             contentItems: [],
             showGroupModal: false,
         };
+    },
+    computed: {
+        isShortsTab() {
+            return this.tabs[this.selectedTab]?.name === "shorts";
+        },
     },
     mounted() {
         this.getChannelData();
@@ -289,8 +294,21 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .active {
     border: 0.1rem outset red;
+}
+
+.shorts-grid {
+    --grid-item-width: 200px;
+}
+
+.shorts-grid :deep(.aspect-video) {
+    aspect-ratio: 9 / 16;
+}
+
+.shorts-grid :deep(img) {
+    object-fit: cover;
+    height: 100%;
 }
 </style>

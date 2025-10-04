@@ -14,24 +14,24 @@
         >
             <VideoThumbnail :item="item" />
 
-            <div>
+            <div class="mt-2">
                 <p
                     style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
-                    class="link flex overflow-hidden pt-2 font-bold"
+                    class="link flex overflow-hidden font-bold"
                     :title="title"
                     v-text="title"
                 />
             </div>
         </router-link>
 
-        <div class="flex">
-            <router-link :to="item.uploaderUrl" class="relative inline-block">
+        <div class="flex pt-2">
+            <router-link v-if="!hideChannel" :to="item.uploaderUrl" class="relative mr-2 inline-block h-32px w-32px">
                 <img
                     v-if="item.uploaderAvatar"
                     loading="lazy"
                     :src="item.uploaderAvatar"
                     :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
-                    class="mr-0.5 mt-0.5 h-32px w-32px"
+                    class="h-full w-full"
                     width="68"
                     height="68"
                 />
@@ -43,10 +43,10 @@
                 </div>
             </router-link>
 
-            <div class="flex-1 px-2">
+            <div class="flex-1">
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
-                    class="link-secondary overflow-hidden text-sm no-underline hover:underline-dashed"
+                    class="link-secondary overflow-hidden text-sm"
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
@@ -248,7 +248,7 @@ export default {
 
 <style>
 .video-info {
-    @apply mt-1 text-xs text-gray-600 font-normal;
+    @apply text-xs text-gray-600 font-normal;
 }
 
 .dark .video-info {
