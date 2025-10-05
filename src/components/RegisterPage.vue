@@ -86,7 +86,7 @@ export default {
         }
     },
     activated() {
-        document.title = "Register - Piped";
+        document.title = "Register - " + this.getSiteName();
     },
     methods: {
         register() {

@@ -43,7 +43,7 @@ export default {
         });
     },
     activated() {
-        document.title = this.$t("titles.trending") + " - Piped";
+        document.title = this.$t("titles.trending") + " - " + this.getSiteName();
         if (this.videos.length > 0) this.updateWatched(this.videos);
         if (this.$route.path == import.meta.env.BASE_URL) {
             let homepage = this.getHomePage(this);

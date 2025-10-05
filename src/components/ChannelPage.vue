@@ -32,20 +32,20 @@
             </div>
 
             <div class="flex gap-2">
-                <button
-                    class="btn"
-                    @click="subscribeHandler"
-                    v-text="
-                        $t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe')) +
-                        ' - ' +
+                <button :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-primary'" @click="subscribeHandler">
+                    <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
+                    <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
+                    {{
+                        $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) +
+                        " - " +
                         numberFormat(channel.subscriberCount)
-                    "
-                ></button>
+                    }}
+                </button>
 
                 <button
                     v-if="subscribed"
                     v-t="'actions.add_to_group'"
-                    class="btn"
+                    class="btn btn-secondary"
                     @click="showGroupModal = true"
                 ></button>
 
@@ -57,7 +57,7 @@
                     role="button"
                     :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${channel.id}`"
                     target="_blank"
-                    class="btn flex-col"
+                    class="btn btn-secondary flex-col"
                 >
                     <i class="i-fa6-solid:rss" />
                 </a>
@@ -72,14 +72,14 @@
             <button
                 v-for="(tab, index) in tabs"
                 :key="tab.name"
-                class="btn mr-2"
+                class="btn btn-secondary mr-2"
                 :class="{ active: selectedTab == index }"
                 @click="loadTab(index)"
             >
                 <span v-text="tab.translatedName"></span>
             </button>
             <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                <button class="btn mr-2">پخش همه</button>
+                <button class="btn btn-primary mr-2">پخش همه</button>
             </router-link>
         </div>
 
@@ -127,22 +127,22 @@ export default {
             showGroupModal: false,
         };
     },
-    mounted() {
-        this.getChannelData();
-    },
-    activated() {
-        if (this.channel && !this.channel.error) document.title = this.channel.name + " - Piped";
-        window.addEventListener("scroll", this.handleScroll);
-        if (this.channel && !this.channel.error) this.updateWatched(this.channel.relatedStreams);
-    },
-    deactivated() {
-        window.removeEventListener("scroll", this.handleScroll);
-    },
     computed: {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
         },
+    },
+    mounted() {
+        this.getChannelData();
+    },
+    activated() {
+        if (this.channel && !this.channel.error) document.title = this.channel.name + " - " + this.getSiteName();
+        window.addEventListener("scroll", this.handleScroll);
+        if (this.channel && !this.channel.error) this.updateWatched(this.channel.relatedStreams);
+    },
+    deactivated() {
+        window.removeEventListener("scroll", this.handleScroll);
     },
     unmounted() {
         window.removeEventListener("scroll", this.handleScroll);
@@ -164,7 +164,7 @@ export default {
                 .then(data => (this.channel = data))
                 .then(() => {
                     if (!this.channel.error) {
-                        document.title = this.channel.name + " - Piped";
+                        document.title = this.channel.name + " - " + this.getSiteName();
                         // Filter livestreams if they are disabled
                         if (this.filterLivestreams) {
                             this.channel.relatedStreams = this.filterLivestreams(this.channel.relatedStreams);

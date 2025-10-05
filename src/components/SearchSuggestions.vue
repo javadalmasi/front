@@ -1,5 +1,5 @@
 <template>
-    <div class="suggestions-container absolute">
+    <div class="suggestions-container absolute left-0 right-0 top-full mt-1">
         <ul>
             <li
                 v-for="(suggestion, i) in searchSuggestions"
@@ -83,22 +83,22 @@ export default {
 
 <style>
 .suggestions-container {
-    @apply left-1/2 translate-x-[-50%] transform-gpu max-w-3xl w-full box-border z-10 lt-md:max-w-[calc(100%-0.5rem)] bg-gray-300;
+    @apply max-w-3xl w-full box-border z-10 lt-md:max-w-[calc(100%-0.5rem)] bg-white border border-gray-200 rounded-md shadow-lg mt-1;
 }
 
 .dark .suggestions-container {
-    @apply bg-dark-400;
-}
-
-.suggestion-selected {
-    @apply bg-gray-200;
-}
-
-.dark .suggestion-selected {
-    @apply bg-dark-100;
+    @apply bg-dark-300 border-dark-100;
 }
 
 .suggestion {
-    @apply block w-full p-1;
+    @apply block w-full px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-400 cursor-pointer;
+}
+
+.suggestion-selected {
+    @apply bg-blue-100 dark:bg-blue-900 !important;
+}
+
+.dark .suggestion-selected {
+    @apply bg-blue-900 !important;
 }
 </style>

@@ -40,12 +40,13 @@
 
         <button
             v-if="subscribed != null"
-            class="btn mt-2 w-max"
+            :class="[subscribed ? 'btn btn-unsubscribe mt-2 w-max' : 'btn btn-red mt-2 w-max']"
             @click="subscribeHandler"
-            v-text="
-                $t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe')) + ' - ' + numberFormat(item.subscribers)
-            "
-        />
+        >
+            <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
+            <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
+            {{ $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) + " - " + numberFormat(item.subscribers) }}
+        </button>
 
         <br />
     </div>

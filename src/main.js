@@ -614,6 +614,9 @@ const mixin = {
             );
             window.localStorage.setItem("customInstances", JSON.stringify(customInstances));
         },
+        getSiteName() {
+            return import.meta.env.VITE_SITE_NAME || "Piped";
+        },
     },
     computed: {
         authenticated(_this) {

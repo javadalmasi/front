@@ -142,7 +142,7 @@ export default {
                 });
         },
         async updateTitle() {
-            document.title = this.playlist.name + " - Piped";
+            document.title = this.playlist.name + " - " + this.getSiteName();
         },
         handleScroll() {
             if (this.loading || !this.playlist || !this.playlist.nextpage) return;

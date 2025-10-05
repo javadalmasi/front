@@ -134,7 +134,7 @@ export default {
         this.loadPlaylistBookmarks();
     },
     activated() {
-        document.title = this.$t("titles.playlists") + " - Piped";
+        document.title = this.$t("titles.playlists") + " - " + this.getSiteName();
     },
     methods: {
         fetchPlaylists() {
@@ -175,7 +175,7 @@ export default {
         async exportPlaylists() {
             if (!this.playlists) return;
             let json = {
-                format: "Piped",
+                format: this.getSiteName(),
                 version: 1,
                 playlists: [],
             };

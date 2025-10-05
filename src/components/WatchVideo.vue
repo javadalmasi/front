@@ -148,23 +148,26 @@
                             <!-- Subscribe Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
-                                class="btn flex items-center gap-1 <md:hidden"
+                                class="btn btn-primary flex items-center gap-1 <md:hidden"
                                 @click="downloadCurrentFrame"
                             >
                                 {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
                             </button>
-                            <button class="btn flex items-center" @click="showModal = !showModal">
+                            <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
                                 {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
                             </button>
                             <button
-                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-red'"
+                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-primary'"
                                 @click="subscribeHandler"
-                                v-text="
-                                    $t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe')) +
-                                    ' - ' +
+                            >
+                                <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
+                                <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
+                                {{
+                                    $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) +
+                                    " - " +
                                     numberFormat(video.uploaderSubscriberCount)
-                                "
-                            />
+                                }}
+                            </button>
                             <div class="flex flex-wrap gap-1">
                                 <!-- RSS Feed button -->
                                 <a
@@ -174,12 +177,15 @@
                                     role="button"
                                     :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
                                     target="_blank"
-                                    class="btn flex items-center"
+                                    class="btn btn-secondary flex items-center"
                                 >
                                     <i class="i-fa6-solid:rss mx-1.5" />
                                 </a>
                                 <!-- Share Dialog -->
-                                <button class="btn flex items-center" @click="showShareModal = !showShareModal">
+                                <button
+                                    class="btn btn-secondary flex items-center"
+                                    @click="showShareModal = !showShareModal"
+                                >
                                     <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="strong"></i18n-t>
                                     <i class="i-fa6-solid:share mx-1.5" />
                                 </button>
@@ -196,7 +202,7 @@
                                     :to="toggleListenUrl"
                                     :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                     :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    class="btn flex items-center"
+                                    class="btn btn-secondary flex items-center"
                                 >
                                     <i
                                         :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
@@ -212,7 +218,7 @@
                     <div
                         v-for="metaInfo in video?.metaInfo ?? []"
                         :key="metaInfo.title"
-                        class="btn my-3 flex flex-wrap cursor-default gap-2 px-4 py-2"
+                        class="btn btn-secondary my-3 flex flex-wrap cursor-default gap-2 px-4 py-2"
                     >
                         <span>{{ metaInfo.description ?? metaInfo.title }}</span>
                         <a v-for="(link, linkIndex) in metaInfo.urls" :key="linkIndex" :href="link" class="underline">{{
@@ -223,11 +229,11 @@
 
                     <button
                         v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
-                        class="btn mb-2"
+                        class="btn btn-secondary mb-2"
                         @click="showDesc = !showDesc"
                     />
 
-                    <span v-show="video?.chapters?.length > 0" class="btn mr-2">
+                    <span v-show="video?.chapters?.length > 0" class="btn btn-secondary mr-2">
                         <input id="showChapters" v-model="showChapters" type="checkbox" />
                         <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
                     </span>
@@ -249,7 +255,7 @@
                             <router-link
                                 v-for="tag in video.tags"
                                 :key="tag"
-                                class="btn line-clamp-1 rounded-2xl px-5 py-1"
+                                class="btn btn-secondary line-clamp-1 rounded-2xl px-5 py-1"
                                 :to="`/results?search_query=${encodeURIComponent(tag)}`"
                                 >{{ tag }}</router-link
                             >
@@ -261,7 +267,7 @@
                 <div v-if="isMobile">
                     <a
                         v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                        class="btn mb-2"
+                        class="btn btn-secondary mb-2"
                         @click="showRecs = !showRecs"
                     />
                     <hr v-show="showRecs" />
@@ -283,7 +289,7 @@
                     <div class="">
                         <button
                             v-if="!comments?.disabled"
-                            class="btn mb-2"
+                            class="btn btn-secondary mb-2"
                             @click="toggleComments"
                             v-text="
                                 `${$t(showComments ? 'actions.minimize_comments' : 'actions.show_comments')} (${numberFormat(
@@ -329,7 +335,7 @@
                 />
                 <a
                     v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                    class="btn mb-2"
+                    class="btn btn-secondary mb-2"
                     @click="showRecs = !showRecs"
                 />
                 <hr v-show="showRecs" />
@@ -532,7 +538,7 @@ export default {
         this.showRecs = !this.getPreferenceBoolean("minimizeRecommendations", false);
         this.showChapters = !this.getPreferenceBoolean("minimizeChapters", false);
         if (this.video?.duration) {
-            document.title = this.video.title + " - Piped";
+            document.title = this.video.title + " - " + this.getSiteName();
             this.$refs.videoPlayer.loadVideo();
         }
         window.addEventListener("scroll", this.handleScroll);
@@ -629,9 +635,9 @@ export default {
                         ) {
                             this.video.error = true;
                             this.video.message = this.$t("info.livestreams_disabled");
-                            document.title = this.$t("info.livestreams_disabled") + " - Piped";
+                            document.title = this.$t("info.livestreams_disabled") + " - " + this.getSiteName();
                         } else {
-                            document.title = this.video.title + " - Piped";
+                            document.title = this.video.title + " - " + this.getSiteName();
                             this.channelId = this.video.uploaderUrl.split("/")[2];
                             if (!this.isEmbed) this.fetchSubscribedStatus();
 

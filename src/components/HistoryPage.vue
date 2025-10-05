@@ -108,7 +108,7 @@ export default {
         });
     },
     activated() {
-        document.title = "Watch History - Piped";
+        document.title = "Watch History - " + this.getSiteName();
         window.addEventListener("scroll", this.handleScroll);
     },
     deactivated() {

@@ -105,11 +105,11 @@ export default {
         exportAsPlaylist() {
             const dateStr = new Date().toISOString().split(".")[0];
             let json = {
-                format: "Piped",
+                format: this.getSiteName(),
                 version: 1,
                 playlists: [
                     {
-                        name: `Piped History ${dateStr}`,
+                        name: `${this.getSiteName()} History ${dateStr}`,
                         type: "history",
                         visibility: "private",
                         videos: this.exportVideos.map(video => "https://youtube.com" + video.url),
@@ -121,7 +121,7 @@ export default {
         exportAsHistory() {
             const dateStr = new Date().toISOString().split(".")[0];
             let json = {
-                format: "Piped",
+                format: this.getSiteName(),
                 version: 1,
                 watchHistory: this.exportVideos.map(video => {
                     let obj = {};

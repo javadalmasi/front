@@ -314,8 +314,9 @@ b {
     @apply grid grid-cols-1 mx-2 sm:mx-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 col-auto lt-md:gap-x-3 md:gap-x-6 gap-y-5;
 }
 
+/* Base button styles with consistent sizing, spacing, and hover effects */
 .btn {
-    @apply py-2 px-4 rounded-3xl cursor-pointer inline-block transition-colors duration-200 ease-in-out;
+    @apply py-2 px-4 rounded-3xl cursor-pointer inline-block transition-all duration-200 ease-in-out;
 }
 
 .btn:hover {
@@ -326,14 +327,116 @@ b {
     @apply transform scale-95;
 }
 
-.reset {
-    @apply text-black bg-white;
+/* Primary button variant - for main actions */
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
 }
 
-.dark {
-    @apply text-white bg-dark-900;
+/* Secondary button variant - for supporting actions */
+.btn-secondary {
+    @apply bg-gray-300 text-gray-800 hover:bg-gray-400;
 }
 
+/* Danger button variant - for destructive actions */
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+/* Success button variant - for confirmation actions */
+.btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+/* Warning button variant - for cautionary actions */
+.btn-warning {
+    @apply bg-yellow-500 text-white hover:bg-yellow-600;
+}
+
+/* Info button variant - for informational actions */
+.btn-info {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700;
+}
+
+/* Outline button variant - for subtle actions */
+.btn-outline {
+    @apply border-2 border-gray-300 bg-transparent text-gray-700 hover:bg-gray-200 hover:text-gray-900;
+}
+
+/* Small button size */
+.btn-sm {
+    @apply py-1 px-3 text-sm;
+}
+
+/* Large button size */
+.btn-lg {
+    @apply py-3 px-6 text-lg;
+}
+
+/* Extra small button size */
+.btn-xs {
+    @apply py-0.5 px-2 text-xs;
+}
+
+/* Extra large button size */
+.btn-xl {
+    @apply py-4 px-8 text-xl;
+}
+
+/* Block button - full width */
+.btn-block {
+    @apply w-full;
+}
+
+/* Rounded button - circular shape */
+.btn-rounded {
+    @apply rounded-full;
+}
+
+/* Square button - minimal padding */
+.btn-square {
+    @apply p-2 aspect-square;
+}
+
+/* Responsive button sizes for different screen sizes */
+.btn-responsive-sm {
+    @apply py-1 px-2 text-sm lt-md:py-0.5 lt-md:px-1.5 lt-md:text-xs;
+}
+
+.btn-responsive-md {
+    @apply py-2 px-4 text-base lt-md:py-1.5 lt-md:px-3 lt-md:text-sm;
+}
+
+.btn-responsive-lg {
+    @apply py-3 px-6 text-lg lt-md:py-2 lt-md:px-4 lt-md:text-base;
+}
+
+/* Full width button on mobile */
+.btn-mobile-block {
+    @apply w-full lt-md:w-full;
+}
+
+/* Responsive padding adjustments */
+.btn-responsive-padding {
+    @apply px-4 lt-md:px-3 sm:px-5;
+}
+
+/* Responsive margin adjustments */
+.btn-responsive-margin {
+    @apply mx-2 lt-md:mx-1 sm:mx-3;
+}
+
+/* Disabled button state */
+.btn:disabled,
+.btn.disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+/* Focus state for accessibility */
+.btn:focus {
+    @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
+}
+
+/* Input and select base styles */
 .input,
 .select,
 .btn {
@@ -349,55 +452,13 @@ b {
     @apply h-4 w-4;
 }
 
-/* Primary button variant */
-.btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
+/* Reset and dark theme styles */
+.reset {
+    @apply text-black bg-white;
 }
 
-/* Secondary button variant */
-.btn-secondary {
-    @apply bg-gray-300 text-gray-800 hover:bg-gray-400;
-}
-
-/* Subscribe button variant (red) */
-.btn-red {
-    @apply bg-red-600 text-white hover:bg-red-700;
-}
-
-/* Danger button variant */
-.btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700;
-}
-
-/* Unsubscribe button variant (to differentiate from subscribe) */
-.btn-unsubscribe {
-    @apply bg-blue-500 text-white hover:bg-blue-600;
-}
-
-/* Success button variant */
-.btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700;
-}
-
-/* Small button size */
-.btn-sm {
-    @apply py-1 px-3 text-sm;
-}
-
-/* Large button size */
-.btn-lg {
-    @apply py-3 px-6 text-lg;
-}
-
-/* Block button */
-.btn-block {
-    @apply w-full;
-}
-
-/* Disabled button */
-.btn:disabled,
-.btn.disabled {
-    @apply opacity-50 cursor-not-allowed;
+.dark {
+    @apply text-white bg-dark-900;
 }
 
 .dark .input,
@@ -410,6 +471,7 @@ b {
     @apply bg-dark-400 text-white;
 }
 
+/* Dark theme variants */
 .dark .btn-primary {
     @apply bg-blue-700 text-white hover:bg-blue-600;
 }
@@ -422,16 +484,24 @@ b {
     @apply bg-red-700 text-white hover:bg-red-600;
 }
 
-.dark .btn-red {
-    @apply bg-red-700 text-white hover:bg-red-600;
-}
-
-.dark .btn-unsubscribe {
-    @apply bg-blue-600 text-white hover:bg-blue-500;
-}
-
 .dark .btn-success {
     @apply bg-green-700 text-white hover:bg-green-600;
+}
+
+.dark .btn-warning {
+    @apply bg-yellow-600 text-white hover:bg-yellow-500;
+}
+
+.dark .btn-info {
+    @apply bg-indigo-700 text-white hover:bg-indigo-600;
+}
+
+.dark .btn-outline {
+    @apply border-2 border-dark-400 bg-transparent text-gray-300 hover:bg-dark-400 hover:text-white;
+}
+
+.dark .btn:focus {
+    @apply ring-2 ring-blue-400 ring-opacity-75;
 }
 
 .input {

@@ -71,7 +71,7 @@ export default {
         },
     },
     activated() {
-        document.title = "Import - Piped";
+        document.title = "Import - " + this.getSiteName();
     },
     methods: {
         fileChange() {

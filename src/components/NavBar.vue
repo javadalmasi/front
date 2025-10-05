@@ -1,58 +1,42 @@
 <template>
     <nav
-        class="sticky top-0 z-60 h-16 w-full border-b border-gray-200 bg-gray-50 dark:border-dark-100 dark:bg-dark-800 lt-md:static"
+        class="sticky top-0 z-60 h-16 w-full border-b border-gray-200 bg-gray-50 lt-md:static dark:border-dark-100 dark:bg-dark-800"
     >
-        <div class="mx-auto flex h-full items-center justify-between px-2 sm:px-4">
+        <div class="mx-auto h-full flex items-center justify-between px-2 sm:px-4">
             <!-- Left side: Menu button and Logo -->
             <div class="flex items-center">
                 <button
-                    class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                    class="relative h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
                     aria-label="Toggle sidebar"
                     @click="toggleSidebar"
                 >
                     <div class="i-fa6-solid:bars text-2xl" />
                 </button>
-                <router-link class="ml-4 flex items-center font-sans text-3xl font-bold" :to="homePagePath">
+                <router-link class="ml-4 flex items-center text-3xl font-bold font-sans" :to="homePagePath">
                     <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
                     <span class="hidden sm:inline">ویدیو</span>
                 </router-link>
             </div>
 
-            <!-- Center: Search bar -->
-            <div class="mx-4 max-w-2xl flex-1">
-                <div class="search-container w-full">
-                    <input
-                        ref="videoSearch"
-                        v-model="searchText"
-                        class="input h-10 w-full pr-10"
-                        type="text"
-                        role="search"
-                        :title="$t('actions.search')"
-                        :placeholder="$t('actions.search')"
-                        @blur="onInputBlur"
-                        @focus="onInputFocus"
-                        @keypress="onKeyPress"
-                        @keyup="onKeyUp"
-                    />
-                    <span v-if="searchText" class="delete-search" @click="searchText = ''">⨉</span>
-                    <button id="search-btn" class="btn absolute right-0 top-0 h-10 w-10" @click="onSearchClick">
-                        <div class="i-fa6-solid:magnifying-glass" />
-                    </button>
-                </div>
-            </div>
-
-            <!-- Right side: User actions (placeholder) -->
+            <!-- Right side: User actions -->
             <div class="flex items-center">
-                <!-- Future icons like notifications, user profile, etc. -->
+                <!-- Search button -->
+                <button
+                    class="ml-2 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                    aria-label="Search"
+                    @click="$router.push({ name: 'SearchResults' })"
+                >
+                    <div class="i-fa6-solid:magnifying-glass text-xl" />
+                </button>
             </div>
+            <SearchSuggestions
+                v-show="!isOnSearchResultsPage && (searchText || showSearchHistory) && suggestionsVisible"
+                ref="searchSuggestions"
+                :search-text="searchText"
+                @searchchange="onSearchTextChange"
+            />
         </div>
     </nav>
-    <SearchSuggestions
-        v-show="(searchText || showSearchHistory) && suggestionsVisible"
-        ref="searchSuggestions"
-        :search-text="searchText"
-        @searchchange="onSearchTextChange"
-    />
 </template>
 
 <script>
@@ -82,6 +66,9 @@ export default {
         };
     },
     computed: {
+        isOnSearchResultsPage() {
+            return this.$route.name === "SearchResults";
+        },
         shouldShowLogin() {
             return this.getAuthToken() == null;
         },
@@ -124,7 +111,9 @@ export default {
             if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                 e.preventDefault();
             }
-            this.$refs.searchSuggestions.onKeyUp(e);
+            if (!this.isOnSearchResultsPage && this.$refs.searchSuggestions) {
+                this.$refs.searchSuggestions.onKeyUp(e);
+            }
         },
         onKeyPress(e) {
             if (e.key === "Enter") {
@@ -132,8 +121,10 @@ export default {
             }
         },
         onInputFocus() {
-            if (this.showSearchHistory) this.$refs.searchSuggestions.refreshSuggestions();
-            this.suggestionsVisible = true;
+            if (!this.isOnSearchResultsPage && this.$refs.searchSuggestions) {
+                if (this.showSearchHistory) this.$refs.searchSuggestions.refreshSuggestions();
+                this.suggestionsVisible = true;
+            }
         },
         onInputBlur() {
             setTimeout(() => (this.suggestionsVisible = false), 200);
@@ -172,7 +163,7 @@ export default {
     @apply relative flex items-center;
 }
 .delete-search {
-    @apply absolute left-12 top-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-[#ccc] w-4 h-4 text-center text-black opacity-50 hover:opacity-70 text-sm;
+    @apply absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-[#ccc] w-4 h-4 text-center text-black opacity-50 hover:opacity-70 text-sm;
 }
 #search-btn {
     @apply rounded-l-none rounded-r-3xl;
@@ -180,4 +171,5 @@ export default {
 .dark #search-btn:hover {
     @apply bg-dark-100;
 }
+/* Additional styles can be added here if needed */
 </style>

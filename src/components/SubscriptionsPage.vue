@@ -166,7 +166,7 @@ export default {
         this.loadChannelGroups();
     },
     activated() {
-        document.title = "Subscriptions - Piped";
+        document.title = "Subscriptions - " + this.getSiteName();
     },
     methods: {
         async loadChannelGroups() {
@@ -263,7 +263,7 @@ export default {
         },
         exportGroupsHandler() {
             const json = {
-                format: "Piped",
+                format: this.getSiteName(),
                 version: 1,
                 groups: this.channelGroups.slice(1),
             };

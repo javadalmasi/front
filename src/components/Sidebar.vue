@@ -21,7 +21,7 @@
                     آیتم‌های عمومی
                 </div>
                 <div
-                    v-for="item in publicItems"
+                    v-for="item in filteredPublicItems"
                     :key="item.name"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
@@ -177,6 +177,7 @@ export default {
             publicItems: [
                 { name: "صفحه اصلی", route: "/", icon: "i-fa6-solid:house" },
                 { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss" },
+                { name: "اشتراک‌ها", route: "/subscriptions", icon: "i-fa6-solid:bell" },
                 { name: "پرطرفدار", route: "/trending", icon: "i-fa6-solid:fire" },
                 { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left" },
                 { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered" },

@@ -130,7 +130,7 @@ export default {
         this.loadChannelGroups();
     },
     activated() {
-        document.title = this.$t("titles.feed") + " - Piped";
+        document.title = this.$t("titles.feed") + " - " + this.getSiteName();
         if (this.videos.length > 0) this.updateWatched(this.videos);
         window.addEventListener("scroll", this.handleScroll);
     },

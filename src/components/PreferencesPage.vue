@@ -6,7 +6,7 @@
     </div>
     <h1 v-t="'titles.preferences'" class="text-center font-bold" />
     <hr />
-    <label for="ddlTheme" class="pref">
+    <label v-if="!isThemeSelectorDisabled" for="ddlTheme" class="pref">
         <strong v-t="'actions.theme'" class="tooltip-hover" :title="$t('tooltips.theme')" />
         <select id="ddlTheme" v-model="selectedTheme" class="select w-auto" @change="onChange($event)">
             <option v-t="'actions.auto'" value="auto" />
@@ -155,7 +155,7 @@
             <option v-t="'video.chapters_vertical'" value="Vertical" />
         </select>
     </label>
-    <label class="pref" for="chkShowWatchOnYouTube">
+    <label v-if="!isWatchOnYouTubeDisabled" class="pref" for="chkShowWatchOnYouTube">
         <strong
             v-t="'actions.show_watch_on_youtube'"
             class="tooltip-hover"
@@ -169,7 +169,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label class="pref" for="chkShowSearchSuggestions">
+    <label v-if="!isSearchSuggestionsDisabled" class="pref" for="chkShowSearchSuggestions">
         <strong
             v-t="'actions.show_search_suggestions'"
             class="tooltip-hover"
@@ -183,7 +183,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label class="pref" for="chkStoreSearchHistory">
+    <label v-if="!isSearchHistoryStorageDisabled" class="pref" for="chkStoreSearchHistory">
         <strong
             v-t="'actions.store_search_history'"
             class="tooltip-hover"
@@ -197,7 +197,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label class="pref" for="chkStoreWatchHistory">
+    <label v-if="!isWatchHistoryStorageDisabled" class="pref" for="chkStoreWatchHistory">
         <strong v-t="'actions.store_watch_history'" class="tooltip-hover" :title="$t('tooltips.store_watch_history')" />
         <input
             id="chkStoreWatchHistory"
@@ -225,11 +225,11 @@
             <option value="avc">AVC (h.264)</option>
         </select>
     </label>
-    <label class="pref" for="chkDisableLBRY">
+    <label v-if="!isLBRYIntegrationDisabled" class="pref" for="chkDisableLBRY">
         <strong v-t="'actions.disable_lbry'" class="tooltip-hover" :title="$t('tooltips.disable_lbry')" />
         <input id="chkDisableLBRY" v-model="disableLBRY" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
-    <label class="pref" for="chkEnableLBRYProxy">
+    <label v-if="!isLBRYProxyDisabled" class="pref" for="chkEnableLBRYProxy">
         <strong v-t="'actions.enable_lbry_proxy'" class="tooltip-hover" :title="$t('tooltips.enable_lbry_proxy')" />
         <input
             id="chkEnableLBRYProxy"
@@ -239,7 +239,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label class="pref" for="txtPrefetchLimit">
+    <label v-if="!isPrefetchLimitDisabled" class="pref" for="txtPrefetchLimit">
         <strong
             v-t="'actions.concurrent_prefetch_limit'"
             class="tooltip-hover"
@@ -303,11 +303,11 @@
         </label>
     </div>
 
-    <h2 v-t="'titles.dearrow'" class="text-center" />
-    <p class="text-center">
+    <h2 v-if="!isDeArrowIntegrationDisabled" v-t="'titles.dearrow'" class="text-center" />
+    <p v-if="!isDeArrowIntegrationDisabled" class="text-center">
         <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
     </p>
-    <label class="pref" for="chkDeArrow">
+    <label v-if="!isDeArrowIntegrationDisabled" class="pref" for="chkDeArrow">
         <strong v-t="'actions.enable_dearrow'" class="tooltip-hover" :title="$t('tooltips.enable_dearrow')" />
         <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
@@ -328,14 +328,14 @@
                     type="password"
                     @keyup.enter="deleteAccount"
                 />
-                <a v-t="'actions.delete_account'" class="btn w-auto" @click="deleteAccount" />
+                <a v-t="'actions.delete_account'" class="btn btn-danger" @click="deleteAccount" />
             </div>
         </label>
         <div class="pref">
-            <a v-t="'actions.logout'" class="btn w-auto" @click="logout" />
+            <a v-t="'actions.logout'" class="btn btn-secondary" @click="logout" />
             <a
                 v-t="'actions.invalidate_session'"
-                class="btn w-auto"
+                class="btn btn-warning"
                 style="margin-left: 0.5em"
                 @click="invalidateSession"
             />
@@ -345,9 +345,14 @@
     <br />
     <p v-t="'info.preferences_note'" />
     <br />
-    <button v-t="'actions.reset_preferences'" class="btn" @click="showConfirmResetPrefsDialog = true" />
-    <button v-t="'actions.backup_preferences'" class="btn mx-4" @click="backupPreferences()" />
-    <label v-t="'actions.restore_preferences'" for="fileSelector" class="btn" @click="restorePreferences()" />
+    <button v-t="'actions.reset_preferences'" class="btn btn-warning" @click="showConfirmResetPrefsDialog = true" />
+    <button v-t="'actions.backup_preferences'" class="btn btn-secondary mx-4" @click="backupPreferences()" />
+    <label
+        v-t="'actions.restore_preferences'"
+        for="fileSelector"
+        class="btn btn-secondary"
+        @click="restorePreferences()"
+    />
     <input id="fileSelector" ref="fileSelector" class="hidden" type="file" @change="restorePreferences()" />
     <ConfirmModal
         v-if="showConfirmResetPrefsDialog"
@@ -410,9 +415,36 @@ export default {
     },
     computed: {
         // instances are removed as we're using a fixed custom instance
+        isThemeSelectorDisabled() {
+            return import.meta.env.VITE_DISABLE_THEME_SELECTOR === "true";
+        },
+        isWatchOnYouTubeDisabled() {
+            return import.meta.env.VITE_DISABLE_WATCH_ON_YOUTUBE === "true";
+        },
+        isWatchHistoryStorageDisabled() {
+            return import.meta.env.VITE_DISABLE_WATCH_HISTORY_STORAGE === "true";
+        },
+        isSearchHistoryStorageDisabled() {
+            return import.meta.env.VITE_DISABLE_SEARCH_HISTORY_STORAGE === "true";
+        },
+        isSearchSuggestionsDisabled() {
+            return import.meta.env.VITE_DISABLE_SEARCH_SUGGESTIONS === "true";
+        },
+        isLBRYIntegrationDisabled() {
+            return import.meta.env.VITE_DISABLE_LBRY_INTEGRATION === "true";
+        },
+        isLBRYProxyDisabled() {
+            return import.meta.env.VITE_DISABLE_LBRY_PROXY === "true";
+        },
+        isPrefetchLimitDisabled() {
+            return import.meta.env.VITE_DISABLE_PREFETCH_LIMIT === "true";
+        },
+        isDeArrowIntegrationDisabled() {
+            return import.meta.env.VITE_DISABLE_DEARROW_INTEGRATION === "true";
+        },
     },
     activated() {
-        document.title = this.$t("titles.preferences") + " - Piped";
+        document.title = this.$t("titles.preferences") + " - " + this.getSiteName();
     },
     async mounted() {
         if (Object.keys(this.$route.query).length > 0) this.$router.replace({ query: {} });
