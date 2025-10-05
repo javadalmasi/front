@@ -39,8 +39,8 @@
     <hr />
 
     <span class="flex gap-2">
-        <router-link v-t="'titles.subscriptions'" class="btn" to="/subscriptions" />
-        <a v-if="!isRssFeedDisabled" :href="getRssUrl" class="btn">
+        <router-link v-t="'titles.subscriptions'" class="btn btn-secondary" to="/subscriptions" />
+        <a v-if="!isRssFeedDisabled" :href="getRssUrl" class="btn btn-secondary">
             <i class="i-fa6-solid:rss" />
         </a>
     </span>

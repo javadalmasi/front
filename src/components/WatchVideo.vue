@@ -157,7 +157,7 @@
                                 {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
                             </button>
                             <button
-                                class="btn"
+                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-red'"
                                 @click="subscribeHandler"
                                 v-text="
                                     $t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe')) +

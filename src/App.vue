@@ -315,7 +315,15 @@ b {
 }
 
 .btn {
-    @apply py-2 lt-md:px-2 md:px-4 rounded-3xl cursor-pointer inline-block hover:bg-gray-500 hover:text-white;
+    @apply py-2 px-4 rounded-3xl cursor-pointer inline-block transition-colors duration-200 ease-in-out;
+}
+
+.btn:hover {
+    @apply bg-gray-400 text-white;
+}
+
+.btn:active {
+    @apply transform scale-95;
 }
 
 .reset {
@@ -329,7 +337,7 @@ b {
 .input,
 .select,
 .btn {
-    @apply w-auto text-gray-600 bg-gray-300;
+    @apply w-auto text-gray-700 bg-gray-200 border border-gray-300;
 }
 
 .input,
@@ -341,14 +349,89 @@ b {
     @apply h-4 w-4;
 }
 
+/* Primary button variant */
+.btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+/* Secondary button variant */
+.btn-secondary {
+    @apply bg-gray-300 text-gray-800 hover:bg-gray-400;
+}
+
+/* Subscribe button variant (red) */
+.btn-red {
+    @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+/* Danger button variant */
+.btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+/* Unsubscribe button variant (to differentiate from subscribe) */
+.btn-unsubscribe {
+    @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+/* Success button variant */
+.btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+/* Small button size */
+.btn-sm {
+    @apply py-1 px-3 text-sm;
+}
+
+/* Large button size */
+.btn-lg {
+    @apply py-3 px-6 text-lg;
+}
+
+/* Block button */
+.btn-block {
+    @apply w-full;
+}
+
+/* Disabled button */
+.btn:disabled,
+.btn.disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
 .dark .input,
 .dark .select,
 .dark .btn {
-    @apply text-gray-400 bg-dark-400;
+    @apply text-gray-300 bg-dark-500 border-dark-400;
 }
 
-.dark .btn {
-    @apply hover:bg-dark-300;
+.dark .btn:hover {
+    @apply bg-dark-400 text-white;
+}
+
+.dark .btn-primary {
+    @apply bg-blue-700 text-white hover:bg-blue-600;
+}
+
+.dark .btn-secondary {
+    @apply bg-dark-400 text-gray-200 hover:bg-dark-300;
+}
+
+.dark .btn-danger {
+    @apply bg-red-700 text-white hover:bg-red-600;
+}
+
+.dark .btn-red {
+    @apply bg-red-700 text-white hover:bg-red-600;
+}
+
+.dark .btn-unsubscribe {
+    @apply bg-blue-600 text-white hover:bg-blue-500;
+}
+
+.dark .btn-success {
+    @apply bg-green-700 text-white hover:bg-green-600;
 }
 
 .input {

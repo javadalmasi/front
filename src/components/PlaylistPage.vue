@@ -38,7 +38,7 @@
                     {{ $t(`actions.${isBookmarked ? "playlist_bookmarked" : "bookmark_playlist"}`)
                     }}<i class="i-fa6-solid:bookmark mr-3" />
                 </button>
-                <button v-if="authenticated && !isPipedPlaylist" class="btn mr-1" @click="clonePlaylist">
+                <button v-if="authenticated && !isPipedPlaylist" class="btn btn-secondary mr-1" @click="clonePlaylist">
                     {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone mr-3" />
                 </button>
                 <button class="btn mr-1" @click="downloadPlaylistAsTxt">
