@@ -1,7 +1,7 @@
 <template>
     <h1 v-t="'titles.subscriptions'" class="my-4 text-center font-bold" />
     <!-- import / export section -->
-    <div class="flex flex-wrap justify-between">
+    <div v-if="!importExportDisabled" class="flex flex-wrap justify-between">
         <div class="flex gap-1">
             <!-- import json/csv -->
             <button class="btn">
@@ -40,8 +40,11 @@
             <i18n-t keypath="subscriptions.subscribed_channels_count">{{ subscriptions.length }}</i18n-t>
         </div>
     </div>
-    <br />
-    <hr />
+    <div v-else class="flex justify-between items-center">
+        <!-- Don't show subscription count when import/export is disabled, as per user request -->
+    </div>
+    <br v-if="!importExportDisabled" />
+    <hr v-if="!importExportDisabled" />
     <div class="w-full flex flex-wrap">
         <button
             v-for="group in channelGroups"
@@ -140,6 +143,7 @@ export default {
             showEditGroupModal: false,
             editedGroupName: "",
             groupToDelete: null,
+            importExportDisabled: import.meta.env.VITE_DISABLE_IMPORT_EXPORT === "true",
         };
     },
     computed: {
