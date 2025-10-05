@@ -138,14 +138,14 @@ export default {
     deactivated() {
         window.removeEventListener("scroll", this.handleScroll);
     },
-    unmounted() {
-        window.removeEventListener("scroll", this.handleScroll);
-    },
     computed: {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
         },
+    },
+    unmounted() {
+        window.removeEventListener("scroll", this.handleScroll);
     },
     methods: {
         async fetchSubscribedStatus() {

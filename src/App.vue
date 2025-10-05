@@ -17,7 +17,7 @@
                         'md:pl-1vw md:pt-1 md:pb-5 p-0 m-0': !isEmbedPage,
                         'md:pr-64 mr-1vw': sidebarState === 'open' && !isWatchPage,
                         'md:pr-20 mr-1vw': sidebarState === 'semi-open' && !isWatchPage,
-                        'pr-1vw': sidebarState === 'closed' || isWatchPage,
+                        'md:pr-1vw p-0 m-0': sidebarState === 'closed' || isWatchPage,
                     }"
                 >
                     <router-view v-slot="{ Component }">
