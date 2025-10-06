@@ -1,51 +1,43 @@
 <template>
-    <div class="flex flex-col flex-justify-between">
-        <router-link :to="props.item.url" class="link inline-block">
-            <div class="relative">
-                <img loading="lazy" class="w-full" :src="props.item.thumbnail" />
+    <router-link :to="item.url" class="card h-full flex flex-col overflow-hidden transition-all duration-200 hover:shadow-lg">
+        <!-- Playlist Thumbnail with Video Count Overlay -->
+        <div class="relative">
+            <img
+                loading="lazy"
+                :src="item.thumbnail"
+                class="w-full h-auto aspect-video object-cover bg-surface"
+                alt=""
+            />
+            <div
+                v-if="item.videos > 0"
+                class="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 bg-black bg-opacity-70 py-1.5 text-sm font-semibold text-white"
+            >
+                <i class="i-fa6-solid:layer-group" />
+                <span>{{ `${item.videos} ${$t("video.videos", item.videos)}` }}</span>
             </div>
-            <p class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
-        </router-link>
-        <p v-if="props.item.description" v-text="props.item.description" />
+        </div>
 
-        <router-link
-            v-if="props.item.uploaderUrl"
-            class="link-secondary text-sm no-underline hover:underline-dashed"
-            :to="props.item.uploaderUrl"
-        >
-            <p>
-                <span v-text="truncatedUploaderName" />
-                <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
+        <!-- Playlist Details -->
+        <div class="p-3 flex-1 flex flex-col">
+            <h3
+                class="font-semibold text-main overflow-hidden"
+                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
+                :title="item.name"
+            >
+                {{ item.name }}
+            </h3>
+            <p v-if="item.uploaderName" class="mt-1 text-sm text-soft truncate">
+                {{ item.uploaderName }}
             </p>
-        </router-link>
-        <a
-            v-else-if="props.item.uploaderName"
-            class="link no-underline hover:underline-dashed"
-            v-text="truncatedUploaderName"
-        />
-
-        <template v-if="props.item.videos >= 0">
-            <br v-if="props.item.uploaderName" />
-            <span class="text-sm" v-text="`${props.item.videos} ${$t('video.videos')}`" />
-        </template>
-
-        <br />
-    </div>
+        </div>
+    </router-link>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { truncateString } from "../utils/Misc";
-
-const props = defineProps({
+defineProps({
     item: {
         type: Object,
         required: true,
     },
-});
-
-const truncatedUploaderName = computed(() => {
-    const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT) : 16;
-    return truncateString(props.item.uploaderName, limit);
 });
 </script>

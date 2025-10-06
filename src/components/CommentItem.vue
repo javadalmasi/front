@@ -1,80 +1,62 @@
 <template>
-    <div class="comment mt-1.5 flex">
-        <div class="relative inline-block">
+    <div class="flex gap-3">
+        <!-- Avatar -->
+        <router-link :to="comment.commentorUrl" class="flex-shrink-0">
             <img
                 loading="lazy"
                 :src="comment.thumbnail"
-                :class="{ 'border-2 border-blue-700': comment.verified, 'rounded-full': true }"
-                class="comment-avatar h-12 w-12"
-                width="48"
-                height="48"
+                class="w-10 h-10 rounded-full bg-surface"
+                alt=""
             />
-            <div
-                v-if="comment.verified"
-                class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
-            >
-                <i class="i-fa6-solid:check text-[8px] text-white" />
-            </div>
-        </div>
+        </router-link>
 
-        <div class="comment-content pr-2">
-            <div class="comment-header">
-                <div v-if="comment.pinned" class="comment-pinned">
-                    <i class="i-fa6-solid:thumbtack" />
-                    <span
-                        v-t="{
-                            path: 'comment.pinned_by',
-                            args: { author: uploader },
-                        }"
-                        class="mr-1.5"
-                    />
-                </div>
-
-                <div class="comment-author">
-                    <router-link class="link font-bold" :to="comment.commentorUrl">{{ comment.author }}</router-link>
-                    <i v-if="comment.verified" class="i-fa6-solid:check mr-1.5" />
-                </div>
-                <div class="comment-meta mb-1.5 text-sm" v-text="comment.commentedTime" />
+        <!-- Comment Content -->
+        <div class="flex-1">
+            <!-- Header: Author and Timestamp -->
+            <div class="flex items-baseline gap-2 text-sm">
+                <router-link :to="comment.commentorUrl" class="font-semibold text-main">{{ comment.author }}</router-link>
+                <span class="text-soft">{{ comment.commentedTime }}</span>
             </div>
+
+             <!-- Pinned Comment Badge -->
+            <div v-if="comment.pinned" class="text-xs text-soft flex items-center gap-1 mt-1">
+                <i class="i-fa6-solid:thumbtack" />
+                <span>{{ $t('comment.pinned_by', { author: uploader }) }}</span>
+            </div>
+
+            <!-- Body -->
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <CollapsableText :text="comment.commentText" :visible-limit="500" />
-            <div class="comment-footer my-1 flex items-center gap-3">
-                <div v-if="likesDislikesEnabled" class="i-fa6-solid:thumbs-up" />
-                <span v-if="likesDislikesEnabled" v-text="numberFormat(comment.likeCount)" />
-                <i v-if="comment.hearted" class="i-fa6-solid:heart" :title="$t('actions.creator_liked')" />
-                <img
-                    v-if="comment.creatorReplied"
-                    :src="uploaderAvatarUrl"
-                    class="h-5 w-5 rounded-full"
-                    :title="$t('actions.creator_replied')"
-                />
+            <CollapsableText :text="comment.commentText" class="mt-1 text-sm text-main" />
+
+            <!-- Footer: Actions -->
+            <div class="mt-2 flex items-center gap-4 text-sm text-soft">
+                <div v-if="likesDislikesEnabled && comment.likeCount > 0" class="flex items-center gap-1.5">
+                    <i class="i-fa6-solid:thumbs-up" />
+                    <span>{{ numberFormat(comment.likeCount) }}</span>
+                </div>
+                <button
+                    v-if="comment.repliesPage && !commentsDisabled"
+                    class="btn btn-ghost btn-xs"
+                    @click="toggleReplies"
+                >
+                    {{ $t(showingReplies ? 'actions.hide_replies' : 'actions.show_replies') }}
+                </button>
             </div>
-            <template v-if="comment.repliesPage && (!loadingReplies || !showingReplies) && !commentsDisabled">
-                <div class="cursor-pointer" @click="loadReplies">
-                    <a v-text="`${$t('actions.reply_count', comment.replyCount)}`" />
-                    <i class="i-fa6-solid:level-down-alt mr-1.5" />
-                </div>
-            </template>
-            <template v-if="showingReplies">
-                <div class="cursor-pointer" @click="hideReplies">
-                    <a v-t="'actions.hide_replies'" />
-                    <i class="i-fa6-solid:level-up-alt mr-1.5" />
-                </div>
-            </template>
-            <div v-show="showingReplies" v-if="replies" class="replies">
-                <div v-for="reply in replies" :key="reply.commentId" class="w-full">
-                    <!-- eslint-disable-next-line vue/no-undef-components -->
-                    <CommentItem
-                        :comment="reply"
-                        :uploader="uploader"
-                        :video-id="videoId"
-                        :comments-disabled="commentsDisabled"
-                    />
-                </div>
-                <div v-if="nextpage" class="cursor-pointer" @click="loadReplies">
-                    <a v-t="'actions.load_more_replies'" />
-                    <i class="i-fa6-solid:level-down-alt mr-1.5" />
-                </div>
+
+            <!-- Replies Section -->
+            <div v-if="showingReplies" class="mt-3 flex flex-col gap-3">
+                <div v-if="loadingReplies" class="text-soft text-sm">{{ $t('comment.loading') }}</div>
+                <CommentItem
+                    v-for="reply in replies"
+                    :key="reply.commentId"
+                    :comment="reply"
+                    :uploader="uploader"
+                    :video-id="videoId"
+                    :comments-disabled="commentsDisabled"
+                />
+                <button v-if="nextpage" class="btn btn-ghost btn-sm" @click="loadReplies(true)">
+                    {{ $t('actions.load_more_replies') }}
+                </button>
             </div>
         </div>
     </div>
@@ -84,16 +66,11 @@
 import CollapsableText from "./CollapsableText.vue";
 
 export default {
+    name: "CommentItem", // Required for recursive components
     components: { CollapsableText },
     props: {
-        comment: {
-            type: Object,
-            default: () => {
-                return {};
-            },
-        },
+        comment: { type: Object, required: true },
         uploader: { type: String, default: null },
-        uploaderAvatarUrl: { type: String, default: null },
         videoId: { type: String, default: null },
         commentsDisabled: { type: Boolean, default: false },
     },
@@ -107,35 +84,36 @@ export default {
     },
     computed: {
         likesDislikesEnabled() {
-            // Check if likes/dislikes are disabled via environment variable
-            return (
-                !import.meta.env.VITE_DISABLE_LIKES_DISLIKES || import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "false"
-            );
+            return import.meta.env.VITE_DISABLE_LIKES_DISLIKES !== "true";
         },
     },
     methods: {
-        async loadReplies() {
-            if (!this.showingReplies && this.loadingReplies) {
-                this.showingReplies = true;
-                return;
+        toggleReplies() {
+            this.showingReplies = !this.showingReplies;
+            // Load replies only on the first time it's opened
+            if (this.showingReplies && this.replies.length === 0) {
+                this.loadReplies();
             }
-            this.loadingReplies = true;
-            this.showingReplies = true;
-            // Check if comments are globally disabled via a prop passed from parent
-            if (this.commentsDisabled) {
-                this.replies = [];
-                this.nextpage = null;
-                return;
-            }
-            this.fetchJson(this.apiUrl() + "/nextpage/comments/" + this.videoId, {
-                nextpage: this.nextpage || this.comment.repliesPage,
-            }).then(json => {
-                this.replies = this.replies.concat(json.comments);
-                this.nextpage = json.nextpage;
-            });
         },
-        async hideReplies() {
-            this.showingReplies = false;
+        async loadReplies(loadMore = false) {
+            if (this.loadingReplies || this.commentsDisabled) return;
+
+            this.loadingReplies = true;
+            try {
+                const pageToFetch = loadMore ? this.nextpage : this.comment.repliesPage;
+                if (!pageToFetch) return;
+
+                const json = await this.fetchJson(this.apiUrl() + "/nextpage/comments/" + this.videoId, {
+                    nextpage: pageToFetch,
+                });
+
+                this.replies.push(...json.comments);
+                this.nextpage = json.nextpage;
+            } catch (error) {
+                console.error("Failed to load replies:", error);
+            } finally {
+                this.loadingReplies = false;
+            }
         },
     },
 };

@@ -1,5 +1,5 @@
 <template>
-    <div class="reset min-h-screen w-full flex flex-col antialiased" :class="[theme]">
+    <div class="bg-main text-main min-h-screen w-full flex flex-col antialiased">
         <div class="flex-1">
             <NavBar v-if="!isEmbedPage" :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
             <div class="flex">
@@ -204,10 +204,14 @@ export default {
             this.changeTitleBarColor();
         },
         changeTitleBarColor() {
-            const currentColor = { dark: "#0F0F0F", light: "#FFF" };
+            // These colors should match the background colors in uno.config.js
+            const themeColors = {
+                light: "#F9FAFB", // theme.colors.background
+                dark: "#111827", // theme.colors.dark.background
+            };
             const themeColor = document.querySelector("meta[name='theme-color']");
             if (themeColor) {
-                themeColor.setAttribute("content", currentColor[this.theme]);
+                themeColor.setAttribute("content", themeColors[this.theme]);
             }
         },
     },
@@ -246,332 +250,59 @@ export default {
 #preview {
     direction: ltr !important;
 }
-h1,
-p,
-a,
-b {
-    unicode-bidi: plaintext;
+
+/* Ensure text alignment respects the document direction */
+h1, p, a, b {
     text-align: start;
 }
 
-:root {
-    color-scheme: only light;
-}
-
+/* Custom scrollbar styles that adapt to the theme */
 ::-webkit-scrollbar {
-    background-color: #d1d5db;
+    background-color: #e5e7eb; /* gray-200 */
+    width: 8px;
 }
-
 ::-webkit-scrollbar-thumb {
-    background-color: #4b4f52;
+    background-color: #9ca3af; /* gray-400 */
+    border-radius: 8px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #5b6469;
+    background-color: #6b7280; /* gray-500 */
 }
 
-::-webkit-scrollbar-thumb:active {
-    background-color: #485053;
+.dark::-webkit-scrollbar {
+    background-color: #1f2937; /* gray-800 */
+}
+.dark::-webkit-scrollbar-thumb {
+    background-color: #4b5563; /* gray-600 */
+}
+.dark::-webkit-scrollbar-thumb:hover {
+    background-color: #6b7280; /* gray-500 */
 }
 
-::-webkit-scrollbar-corner {
-    background-color: #0b0e0f;
-}
 
-:root {
-    scrollbar-color: #4b4f52 #d1d5db;
-}
-
-.dark ::-webkit-scrollbar {
-    background-color: #15191a;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-    background-color: #4b4f52;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-    background-color: #5b6469;
-}
-
-.dark ::-webkit-scrollbar-thumb:active {
-    background-color: #485053;
-}
-
-.dark ::-webkit-scrollbar-corner {
-    background-color: #0b0e0f;
-}
-
-:root.dark {
-    scrollbar-color: #4b4f52 #15191a;
-}
-
+/* Apply the default sans-serif font to all elements */
 * {
     @apply font-sans;
 }
 
+/* Global grid layout for videos */
 .video-grid {
     @apply grid grid-cols-1 mx-2 sm:mx-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 col-auto lt-md:gap-x-3 md:gap-x-6 gap-y-5;
 }
 
-/* Base button styles with consistent sizing, spacing, and hover effects */
-.btn {
-    @apply py-2 px-4 rounded-3xl cursor-pointer inline-block transition-all duration-200 ease-in-out;
-}
-
-.btn:hover {
-    @apply bg-gray-400 text-white;
-}
-
-.btn:active {
-    @apply transform scale-95;
-}
-
-/* Primary button variant - for main actions */
-.btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
-}
-
-/* Secondary button variant - for supporting actions */
-.btn-secondary {
-    @apply bg-gray-300 text-gray-800 hover:bg-gray-400;
-}
-
-/* Danger button variant - for destructive actions */
-.btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700;
-}
-
-/* Success button variant - for confirmation actions */
-.btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700;
-}
-
-/* Warning button variant - for cautionary actions */
-.btn-warning {
-    @apply bg-yellow-500 text-white hover:bg-yellow-600;
-}
-
-/* Info button variant - for informational actions */
-.btn-info {
-    @apply bg-indigo-600 text-white hover:bg-indigo-700;
-}
-
-/* Outline button variant - for subtle actions */
-.btn-outline {
-    @apply border-2 border-gray-300 bg-transparent text-gray-700 hover:bg-gray-200 hover:text-gray-900;
-}
-
-/* Small button size */
-.btn-sm {
-    @apply py-1 px-3 text-sm;
-}
-
-/* Large button size */
-.btn-lg {
-    @apply py-3 px-6 text-lg;
-}
-
-/* Extra small button size */
-.btn-xs {
-    @apply py-0.5 px-2 text-xs;
-}
-
-/* Extra large button size */
-.btn-xl {
-    @apply py-4 px-8 text-xl;
-}
-
-/* Block button - full width */
-.btn-block {
-    @apply w-full;
-}
-
-/* Rounded button - circular shape */
-.btn-rounded {
-    @apply rounded-full;
-}
-
-/* Square button - minimal padding */
-.btn-square {
-    @apply p-2 aspect-square;
-}
-
-/* Responsive button sizes for different screen sizes */
-.btn-responsive-sm {
-    @apply py-1 px-2 text-sm lt-md:py-0.5 lt-md:px-1.5 lt-md:text-xs;
-}
-
-.btn-responsive-md {
-    @apply py-2 px-4 text-base lt-md:py-1.5 lt-md:px-3 lt-md:text-sm;
-}
-
-.btn-responsive-lg {
-    @apply py-3 px-6 text-lg lt-md:py-2 lt-md:px-4 lt-md:text-base;
-}
-
-/* Full width button on mobile */
-.btn-mobile-block {
-    @apply w-full lt-md:w-full;
-}
-
-/* Responsive padding adjustments */
-.btn-responsive-padding {
-    @apply px-4 lt-md:px-3 sm:px-5;
-}
-
-/* Responsive margin adjustments */
-.btn-responsive-margin {
-    @apply mx-2 lt-md:mx-1 sm:mx-3;
-}
-
-/* Disabled button state */
-.btn:disabled,
-.btn.disabled {
-    @apply opacity-50 cursor-not-allowed pointer-events-none;
-}
-
-/* Focus state for accessibility */
-.btn:focus {
-    @apply outline-none ring-2 ring-blue-500 ring-opacity-50;
-}
-
-/* Input and select base styles */
-.input,
-.select,
-.btn {
-    @apply w-auto text-gray-700 bg-gray-200 border border-gray-300;
-}
-
-.input,
-.select {
-    @apply h-8;
-}
-
-.checkbox {
-    @apply h-4 w-4;
-}
-
-/* Reset and dark theme styles */
-.reset {
-    @apply text-black bg-white;
-}
-
-.dark {
-    @apply text-white bg-dark-900;
-}
-
-.dark .input,
-.dark .select,
-.dark .btn {
-    @apply text-gray-300 bg-dark-500 border-dark-400;
-}
-
-.dark .btn:hover {
-    @apply bg-dark-400 text-white;
-}
-
-/* Dark theme variants */
-.dark .btn-primary {
-    @apply bg-blue-700 text-white hover:bg-blue-600;
-}
-
-.dark .btn-secondary {
-    @apply bg-dark-400 text-gray-200 hover:bg-dark-300;
-}
-
-.dark .btn-danger {
-    @apply bg-red-700 text-white hover:bg-red-600;
-}
-
-.dark .btn-success {
-    @apply bg-green-700 text-white hover:bg-green-600;
-}
-
-.dark .btn-warning {
-    @apply bg-yellow-600 text-white hover:bg-yellow-500;
-}
-
-.dark .btn-info {
-    @apply bg-indigo-700 text-white hover:bg-indigo-600;
-}
-
-.dark .btn-outline {
-    @apply border-2 border-dark-400 bg-transparent text-gray-300 hover:bg-dark-400 hover:text-white;
-}
-
-.dark .btn:focus {
-    @apply ring-2 ring-blue-400 ring-opacity-75;
-}
-
-.input {
-    @apply px-2.5 rounded-3xl;
-}
-
-.input:focus {
-    @apply outline-red-500;
-    outline-style: solid;
-    outline-width: 2px;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 1);
-}
-
+/* Global styles for horizontal rule */
 hr {
-    @apply !mt-2 !mb-3 border-gray-300;
+    @apply !my-4 border-color; /* Using border-color shortcut from uno.config.js */
 }
 
-.dark hr {
-    @apply border-dark-100;
-}
-
-h1,
-h2 {
-    @apply m-0 font-bold;
-}
-
-h1 {
-    @apply !text-5xl;
-}
-
-h2 {
-    @apply !text-3xl;
-}
-
-.table {
-    @apply w-full text-lg text-left font-light border;
-}
-
-.link {
-    @apply focus:text-red-500 hover:text-red-500;
-}
-
-.link-secondary {
-    @apply hover:text-dark-400 focus:text-dark-400 underline underline-dark-400;
-}
-
-.dark .link {
-    @apply focus:text-red-400 hover:text-red-400;
-}
-
-.dark .link-secondary {
-    @apply text-gray-300 hover:(text-gray-400 underline underline-gray-400);
-}
-
-.line {
-    @apply px-2.5 py-0.25 my-0.45 rounded-xl bg-dark-900;
-}
-
-.dark .line {
-    @apply bg-white;
-}
-
+/* Thumbnail overlays */
 .thumbnail-overlay {
-    @apply rounded-md absolute bg-black text-white bg-opacity-75 px-5px;
+    @apply rounded-md absolute bg-black text-white bg-opacity-75 px-1;
 }
-
 .thumbnail-right {
-    @apply bottom-5px right-5px;
+    @apply bottom-1 right-1;
 }
 .thumbnail-left {
-    @apply bottom-5px left-5px text-xs font-bold bg-red-600 uppercase;
+    @apply bottom-1 left-1 text-xs font-bold bg-red-600 uppercase;
 }
 </style>
