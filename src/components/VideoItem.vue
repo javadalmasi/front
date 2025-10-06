@@ -30,7 +30,7 @@
                     <img
                         v-if="item.uploaderAvatar"
                         loading="lazy"
-                        :src="item.uploaderAvatar"
+                        :src="getOptimalThumbnailUrl(item.uploaderAvatar, { width: '68', height: '68', quality: 85 })"
                         :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
                         class="h-32px w-32px"
                         width="68"

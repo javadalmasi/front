@@ -20,7 +20,7 @@
     <div class="video-grid">
         <div v-for="playlist in playlists" :key="playlist.id">
             <router-link :to="`/playlist?list=${playlist.id}`">
-                <img class="w-full" :src="playlist.thumbnail" alt="thumbnail" />
+                <img class="w-full rounded-lg" :src="getOptimalThumbnailUrl(playlist.thumbnail)" alt="thumbnail" />
                 <div class="relative text-sm">
                     <span
                         class="thumbnail-overlay thumbnail-right"
@@ -72,7 +72,7 @@
             :key="playlist.playlistId"
             :to="`/playlist?list=${playlist.playlistId}`"
         >
-            <img class="w-full" :src="playlist.thumbnail" alt="thumbnail" />
+            <img class="w-full rounded-lg" :src="getOptimalThumbnailUrl(playlist.thumbnail)" alt="thumbnail" />
             <div class="relative text-sm">
                 <span class="thumbnail-overlay thumbnail-right" v-text="`${playlist.videos} ${$t('video.videos')}`" />
                 <div class="absolute bottom-100px right-5px z-100 px-5px" @click.prevent="removeBookmark(index)">
@@ -88,7 +88,13 @@
             <a :href="playlist.uploaderUrl" class="flex items-center">
                 <div class="relative inline-block">
                     <img
-                        :src="playlist.uploaderAvatar"
+                        :src="
+                            getOptimalThumbnailUrl(playlist.uploaderAvatar, {
+                                width: '32',
+                                height: '32',
+                                quality: 85,
+                            })
+                        "
                         :class="{ 'border-2 border-blue-700': playlist.uploaderVerified, 'rounded-full': true }"
                         class="h-32px w-32px"
                     />

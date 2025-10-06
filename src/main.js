@@ -5,6 +5,7 @@ import App from "./App.vue";
 import TimeAgo from "javascript-time-ago";
 
 import en from "javascript-time-ago/locale/en";
+import { getOptimalThumbnailUrl } from "./utils/ThumbnailUtils";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -522,6 +523,9 @@ const mixin = {
         },
         isLiveStreamDisabled() {
             return import.meta.env.VITE_DISABLE_LIVESTREAMS === "true";
+        },
+        getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions = {}) {
+            return getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions);
         },
         filterLivestreams(items) {
             if (this.isLiveStreamDisabled()) {
