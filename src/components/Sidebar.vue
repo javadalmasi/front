@@ -26,10 +26,7 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div :class="item.icon" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">
@@ -49,10 +46,7 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="searchCategory(category.name)"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div :class="getIconForCategory(category.name)" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">{{ category.name }}</span>
@@ -65,11 +59,8 @@
                     @click="toggleShowMoreCategories"
                 >
                     <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[
-                            sidebarState === 'open' ? 'text-xl' : 'text-2xl',
-                            showMoreCategories ? 'i-fa6-solid:chevron-up' : 'i-fa6-solid:chevron-down',
-                        ]"
+                        class="w-10 flex items-center justify-center text-lg"
+                        :class="[showMoreCategories ? 'i-fa6-solid:chevron-up' : 'i-fa6-solid:chevron-down']"
                     />
                     <span class="mr-4 text-base">{{ showMoreCategories ? "نمایش کمتر" : "نمایش بیشتر" }}</span>
                 </div>
@@ -85,10 +76,7 @@
                     data-testid="theme-toggle"
                     @click="emitToggleTheme"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div :class="theme === 'light' ? 'i-fa6-solid:moon' : 'i-fa6-solid:sun'" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">
@@ -107,10 +95,7 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/login')"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div class="i-fa6-solid:right-to-bracket" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">ورود</span>
@@ -120,10 +105,7 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/register')"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div class="i-fa6-solid:user-plus" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">ثبت نام</span>
@@ -133,10 +115,7 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="logout"
                 >
-                    <div
-                        class="w-10 flex items-center justify-center"
-                        :class="[sidebarState === 'open' ? 'text-xl' : 'text-2xl']"
-                    >
+                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
                         <div class="i-fa6-solid:right-from-bracket" />
                     </div>
                     <span v-if="sidebarState === 'open'" class="mr-4 text-base">خروج از حساب</span>

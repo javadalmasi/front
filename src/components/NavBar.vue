@@ -10,7 +10,7 @@
                     aria-label="Toggle sidebar"
                     @click="toggleSidebar"
                 >
-                    <div class="i-fa6-solid:bars text-2xl" />
+                    <div class="i-fa6-solid:bars text-lg" />
                 </button>
                 <router-link class="ml-4 flex items-center text-3xl font-bold font-sans" :to="homePagePath">
                     <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
@@ -26,7 +26,7 @@
                     aria-label="Search"
                     @click="$router.push({ name: 'SearchResults' })"
                 >
-                    <div class="i-fa6-solid:magnifying-glass text-xl" />
+                    <div class="i-fa6-solid:magnifying-glass text-lg" />
                 </button>
             </div>
             <SearchSuggestions
