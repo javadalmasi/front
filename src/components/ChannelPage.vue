@@ -43,7 +43,7 @@
                 </button>
 
                 <button
-                    v-if="subscribed"
+                    v-if="subscribed && !isAddToGroupDisabled"
                     v-t="'actions.add_to_group'"
                     class="btn btn-secondary"
                     @click="showGroupModal = true"
@@ -131,6 +131,10 @@ export default {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+        isAddToGroupDisabled() {
+            // Check if add to group button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_ADD_TO_GROUP === "true";
         },
     },
     mounted() {
