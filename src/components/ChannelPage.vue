@@ -15,15 +15,15 @@
                         loading="lazy"
                         :src="channel.avatarUrl"
                         :class="{ 'border-2 border-blue-700': channel.verified, 'rounded-full': true }"
-                        class="m-1"
+                        class="h-48px w-48px"
                         width="48"
                         height="48"
                     />
                     <div
                         v-if="channel.verified"
-                        class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                        class="absolute end-0 bottom-0 h-5 w-5 flex items-center justify-center rounded-full bg-blue-700"
                     >
-                        <i class="i-fa6-solid:check text-[8px] text-white" />
+                        <i class="i-fa6-solid:check text-[10px] text-white" />
                     </div>
                 </div>
                 <div class="flex items-center gap-1">

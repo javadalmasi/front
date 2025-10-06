@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showVideo" class="flex flex-col flex-justify-between">
+    <div v-if="showVideo" class="h-full flex flex-col flex-justify-between">
         <router-link
             class="link inline-block w-full"
             :to="{
@@ -25,21 +25,23 @@
         </router-link>
 
         <div class="flex">
-            <router-link :to="item.uploaderUrl" class="relative inline-block">
-                <img
-                    v-if="item.uploaderAvatar"
-                    loading="lazy"
-                    :src="item.uploaderAvatar"
-                    :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
-                    class="mr-0.5 mt-0.5 h-32px w-32px"
-                    width="68"
-                    height="68"
-                />
-                <div
-                    v-if="item.uploaderVerified && item.uploaderAvatar"
-                    class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
-                >
-                    <i class="i-fa6-solid:check text-[8px] text-white" />
+            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5">
+                <div class="relative inline-block">
+                    <img
+                        v-if="item.uploaderAvatar"
+                        loading="lazy"
+                        :src="item.uploaderAvatar"
+                        :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
+                        class="h-32px w-32px"
+                        width="68"
+                        height="68"
+                    />
+                    <div
+                        v-if="item.uploaderVerified && item.uploaderAvatar"
+                        class="absolute end-0 bottom-0 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
+                    >
+                        <i class="i-fa6-solid:check text-[8px] text-white" />
+                    </div>
                 </div>
             </router-link>
 

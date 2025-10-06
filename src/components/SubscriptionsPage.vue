@@ -40,7 +40,7 @@
             <i18n-t keypath="subscriptions.subscribed_channels_count">{{ subscriptions.length }}</i18n-t>
         </div>
     </div>
-    <div v-else class="flex justify-between items-center">
+    <div v-else class="flex items-center justify-between">
         <!-- Don't show subscription count when import/export is disabled, as per user request -->
     </div>
     <br v-if="!importExportDisabled" />

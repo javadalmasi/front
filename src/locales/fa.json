@@ -269,7 +269,13 @@
         "oldest_first": "قدیمی ترین ابتدا",
         "view_count_combined": "مرتب سازی ترکیبی بر اساس بازدید",
         "highest_views": "بیشترین بازدیدها",
-        "lowest_views": "کمترین بازدیدها"
+        "lowest_views": "کمترین بازدیدها",
+        "longest": "طولانی‌ترین",
+        "shortest": "کوتاه‌ترین",
+        "advanced_search": "جستجوی پیشرفته",
+        "verified_uploader_only": "فقط ویدیوهای تأیید شده",
+        "with_description_only": "فقط دارای توضیح",
+        "shorts": "کوتاه"
     },
     "video": {
         "views": "{views} بازدید ها",

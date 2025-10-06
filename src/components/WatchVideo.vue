@@ -106,29 +106,30 @@
                     <div class="flex flex-wrap gap-1">
                         <!-- Channel Image & Info -->
                         <div class="flex items-center">
-                            <div class="relative inline-block">
-                                <img
-                                    loading="lazy"
-                                    :src="video.uploaderAvatar"
-                                    :class="{
-                                        'border-2 border-blue-700': video.uploaderVerified,
-                                        'rounded-full': true,
-                                    }"
-                                    width="48"
-                                    height="48"
-                                />
-                                <div
-                                    v-if="video.uploaderVerified"
-                                    class="absolute end-0.5 bottom-0.5 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
-                                >
-                                    <i class="i-fa6-solid:check text-[8px] text-white" />
+                            <router-link :to="video.uploaderUrl" class="mr-1.5">
+                                <div class="relative inline-block">
+                                    <img
+                                        loading="lazy"
+                                        :src="video.uploaderAvatar"
+                                        :class="{
+                                            'border-2 border-blue-700': video.uploaderVerified,
+                                            'rounded-full': true,
+                                        }"
+                                        class="h-48px w-48px"
+                                        width="48"
+                                        height="48"
+                                    />
+                                    <div
+                                        v-if="video.uploaderVerified"
+                                        class="absolute end-0 bottom-0 h-5 w-5 flex items-center justify-center rounded-full bg-blue-700"
+                                    >
+                                        <i class="i-fa6-solid:check text-[10px] text-white" />
+                                    </div>
                                 </div>
-                            </div>
-                            <router-link v-if="video.uploaderUrl" class="link mr-1.5" :to="video.uploaderUrl">{{
+                            </router-link>
+                            <router-link v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
                                 video.uploader
                             }}</router-link>
-                            <!-- Verified Badge -->
-                            <i v-if="video.uploaderVerified" class="i-fa6-solid:check mr-1" />
                         </div>
                         <PlaylistAddModal
                             v-if="showModal"

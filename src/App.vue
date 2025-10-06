@@ -68,7 +68,7 @@ export default {
     },
     watch: {
         $route(to) {
-            this.isWatchPage = to.name === "WatchVideo";
+            this.isWatchPage = to.name === "WatchVideo" || to.name === "SearchResults";
             if (this.isWatchPage) {
                 this.sidebarState = "closed";
             } else if (this.sidebarState === "closed" && !this.isMobile) {
@@ -84,7 +84,7 @@ export default {
         this.checkIsMobile();
         window.addEventListener("resize", this.checkIsMobile);
 
-        this.isWatchPage = this.$route.name === "WatchVideo";
+        this.isWatchPage = this.$route.name === "WatchVideo" || this.$route.name === "SearchResults";
         if (this.isWatchPage) {
             this.sidebarState = "closed";
         }

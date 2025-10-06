@@ -1,16 +1,12 @@
 <template>
-    <div class="search-page-container">
-        <div class="search-input-container mb-8 flex flex-col items-center">
-            <div class="logo-container mb-8">
-                <h1 class="font-logo text-6xl font-bold">ویدیو</h1>
-            </div>
-            <div class="search-controls-container max-w-2xl w-full flex items-center gap-2">
+    <div class="search-page-container" dir="rtl">
+        <!-- Search Input -->
+        <div class="search-input-container mb-8 flex flex-col items-center px-4">
+            <div class="search-controls-container max-w-3xl w-full flex items-center gap-2">
                 <select
                     id="ddlSearchFilters"
                     v-model="selectedFilter"
-                    default="videos"
-                    class="select h-10 border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
-                    @change="updateFilter()"
+                    class="select h-12 border border-gray-300 rounded-md bg-white px-3 text-base dark:border-dark-200 dark:bg-dark-600"
                 >
                     <option v-for="filter in availableFilters" :key="filter" v-t="`search.${filter}`" :value="filter" />
                 </select>
@@ -18,7 +14,7 @@
                     <input
                         ref="searchInput"
                         v-model="searchQueryText"
-                        class="input h-10 w-full border border-gray-300 rounded-full px-4 pr-10 shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="input h-12 w-full border border-gray-300 rounded-full px-5 pr-12 text-lg shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                         type="text"
                         role="search"
                         :title="$t('actions.search')"
@@ -30,21 +26,20 @@
                     />
                     <span
                         v-if="searchQueryText"
-                        class="delete-search absolute right-3 top-1/2 h-6 w-6 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
+                        class="delete-search absolute right-4 top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
                         @click="searchQueryText = ''"
                     >
                         ×
                     </span>
                 </div>
                 <button
-                    id="search-submit-btn"
-                    class="btn h-10 flex items-center justify-center rounded-lg bg-gray-100 px-4 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
+                    class="btn h-12 flex items-center justify-center rounded-lg bg-gray-100 px-5 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
                     @click="submitSearch"
                 >
-                    <div class="i-fa6-solid:magnifying-glass text-sm" />
+                    <div class="i-fa6-solid:magnifying-glass text-base" />
                 </button>
             </div>
-            <div class="relative mt-1 max-w-2xl w-full">
+            <div class="relative mt-1 max-w-3xl w-full">
                 <SearchSuggestions
                     v-show="(searchQueryText || showSearchHistory) && suggestionsVisible"
                     ref="searchSuggestions"
@@ -54,103 +49,97 @@
             </div>
         </div>
 
-        <!-- Advanced Filters Section -->
-        <div class="advanced-filters-container mx-auto mb-6 max-w-2xl w-full">
-            <div class="filters-grid grid grid-cols-1 gap-4 lg:grid-cols-4 md:grid-cols-2">
-                <!-- Duration Filter -->
-                <div class="filter-group">
-                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
-                        {{ $t("search.duration") }}
-                    </label>
+        <!-- Sticky Filter Bar -->
+        <div
+            v-if="selectedFilter === 'videos'"
+            class="filters-container sticky top-0 z-10 mb-6 bg-white p-4 shadow-md dark:bg-dark-800"
+        >
+            <div class="mx-auto max-w-6xl">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <!-- Time Filter -->
                     <select
-                        v-model="durationFilter"
-                        class="select h-10 w-full border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
-                        @change="applyAdvancedFilters"
+                        v-model="filters.date"
+                        class="select h-10 border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
                     >
-                        <option value="">{{ $t("search.any_duration") }}</option>
-                        <option value="short">{{ $t("search.short_videos") }} (&lt; 4 دقیقه)</option>
-                        <option value="under_5">{{ $t("search.under_5_minutes") }}</option>
-                        <option value="under_10">{{ $t("search.under_10_minutes") }}</option>
-                        <option value="under_20">{{ $t("search.under_20_minutes") }}</option>
-                        <option value="under_30">{{ $t("search.under_30_minutes") }}</option>
-                        <option value="under_40">{{ $t("search.under_40_minutes") }}</option>
-                        <option value="under_50">{{ $t("search.under_50_minutes") }}</option>
-                        <option value="under_60">{{ $t("search.under_1_hour") }}</option>
-                        <option value="under_120">{{ $t("search.under_2_hours") }}</option>
-                        <option value="long">{{ $t("search.long_videos") }} (&gt; 2 ساعت)</option>
+                        <option value="all">{{ $t("search.any_time") }}</option>
+                        <option value="today">{{ $t("search.today") }}</option>
+                        <option value="this_week">{{ $t("search.this_week") }}</option>
+                        <option value="this_month">{{ $t("search.this_month") }}</option>
+                        <option value="this_year">{{ $t("search.this_year") }}</option>
                     </select>
-                </div>
 
-                <!-- View Count Sorting Filter -->
-                <div class="filter-group">
-                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
-                        {{ $t("search.view_count_sort") }}
-                    </label>
+                    <!-- Sort By Filter -->
                     <select
-                        v-model="viewCountSortFilter"
-                        class="select h-10 w-full border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
-                        @change="applyAdvancedFilters"
+                        v-model="filters.sort_by"
+                        class="select h-10 border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
+                        data-testid="sort-by-filter"
                     >
-                        <option value="">{{ $t("search.no_sort") }}</option>
+                        <option value="any">{{ $t("search.no_sort") }}</option>
                         <option value="most_viewed">{{ $t("search.most_viewed") }}</option>
                         <option value="least_viewed">{{ $t("search.least_viewed") }}</option>
+                        <option value="longest">{{ $t("search.longest") }}</option>
+                        <option value="shortest">{{ $t("search.shortest") }}</option>
                     </select>
-                </div>
 
-                <!-- Upload Date Sorting Filter -->
-                <div class="filter-group">
-                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
-                        {{ $t("search.upload_date_sort") }}
-                    </label>
+                    <!-- Content Type Filter -->
                     <select
-                        v-model="uploadDateSortFilter"
-                        class="select h-10 w-full border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
-                        @change="applyAdvancedFilters"
+                        v-model="filters.type"
+                        class="select h-10 border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
+                        data-testid="content-type-filter"
                     >
-                        <option value="">{{ $t("search.no_sort") }}</option>
-                        <option value="newest_first">{{ $t("search.newest_first") }}</option>
-                        <option value="oldest_first">{{ $t("search.oldest_first") }}</option>
+                        <option value="all">{{ $t("search.all_types") }}</option>
+                        <option value="video">{{ $t("search.videos") }}</option>
+                        <option value="shorts">{{ $t("search.shorts") }}</option>
                     </select>
-                </div>
 
-                <!-- Combined View Count Sorting Filter -->
-                <div class="filter-group">
-                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
-                        {{ $t("search.view_count_combined") }}
-                    </label>
-                    <select
-                        v-model="combinedViewCountSortFilter"
-                        class="select h-10 w-full border border-gray-300 rounded-md bg-white px-3 text-sm dark:border-dark-200 dark:bg-dark-600"
-                        @change="applyAdvancedFilters"
-                    >
-                        <option value="">{{ $t("search.no_sort") }}</option>
-                        <option value="highest_views">{{ $t("search.highest_views") }}</option>
-                        <option value="lowest_views">{{ $t("search.lowest_views") }}</option>
-                    </select>
+                    <!-- Advanced Search -->
+                    <div class="relative">
+                        <button
+                            class="btn h-10 w-full flex items-center justify-center rounded-lg bg-gray-100 px-4 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
+                            @click="advancedFilterVisible = !advancedFilterVisible"
+                        >
+                            {{ $t("search.advanced_search") }}
+                        </button>
+                        <div
+                            v-if="advancedFilterVisible"
+                            class="absolute z-20 mt-2 w-full rounded-md bg-white p-4 shadow-lg dark:bg-dark-700"
+                        >
+                            <label class="flex items-center space-x-2">
+                                <input v-model="filters.uploaderVerified" type="checkbox" class="checkbox" />
+                                <span>{{ $t("search.verified_uploader_only") }}</span>
+                            </label>
+                            <label class="mt-2 flex items-center space-x-2">
+                                <input v-model="filters.shortDescription" type="checkbox" class="checkbox" />
+                                <span>{{ $t("search.with_description_only") }}</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div v-if="results && results.corrected" class="mb-4 text-center">
-            <i18n-t keypath="search.did_you_mean" tag="div" class="text-base text-gray-600 dark:text-gray-400">
-                <router-link
-                    :to="{ name: 'SearchResults', query: { search_query: results.suggestion } }"
-                    class="text-blue-500 hover:underline"
-                >
-                    <em v-text="results.suggestion" />
-                </router-link>
-            </i18n-t>
-        </div>
-
-        <div class="mx-auto max-w-2xl">
+        <!-- Search Results -->
+        <div class="mx-auto max-w-6xl px-4">
             <LoadingIndicatorPage
-                :show-content="results != null && results.items?.length"
-                class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-3 md:grid-cols-2"
+                :show-content="!loading && filteredResults.length > 0"
+                class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2"
             >
-                <template v-for="result in results.items" :key="result.url">
+                <template v-for="result in filteredResults" :key="result.url">
                     <ContentItem :item="result" height="94" width="168" />
                 </template>
             </LoadingIndicatorPage>
+
+            <div v-if="loading" class="py-10 text-center">
+                <p>{{ $t("actions.loading") }}</p>
+            </div>
+
+            <div v-if="!loading && filteredResults.length === 0 && rawResults.length > 0" class="py-10 text-center">
+                <p>هیچ نتیجه‌ای با فیلترهای انتخابی یافت نشد.</p>
+            </div>
+
+            <div v-if="!loading && rawResults.length === 0 && searchQueryText" class="py-10 text-center">
+                <p>هیچ نتیجه‌ای برای جستجوی شما یافت نشد.</p>
+            </div>
         </div>
     </div>
 </template>
@@ -166,10 +155,20 @@ export default {
         LoadingIndicatorPage,
         SearchSuggestions,
     },
+    beforeRouteLeave(to, from, next) {
+        // Clear search query only when navigating away from the search page
+        if (to.name !== "SearchResults") {
+            this.searchQueryText = "";
+        }
+        next();
+    },
     data() {
         return {
-            results: null,
             searchQueryText: "",
+            rawResults: [],
+            nextPage: null,
+            loading: false,
+            advancedFilterVisible: false,
             suggestionsVisible: false,
             availableFilters: [
                 "all",
@@ -180,219 +179,150 @@ export default {
                 "music_videos",
                 "music_albums",
                 "music_playlists",
-                "music_artists",
             ],
             selectedFilter: this.$route.query.filter ?? "videos",
-            // Advanced filters
-            durationFilter: this.$route.query.duration ?? "",
-            viewCountSortFilter: this.$route.query.view_count_sort ?? "",
-            uploadDateSortFilter: this.$route.query.upload_date_sort ?? "",
-            combinedViewCountSortFilter: this.$route.query.combined_view_count_sort ?? "",
+            filters: {
+                date: "all",
+                sort_by: "any",
+                type: "all",
+                uploaderVerified: false,
+                shortDescription: false,
+            },
+            isFilterActive: false,
         };
     },
     computed: {
         showSearchHistory() {
             return this.getPreferenceBoolean("searchHistory", false) && localStorage.getItem("search_history");
         },
+        filteredResults() {
+            if (!this.isFilterActive) {
+                return this.rawResults;
+            }
+
+            let results = [...this.rawResults];
+
+            // Date filter
+            if (this.filters.date !== "all") {
+                const now = new Date();
+                results = results.filter(item => {
+                    if (typeof item.uploaded !== "number") return false;
+                    const uploaded = new Date(item.uploaded * 1000);
+                    switch (this.filters.date) {
+                        case "today":
+                            return uploaded.toDateString() === now.toDateString();
+                        case "this_week": {
+                            const oneWeekAgo = new Date();
+                            oneWeekAgo.setDate(now.getDate() - 7);
+                            return uploaded >= oneWeekAgo;
+                        }
+                        case "this_month":
+                            return (
+                                uploaded.getMonth() === now.getMonth() && uploaded.getFullYear() === now.getFullYear()
+                            );
+                        case "this_year":
+                            return uploaded.getFullYear() === now.getFullYear();
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            // Content Type filter
+            if (this.filters.type !== "all") {
+                results = results.filter(item => {
+                    if (this.filters.type === "video") return !item.isShort;
+                    if (this.filters.type === "shorts") return item.isShort;
+                    return true;
+                });
+            }
+
+            // Verified uploader filter
+            if (this.filters.uploaderVerified) {
+                results = results.filter(item => item.uploaderVerified);
+            }
+
+            // Description filter
+            if (this.filters.shortDescription) {
+                results = results.filter(item => item.shortDescription);
+            }
+
+            // Sorting logic
+            if (this.filters.sort_by === "most_viewed") {
+                results.sort((a, b) => (b.views || 0) - (a.views || 0));
+            } else if (this.filters.sort_by === "least_viewed") {
+                results.sort((a, b) => (a.views || 0) - (b.views || 0));
+            } else if (this.filters.sort_by === "longest") {
+                results = results.filter(item => item.duration > 0);
+                results.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+            } else if (this.filters.sort_by === "shortest") {
+                results = results.filter(item => item.duration > 0);
+                results.sort((a, b) => (a.duration || 0) - (b.duration || 0));
+            }
+
+            return results;
+        },
     },
     watch: {
-        $route(to, from) {
-            if (to.query.search_query !== from.query.search_query) {
-                this.updateSearchTextFromURL();
-                this.updateResults();
-            }
-            if (to.query.filter !== from.query.filter) {
-                this.selectedFilter = to.query.filter ?? "videos";
-            }
-            if (to.query.duration !== from.query.duration) {
-                this.durationFilter = to.query.duration ?? "";
-            }
-            if (to.query.view_count_sort !== from.query.view_count_sort) {
-                this.viewCountSortFilter = to.query.view_count_sort ?? "";
-            }
-            if (to.query.upload_date_sort !== from.query.upload_date_sort) {
-                this.uploadDateSortFilter = to.query.upload_date_sort ?? "";
-            }
-            if (to.query.combined_view_count_sort !== from.query.combined_view_count_sort) {
-                this.combinedViewCountSortFilter = to.query.combined_view_count_sort ?? "";
-            }
+        "$route.query": {
+            handler(to, from) {
+                from = from || {}; // handle initial load where from is undefined
+                const newQuery = to.search_query;
+                const oldQuery = from.search_query;
+                const newFilter = to.filter;
+                const oldFilter = from.filter;
+
+                if (newQuery !== oldQuery || newFilter !== oldFilter) {
+                    this.searchQueryText = newQuery || "";
+                    this.selectedFilter = newFilter || "videos";
+                    this.applyFiltersAndSearch();
+                }
+            },
+            immediate: true,
+        },
+        filters: {
+            handler() {
+                this.applyFiltersAndSearch();
+            },
+            deep: true,
         },
     },
     mounted() {
-        if (this.handleRedirect()) return;
-        this.updateSearchTextFromURL();
-        this.initializeAdvancedFilters();
-        this.updateResults();
-        this.saveQueryToHistory();
+        window.addEventListener("scroll", this.handleScroll);
     },
-    updated() {
-        const query = this.searchQueryText || this.$route.query.search_query;
-        if (query !== undefined) {
-            document.title = query + " - " + this.getSiteName();
-        }
+    unmounted() {
+        window.removeEventListener("scroll", this.handleScroll);
     },
     activated() {
-        this.handleRedirect();
         window.addEventListener("scroll", this.handleScroll);
     },
     deactivated() {
         window.removeEventListener("scroll", this.handleScroll);
     },
-    unmounted() {
-        window.removeEventListener("scroll", this.handleScroll);
-    },
     methods: {
-        async fetchResults() {
-            const params = {
-                q: this.searchQueryText || this.$route.query.search_query,
-                filter: this.selectedFilter,
-            };
-
-            // Add advanced filter parameters if they are set
-            if (this.durationFilter) params.duration = this.durationFilter;
-            if (this.viewCountSortFilter) params.view_count_sort = this.viewCountSortFilter;
-            if (this.uploadDateSortFilter) params.upload_date_sort = this.uploadDateSortFilter;
-            if (this.combinedViewCountSortFilter) params.combined_view_count_sort = this.combinedViewCountSortFilter;
-
-            return await await this.fetchJson(this.apiUrl() + "/search", params);
-        },
-        async updateResults() {
-            const query = this.searchQueryText || this.$route.query.search_query;
-            document.title = query + " - " + this.getSiteName();
-            const json = await this.fetchResults();
-            this.results = json;
-            // Filter out livestreams if they are disabled
-            if (this.filterLivestreams) {
-                this.results.items = this.filterLivestreams(this.results.items);
-            }
-            this.updateWatched(this.results.items);
-        },
-        applyAdvancedFilters() {
-            // Update the route with advanced filter parameters
-            this.$router.replace({
-                query: {
-                    search_query: this.searchQueryText || this.$route.query.search_query,
-                    filter: this.selectedFilter,
-                    ...(this.durationFilter && { duration: this.durationFilter }),
-                    ...(this.viewCountSortFilter && { view_count_sort: this.viewCountSortFilter }),
-                    ...(this.uploadDateSortFilter && { upload_date_sort: this.uploadDateSortFilter }),
-                    ...(this.combinedViewCountSortFilter && {
-                        combined_view_count_sort: this.combinedViewCountSortFilter,
-                    }),
-                },
-            });
-        },
-        updateFilter() {
-            this.$router.replace({
-                query: {
-                    search_query: this.searchQueryText || this.$route.query.search_query,
-                    filter: this.selectedFilter,
-                    ...(this.durationFilter && { duration: this.durationFilter }),
-                    ...(this.viewCountSortFilter && { view_count_sort: this.viewCountSortFilter }),
-                    ...(this.uploadDateSortFilter && { upload_date_sort: this.uploadDateSortFilter }),
-                    ...(this.combinedViewCountSortFilter && {
-                        combined_view_count_sort: this.combinedViewCountSortFilter,
-                    }),
-                },
-            });
-        },
         handleScroll() {
-            // Check if any filter is active
-            const isFilterActive =
-                this.durationFilter ||
-                this.viewCountSortFilter ||
-                this.uploadDateSortFilter ||
-                this.combinedViewCountSortFilter;
+            // Infinite scroll should only work when no filters are active
+            if (this.isFilterActive || this.loading || !this.nextPage) return;
 
-            if (this.loading || !this.results || !this.results.nextpage) return;
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - window.innerHeight) {
                 this.loading = true;
                 const params = {
-                    nextpage: this.results.nextpage,
-                    q: this.searchQueryText || this.$route.query.search_query,
+                    nextpage: this.nextPage,
+                    q: this.searchQueryText,
                     filter: this.selectedFilter,
                 };
-
-                // Add advanced filter parameters if they are set
-                if (this.durationFilter) params.duration = this.durationFilter;
-                if (this.viewCountSortFilter) params.view_count_sort = this.viewCountSortFilter;
-                if (this.uploadDateSortFilter) params.upload_date_sort = this.uploadDateSortFilter;
-                if (this.combinedViewCountSortFilter)
-                    params.combined_view_count_sort = this.combinedViewCountSortFilter;
 
                 this.fetchJson(this.apiUrl() + "/nextpage/search", params).then(json => {
-                    this.results.nextpage = json.nextpage;
-                    this.results.id = json.id;
-                    this.loading = false;
-                    // Filter livestreams from the new items before adding them
-                    const filteredItems = this.filterLivestreams ? this.filterLivestreams(json.items) : json.items;
-                    filteredItems.map(stream => this.results.items.push(stream));
-
-                    // If a filter is active, automatically load the next 5 pages
-                    if (isFilterActive) {
-                        this.loadNextPages(5);
+                    if (json && json.items) {
+                        this.rawResults.push(...json.items);
+                        this.nextPage = json.nextpage;
+                        this.updateWatched(json.items);
+                    } else {
+                        this.nextPage = null;
                     }
+                    this.loading = false;
                 });
             }
-        },
-        async loadNextPages(pageCount) {
-            // Load the next specified number of pages automatically
-            for (let i = 0; i < pageCount && this.results && this.results.nextpage; i++) {
-                if (this.loading) break;
-
-                this.loading = true;
-                const params = {
-                    nextpage: this.results.nextpage,
-                    q: this.searchQueryText || this.$route.query.search_query,
-                    filter: this.selectedFilter,
-                };
-
-                // Add advanced filter parameters if they are set
-                if (this.durationFilter) params.duration = this.durationFilter;
-                if (this.viewCountSortFilter) params.view_count_sort = this.viewCountSortFilter;
-                if (this.uploadDateSortFilter) params.upload_date_sort = this.uploadDateSortFilter;
-                if (this.combinedViewCountSortFilter)
-                    params.combined_view_count_sort = this.combinedViewCountSortFilter;
-
-                try {
-                    const json = await this.fetchJson(this.apiUrl() + "/nextpage/search", params);
-                    this.results.nextpage = json.nextpage;
-                    this.results.id = json.id;
-                    // Filter livestreams from the new items before adding them
-                    const filteredItems = this.filterLivestreams ? this.filterLivestreams(json.items) : json.items;
-                    filteredItems.map(stream => this.results.items.push(stream));
-                } catch (error) {
-                    console.error("Error loading next page:", error);
-                    break;
-                } finally {
-                    this.loading = false;
-                }
-            }
-        },
-        handleRedirect() {
-            const query = this.$route.query.search_query;
-            const url =
-                /(?:http(?:s)?:\/\/)?(?:www\.)?youtube\.com(\/[/a-zA-Z0-9_?=&-]*)/gm.exec(query)?.[1] ??
-                /(?:http(?:s)?:\/\/)?(?:www\.)?youtu\.be\/(?:watch\?v=)?([/a-zA-Z0-9_?=&-]*)/gm
-                    .exec(query)?.[1]
-                    .replace(/^/, "/watch?v=");
-            if (url) {
-                this.$router.push(url);
-                return true;
-            }
-        },
-        saveQueryToHistory() {
-            if (!this.getPreferenceBoolean("searchHistory", false)) return;
-            const query = this.$route.query.search_query;
-            if (!query) return;
-            const searchHistory = JSON.parse(localStorage.getItem("search_history")) ?? [];
-            if (searchHistory.includes(query)) {
-                const index = searchHistory.indexOf(query);
-                searchHistory.splice(index, 1);
-            }
-            searchHistory.unshift(query);
-            if (searchHistory.length > 10) searchHistory.shift();
-            localStorage.setItem("search_history", JSON.stringify(searchHistory));
         },
         onInputFocus() {
             if (this.showSearchHistory) this.$refs.searchSuggestions.refreshSuggestions();
@@ -410,50 +340,89 @@ export default {
             if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                 e.preventDefault();
             }
-            this.$refs.searchSuggestions.onKeyUp(e);
+            if (this.$refs.searchSuggestions) this.$refs.searchSuggestions.onKeyUp(e);
         },
         onSearchTextChange(searchText) {
             this.searchQueryText = searchText;
-            // Don't automatically submit search when a suggestion is clicked
-            // User must press Enter or click search button to initiate search
         },
-        initializeAdvancedFilters() {
-            // Initialize advanced filters from URL parameters
-            this.durationFilter = this.$route.query.duration ?? "";
-            this.viewCountSortFilter = this.$route.query.view_count_sort ?? "";
-            this.uploadDateSortFilter = this.$route.query.upload_date_sort ?? "";
-            this.combinedViewCountSortFilter = this.$route.query.combined_view_count_sort ?? "";
-        },
-        submitSearch(e) {
-            if (e) e.target.blur();
-            if (this.searchQueryText) {
-                const queryParams = {
-                    search_query: this.searchQueryText,
-                    filter: this.selectedFilter,
-                };
-
-                // Add advanced filter parameters if they are set
-                if (this.durationFilter) queryParams.duration = this.durationFilter;
-                if (this.viewCountSortFilter) queryParams.view_count_sort = this.viewCountSortFilter;
-                if (this.uploadDateSortFilter) queryParams.upload_date_sort = this.uploadDateSortFilter;
-                if (this.combinedViewCountSortFilter)
-                    queryParams.combined_view_count_sort = this.combinedViewCountSortFilter;
+        submitSearch() {
+            if (this.searchQueryText.trim()) {
+                if (
+                    this.searchQueryText === this.$route.query.search_query &&
+                    this.selectedFilter === this.$route.query.filter
+                )
+                    return;
 
                 this.$router.push({
                     name: "SearchResults",
-                    query: queryParams,
+                    query: { search_query: this.searchQueryText, filter: this.selectedFilter },
                 });
-                this.suggestionsVisible = false;
-            } else {
-                this.$router.push("/");
             }
         },
-        updateSearchTextFromURL() {
-            const query = this.$route.query.search_query;
-            if (query) {
-                this.searchQueryText = query;
+        checkIfFilterIsActive() {
+            this.isFilterActive =
+                this.filters.date !== "all" ||
+                this.filters.sort_by !== "any" ||
+                this.filters.type !== "all" ||
+                this.filters.uploaderVerified ||
+                this.filters.shortDescription;
+        },
+        async applyFiltersAndSearch() {
+            if (!this.searchQueryText) return;
+
+            this.loading = true;
+            this.rawResults = [];
+            this.nextPage = null;
+
+            // Step 1: Fetch the initial page of results
+            const params = { q: this.searchQueryText, filter: this.selectedFilter };
+            const initialJson = await this.fetchJson(this.apiUrl() + "/search", params);
+
+            if (initialJson && initialJson.items) {
+                this.rawResults.push(...initialJson.items);
+                this.nextPage = initialJson.nextpage;
+                this.updateWatched(initialJson.items);
+            } else {
+                this.loading = false;
+                return;
             }
+
+            // Step 2: If filters are active, fetch more pages
+            this.checkIfFilterIsActive();
+            if (this.isFilterActive && this.selectedFilter === "videos") {
+                for (let i = 0; i < 5; i++) {
+                    if (!this.nextPage) break;
+                    const nextPageParams = {
+                        nextpage: this.nextPage,
+                        q: this.searchQueryText,
+                        filter: this.selectedFilter,
+                    };
+                    try {
+                        const nextJson = await this.fetchJson(this.apiUrl() + "/nextpage/search", nextPageParams);
+                        if (nextJson && nextJson.items) {
+                            this.rawResults.push(...nextJson.items);
+                            this.nextPage = nextJson.nextpage;
+                            this.updateWatched(nextJson.items);
+                        } else {
+                            this.nextPage = null;
+                        }
+                    } catch (error) {
+                        console.error("Error fetching next page:", error);
+                        this.nextPage = null;
+                    }
+                }
+            }
+
+            this.loading = false;
         },
     },
 };
 </script>
+<style scoped>
+.filters-container {
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+.dark .filters-container {
+    border-bottom: 1px solid var(--border-color, #374151);
+}
+</style>
