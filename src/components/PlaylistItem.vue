@@ -2,7 +2,7 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="props.item.url" class="link inline-block">
             <div class="relative">
-                <img loading="lazy" class="w-full aspect-video object-cover rounded-lg" :src="optimizedThumbnail" />
+                <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
                 <div
                     class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white"
                 >
