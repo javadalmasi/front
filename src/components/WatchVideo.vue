@@ -18,341 +18,168 @@
     >
         <PageNotFound />
     </div>
-    <div id="theaterModeSpot" class="-mx-1vw"></div>
+    <div id="theaterModeSpot" class="w-full bg-black -mx-1vw"></div>
     <PageNotFound v-if="video && checkIfLivestreamDisabled(video)" />
     <LoadingIndicatorPage v-else :show-content="video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
-        <Transition>
-            <ToastComponent v-if="shouldShowToast" @dismissed="dismiss">
-                <i18n-t keypath="info.next_video_countdown">{{ counter }}</i18n-t>
-            </ToastComponent>
-        </Transition>
-        <div v-if="video && !checkIfLivestreamDisabled(video)" class="flex gap-5">
-            <div class="flex-auto">
-                <div>
-                    <Teleport defer to="#theaterModeSpot" :disabled="!theaterMode">
-                        <div class="flex flex-row">
-                            <keep-alive>
-                                <VideoPlayer
-                                    ref="videoPlayer"
-                                    :video="video"
-                                    :sponsors="sponsors"
-                                    :selected-auto-play="selectedAutoPlay"
-                                    :selected-auto-loop="selectedAutoLoop"
-                                    :theater-mode="theaterMode"
-                                    @timeupdate="onTimeUpdate"
-                                    @ended="onVideoEnded"
-                                    @navigate-next="navigateNext"
-                                    @toggle-theater="
-                                        theaterMode = !theaterMode;
-                                        setPreference('theaterMode', theaterMode);
-                                    "
-                                    @toggle-loop="selectedAutoLoop = !selectedAutoLoop"
-                                    @cycle-autoplay="
-                                        selectedAutoPlay = (selectedAutoPlay + 1) % 3;
-                                        setPreference('autoplay', selectedAutoPlay, true);
-                                    "
-                                />
-                            </keep-alive>
-                        </div>
-                    </Teleport>
-                    <div v-if="video && isMobile">
-                        <ChaptersBar
-                            v-if="video?.chapters?.length > 0 && showChapters"
-                            :mobile-layout="isMobile"
-                            :chapters="video.chapters"
-                            :player-position="currentTime"
-                            @seek="navigate"
-                        />
-                        <PlaylistVideos
-                            v-if="playlist"
-                            :playlist-id="playlistId"
-                            :playlist="playlist"
-                            :selected-index="index"
-                            :prefer-listen="isListening"
+        <div v-if="video && !checkIfLivestreamDisabled(video)" class="page-container py-8 flex flex-col lg:flex-row gap-8">
+            <!-- Main Content: Player and Video Info -->
+            <div class="flex-1 lg:max-w-[calc(100%-24rem-2rem)]">
+                <!-- Video Player -->
+                <Teleport defer to="#theaterModeSpot" :disabled="!theaterMode">
+                     <div :class="{ 'relative': !theaterMode, 'fixed z-100 inset-0': theaterMode }">
+                        <VideoPlayer
+                            ref="videoPlayer"
+                            :video="video"
+                            :sponsors="sponsors"
+                            :selected-auto-play="selectedAutoPlay"
+                            :selected-auto-loop="selectedAutoLoop"
+                            :theater-mode="theaterMode"
+                            @timeupdate="onTimeUpdate"
+                            @ended="onVideoEnded"
+                            @navigate-next="navigateNext"
+                            @toggle-theater="toggleTheaterMode"
+                            @toggle-loop="selectedAutoLoop = !selectedAutoLoop"
+                            @cycle-autoplay="cycleAutoplay"
                         />
                     </div>
-                    <!-- video title -->
-                    <div class="mt-2 break-words text-2xl font-bold" v-text="video.title" />
-                    <div class="mb-3 mt-3 flex flex-wrap">
-                        <!-- views / date -->
-                        <div class="flex flex-auto gap-2">
-                            <span v-t="{ path: 'video.views', args: { views: addCommas(video.views) } }" />
-                            <span> | </span>
-                            <span :title="new Date(video.uploadDate).toLocaleString()" v-text="uploadDate" />
-                        </div>
-                        <!-- Likes/disilikes -->
-                        <div v-if="likesDislikesEnabled" class="flex gap-2">
-                            <template v-if="video.likes >= 0">
-                                <div class="flex items-center">
-                                    <div class="i-fa6-solid:thumbs-up" />
-                                    <strong class="mr-1" v-text="addCommas(video.likes)" />
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="i-fa6-solid:thumbs-down" />
-                                    <strong
-                                        class="mr-1"
-                                        v-text="video.dislikes >= 0 ? addCommas(video.dislikes) : '?'"
-                                    />
-                                </div>
-                            </template>
-                            <template v-if="video.likes < 0">
-                                <div>
-                                    <strong v-t="'video.ratings_disabled'" />
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                    <!-- Channel info & options flex container -->
-                    <div class="flex flex-wrap gap-1">
-                        <!-- Channel Image & Info -->
-                        <div class="flex items-center">
-                            <router-link :to="video.uploaderUrl" class="mr-1.5">
-                                <div class="relative inline-block">
-                                    <img
-                                        loading="lazy"
-                                        :src="video.uploaderAvatar"
-                                        :class="{
-                                            'border-2 border-blue-700': video.uploaderVerified,
-                                            'rounded-full': true,
-                                        }"
-                                        class="h-48px w-48px"
-                                        width="48"
-                                        height="48"
-                                    />
-                                    <div
-                                        v-if="video.uploaderVerified"
-                                        class="absolute end-0 bottom-0 h-5 w-5 flex items-center justify-center rounded-full bg-blue-700"
-                                    >
-                                        <i class="i-fa6-solid:check text-[10px] text-white" />
-                                    </div>
-                                </div>
-                            </router-link>
-                            <router-link v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
-                                video.uploader
-                            }}</router-link>
-                        </div>
-                        <PlaylistAddModal
-                            v-if="showModal"
-                            :video-id="getVideoId()"
-                            :video-info="video"
-                            @close="showModal = !showModal"
-                        />
-                        <ShareModal
-                            v-if="showShareModal"
-                            :video-id="getVideoId()"
-                            :current-time="currentTime"
-                            :playlist-id="playlistId"
-                            :playlist-index="index"
-                            @close="showShareModal = !showShareModal"
-                        />
-                        <div class="mr-auto flex flex-wrap gap-1">
-                            <!-- Subscribe Button -->
-                            <button
-                                v-if="!isDownloadThumbnailDisabled"
-                                class="btn btn-primary flex items-center gap-1 <md:hidden"
-                                @click="downloadCurrentFrame"
-                            >
-                                {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
-                            </button>
-                            <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
-                                {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
-                            </button>
-                            <button
-                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-primary'"
-                                @click="subscribeHandler"
-                            >
-                                <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
-                                <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
-                                {{
-                                    $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) +
-                                    " - " +
-                                    numberFormat(video.uploaderSubscriberCount)
-                                }}
-                            </button>
-                            <div class="flex flex-wrap gap-1">
-                                <!-- RSS Feed button -->
-                                <a
-                                    v-if="video.uploaderUrl && !isRssFeedDisabled"
-                                    aria-label="RSS feed"
-                                    title="RSS feed"
-                                    role="button"
-                                    :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
-                                    target="_blank"
-                                    class="btn btn-secondary flex items-center"
-                                >
-                                    <i class="i-fa6-solid:rss mx-1.5" />
-                                </a>
-                                <!-- Share Dialog -->
-                                <button
-                                    class="btn btn-secondary flex items-center"
-                                    @click="showShareModal = !showShareModal"
-                                >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="strong"></i18n-t>
-                                    <i class="i-fa6-solid:share mx-1.5" />
-                                </button>
-                                <!-- YouTube -->
-                                <WatchOnButton :link="youtubeVideoHref" />
-                                <!-- Odysee -->
-                                <WatchOnButton
-                                    v-if="video.lbryId"
-                                    :link="`https://odysee.com/${video.lbryId}`"
-                                    platform="Odysee"
-                                />
-                                <!-- listen / watch toggle -->
-                                <router-link
-                                    :to="toggleListenUrl"
-                                    :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    class="btn btn-secondary flex items-center"
-                                >
-                                    <i
-                                        :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
-                                        class="mx-1.5"
-                                    />
-                                </router-link>
+                </Teleport>
+
+                <!-- Video Metadata -->
+                <div class="mt-4">
+                    <h1 class="text-2xl font-bold text-main break-words">{{ video.title }}</h1>
+                    <div class="mt-2 flex flex-col sm:flex-row sm:items-center text-soft gap-x-4 gap-y-2">
+                        <span>{{ `${numberFormat(video.views)} ${$t("video.views", video.views)}` }}</span>
+                        <span :title="new Date(video.uploadDate).toLocaleString()">{{ uploadDate }}</span>
+                        <div v-if="likesDislikesEnabled && video.likes >= 0" class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <i class="i-fa6-solid:thumbs-up" />
+                                <span>{{ numberFormat(video.likes) }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="i-fa6-solid:thumbs-down" />
+                                <span>{{ video.dislikes >= 0 ? numberFormat(video.dislikes) : "?" }}</span>
                             </div>
                         </div>
-                    </div>
-
-                    <hr class="mb-2" />
-
-                    <div
-                        v-for="metaInfo in video?.metaInfo ?? []"
-                        :key="metaInfo.title"
-                        class="btn btn-secondary my-3 flex flex-wrap cursor-default gap-2 px-4 py-2"
-                    >
-                        <span>{{ metaInfo.description ?? metaInfo.title }}</span>
-                        <a v-for="(link, linkIndex) in metaInfo.urls" :key="linkIndex" :href="link" class="underline">{{
-                            metaInfo.urlTexts[linkIndex]
-                        }}</a>
-                        <br />
-                    </div>
-
-                    <button
-                        v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
-                        class="btn btn-secondary mb-2"
-                        @click="showDesc = !showDesc"
-                    />
-
-                    <span v-show="video?.chapters?.length > 0" class="btn btn-secondary mr-2">
-                        <input id="showChapters" v-model="showChapters" type="checkbox" />
-                        <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
-                    </span>
-
-                    <template v-if="showDesc">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <div class="description break-words" v-html="purifiedDescription" />
-                        <br />
-
-                        <div
-                            v-if="sponsors && sponsors.segments"
-                            v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
-                        />
-                        <div v-if="video.category" v-text="`${$t('video.category')}: ${video.category}`" />
-                        <div v-text="`${$t('video.license')}: ${video.license}`" />
-                        <div class="capitalize" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
-
-                        <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2">
-                            <router-link
-                                v-for="tag in video.tags"
-                                :key="tag"
-                                class="btn btn-secondary line-clamp-1 rounded-2xl px-5 py-1"
-                                :to="`/results?search_query=${encodeURIComponent(tag)}`"
-                                >{{ tag }}</router-link
-                            >
+                         <div v-if="likesDislikesEnabled && video.likes < 0">
+                            <span>{{ $t('video.ratings_disabled') }}</span>
                         </div>
-                    </template>
+                    </div>
                 </div>
 
-                <hr />
-                <div v-if="isMobile">
-                    <a
-                        v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                        class="btn btn-secondary mb-2"
-                        @click="showRecs = !showRecs"
-                    />
-                    <hr v-show="showRecs" />
-                    <div v-show="showRecs">
-                        <ContentItem
-                            v-for="related in video.relatedStreams"
-                            :key="related.url"
-                            :item="related"
-                            :prefer-listen="isListening"
-                            class="mb-4"
-                            height="94"
-                            width="168"
+                <!-- Channel Info & Actions -->
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <router-link :to="video.uploaderUrl" class="flex items-center gap-3 self-start">
+                        <img
+                            loading="lazy"
+                            :src="video.uploaderAvatar"
+                            class="w-12 h-12 rounded-full bg-surface"
+                            alt=""
                         />
+                        <div>
+                            <div class="font-semibold text-main flex items-center gap-2">
+                                <span>{{ video.uploader }}</span>
+                                <i v-if="video.uploaderVerified" class="i-fa6-solid:check-circle text-primary" :title="$t('channel.verified')"></i>
+                            </div>
+                            <span class="text-sm text-soft">{{ `${numberFormat(video.uploaderSubscriberCount)} ${$t("channel.subscribers", video.uploaderSubscriberCount)}` }}</span>
+                        </div>
+                    </router-link>
+
+                    <div class="flex flex-wrap gap-2 items-center self-start sm:self-center">
+                         <button
+                            class="btn"
+                            :class="subscribed ? 'btn-secondary' : 'btn-subscribe'"
+                            @click="subscribeHandler"
+                        >
+                            <i v-if="!subscribed" class="i-fa6-solid:bell" />
+                            <i v-else class="i-fa6-solid:bell-slash" />
+                            <span>{{ $t(subscribed ? "actions.unsubscribe" : "actions.subscribe") }}</span>
+                        </button>
+                        <button class="btn btn-secondary" @click="showShareModal = !showShareModal">
+                            <i class="i-fa6-solid:share" />
+                            <span>{{ $t("actions.share") }}</span>
+                        </button>
+                        <button class="btn btn-secondary" @click="showModal = !showModal">
+                            <i class="i-fa6-solid:plus" />
+                            <span>{{ $t("actions.add_to_playlist") }}</span>
+                        </button>
+                         <button v-if="!isDownloadThumbnailDisabled" class="btn btn-secondary" @click="downloadCurrentFrame">
+                            <i class="i-fa6-solid:download" />
+                        </button>
                     </div>
-                    <hr class="" />
                 </div>
 
-                <div v-if="commentsEnabled" class="flex flex-col">
-                    <div class="">
-                        <button
-                            v-if="!comments?.disabled"
-                            class="btn btn-secondary mb-2"
-                            @click="toggleComments"
-                            v-text="
-                                `${$t(showComments ? 'actions.minimize_comments' : 'actions.show_comments')} (${numberFormat(
-                                    comments?.commentCount,
-                                )})`
-                            "
-                        />
+                <hr class="my-4" />
+
+                <!-- Description -->
+                <div class="bg-surface card p-4 rounded-lg cursor-pointer" @click="showDesc = !showDesc">
+                    <div :class="{ 'line-clamp-3': !showDesc }" class="whitespace-pre-wrap">
+                        <!-- eslint-disable-next-line vue/no-v-html -->
+                        <div class="description break-words text-sm" v-html="purifiedDescription" />
                     </div>
-                    <div v-if="!showComments" class=""></div>
-                    <div v-else-if="!comments" class="">
-                        <p v-t="'comment.loading'" class="mt-8 text-center"></p>
+                     <a class="text-sm font-semibold mt-2 block">{{ $t(`actions.${showDesc ? 'minimize_description' : 'show_description'}`) }}</a>
+                </div>
+
+
+                <!-- Comments Section -->
+                <div v-if="commentsEnabled" class="mt-6">
+                    <h2 class="text-xl font-bold text-main mb-4">{{ $t('comment.comments') }} ({{ numberFormat(comments?.commentCount) }})</h2>
+                    <div v-if="!comments" class="text-center text-soft py-8">
+                        <p>{{ $t("comment.loading") }}</p>
                     </div>
-                    <div v-else-if="comments.disabled" class="">
-                        <p v-t="'comment.disabled'" class="mt-8 text-center"></p>
+                    <div v-else-if="comments.disabled" class="text-center text-soft py-8">
+                        <p>{{ $t("comment.disabled") }}</p>
                     </div>
-                    <div v-else ref="comments" class="">
+                    <div v-else ref="comments" class="flex flex-col gap-4">
                         <CommentItem
                             v-for="comment in comments.comments"
                             :key="comment.commentId"
                             :comment="comment"
                             :uploader="video.uploader"
-                            :uploader-avatar-url="video.uploaderAvatar"
-                            :video-id="getVideoId()"
-                            :comments-disabled="!commentsEnabled"
                         />
                     </div>
                 </div>
             </div>
-            <div v-if="video && !isMobile" class="max-w-96 flex-none">
-                <ChaptersBar
-                    v-if="video?.chapters?.length > 0 && showChapters"
-                    :mobile-layout="isMobile"
-                    :chapters="video.chapters"
-                    :player-position="currentTime"
-                    @seek="navigate"
-                />
-                <PlaylistVideos
-                    v-if="playlist"
-                    :playlist-id="playlistId"
-                    :playlist="playlist"
-                    :selected-index="index"
-                    :prefer-listen="isListening"
-                />
-                <a
-                    v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                    class="btn btn-secondary mb-2"
-                    @click="showRecs = !showRecs"
-                />
-                <hr v-show="showRecs" />
-                <div v-show="showRecs">
+
+            <!-- Sidebar: Recommendations, Chapters, Playlist -->
+            <div class="w-full lg:w-96 flex-shrink-0">
+                <div class="flex flex-col gap-4">
+                     <ChaptersBar
+                        v-if="video?.chapters?.length > 0"
+                        :chapters="video.chapters"
+                        :player-position="currentTime"
+                        @seek="navigate"
+                    />
+                    <PlaylistVideos
+                        v-if="playlist"
+                        :playlist-id="playlistId"
+                        :playlist="playlist"
+                        :selected-index="index"
+                        :prefer-listen="isListening"
+                    />
+                    <h3 class="text-lg font-semibold">{{ $t('video.recommendations') }}</h3>
                     <ContentItem
                         v-for="related in video.relatedStreams"
                         :key="related.url"
                         :item="related"
                         :prefer-listen="isListening"
-                        class="mb-4"
-                        height="94"
-                        width="168"
                     />
                 </div>
             </div>
         </div>
+        <PlaylistAddModal v-if="showModal" :video-id="getVideoId()" :video-info="video" @close="showModal = false" />
+        <ShareModal
+            v-if="showShareModal"
+            :video-id="getVideoId()"
+            :current-time="currentTime"
+            :playlist-id="playlistId"
+            :playlist-index="index"
+            @close="showShareModal = false"
+        />
+        <Transition>
+            <ToastComponent v-if="shouldShowToast" @dismissed="dismiss">
+                <i18n-t keypath="info.next_video_countdown">{{ counter }}</i18n-t>
+            </ToastComponent>
+        </Transition>
     </LoadingIndicatorPage>
 </template>
 
@@ -364,18 +191,15 @@ import ChaptersBar from "./ChaptersBar.vue";
 import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
 import PlaylistVideos from "./PlaylistVideos.vue";
-import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
 import PageNotFound from "./PageNotFound.vue";
 import { parseTimeParam } from "@/utils/Misc";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
-
-// Import Jalali moment for date conversion
 import moment from "jalali-moment";
 
 export default {
-    name: "App",
+    name: "WatchVideo",
     components: {
         VideoPlayer,
         ContentItem,
@@ -384,13 +208,11 @@ export default {
         PlaylistAddModal,
         ShareModal,
         PlaylistVideos,
-        WatchOnButton,
         LoadingIndicatorPage,
         ToastComponent,
         PageNotFound,
     },
     data() {
-        const smallViewQuery = window.matchMedia("(max-width: 640px)");
         return {
             video: null,
             playlistId: null,
@@ -398,20 +220,14 @@ export default {
             index: null,
             sponsors: null,
             selectedAutoLoop: false,
-            selectedAutoPlay: null,
-            showComments: true,
+            selectedAutoPlay: 1, // Default to autoplay on
             showDesc: false,
-            showRecs: true,
-            showChapters: true,
             comments: null,
             subscribed: false,
             channelId: null,
             active: true,
-            smallViewQuery: smallViewQuery,
-            smallView: smallViewQuery.matches,
             showModal: false,
             showShareModal: false,
-            isMobile: true,
             currentTime: 0,
             shouldShowToast: false,
             timeoutCounter: null,
@@ -420,127 +236,48 @@ export default {
         };
     },
     computed: {
-        isListening(_this) {
-            return _this.getPreferenceBoolean("listen", false);
+        isListening() {
+            return this.$route.query.listen === "1";
         },
         commentsEnabled() {
-            // Check if comments are disabled via environment variable
-            return !import.meta.env.VITE_DISABLE_COMMENTS || import.meta.env.VITE_DISABLE_COMMENTS === "false";
+            return import.meta.env.VITE_DISABLE_COMMENTS !== "true";
         },
         isDownloadThumbnailDisabled() {
-            // Check if download thumbnail button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_DOWNLOAD_THUMBNAIL === "true";
         },
-        isRssFeedDisabled() {
-            // Check if RSS feed button is disabled via environment variable
-            return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
-        },
         likesDislikesEnabled() {
-            // Check if likes/dislikes are disabled via environment variable
-            return (
-                !import.meta.env.VITE_DISABLE_LIKES_DISLIKES || import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "false"
-            );
+            return import.meta.env.VITE_DISABLE_LIKES_DISLIKES !== "true";
         },
-        toggleListenUrl(_this) {
-            const url = new URL(window.location.href);
-            url.searchParams.set("listen", _this.isListening ? "0" : "1");
-            url.searchParams.set("t", Math.floor(this.currentTime));
-            return url.pathname + url.search;
+        isEmbed() {
+            return this.$route.path.startsWith("/embed/");
         },
-        isEmbed(_this) {
-            return String(_this.$route.path).indexOf("/embed/") == 0;
-        },
-        uploadDate(_this) {
-            if (!_this.video) return "";
-
-            const date = new Date(_this.video.uploadDate);
-
-            // Check if we should use Jalali calendar based on environment variable
+        uploadDate() {
+            if (!this.video?.uploadDate) return "";
+            const date = new Date(this.video.uploadDate);
             if (import.meta.env.VITE_CALENDAR_TYPE === "jalali") {
-                // Convert Gregorian date to Jalali
                 return moment(date).locale("fa").format("jYYYY/jMM/jDD");
-            } else {
-                // Use Gregorian calendar (default)
-                return date.toLocaleString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                });
             }
-        },
-        defaultCounter(_this) {
-            return _this.getPreferenceNumber("autoPlayNextCountdown", 5);
+            return date.toLocaleDateString(undefined, {
+                month: "short", day: "numeric", year: "numeric",
+            });
         },
         purifiedDescription() {
             return purifyHTML(this.video.description);
         },
-        youtubeVideoHref() {
-            let link = `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}`;
-            if (this.playlistId) link += `&list=${this.playlistId}`;
-            return link;
-        },
+    },
+    watch: {
+        '$route.query.v': 'resetAndFetchData',
+        '$route.query.list': 'resetAndFetchData',
     },
     mounted() {
-        // check screen size
-        this.isMobile = window.innerWidth < 1024;
-        // add an event listener to watch for screen size changes
-        window.addEventListener("resize", () => {
-            this.isMobile = window.innerWidth < 1024;
-        });
-        this.getVideoData().then(() => {
-            (async () => {
-                const videoId = this.getVideoId();
-                const instance = this;
-                if (window.db && this.getPreferenceBoolean("watchHistory", false) && !this.video.error) {
-                    var tx = window.db.transaction("watch_history", "readwrite");
-                    var store = tx.objectStore("watch_history");
-                    var request = store.get(videoId);
-                    request.onsuccess = function (event) {
-                        var video = event.target.result;
-                        if (video) {
-                            video.watchedAt = Date.now();
-                        } else {
-                            video = {
-                                videoId: videoId,
-                                title: instance.video.title,
-                                duration: instance.video.duration,
-                                thumbnail: instance.video.thumbnailUrl,
-                                uploaderUrl: instance.video.uploaderUrl,
-                                uploaderName: instance.video.uploader,
-                                watchedAt: Date.now(),
-                            };
-                        }
-                        store.put(video);
-                    };
-                }
-            })();
-            if (this.active) this.$refs.videoPlayer.loadVideo();
-        });
-        this.playlistId = this.$route.query.list;
-        this.index = Number(this.$route.query.index);
-        this.getPlaylistData();
-        this.getSponsors();
-        if (!this.isEmbed && this.showComments && this.commentsEnabled) this.getComments();
-        if (this.isEmbed) document.querySelector("html").style.overflow = "hidden";
-        window.addEventListener("click", this.handleClick);
-        window.addEventListener("resize", () => {
-            this.smallView = this.smallViewQuery.matches;
-        });
+        this.initialize();
     },
     activated() {
         this.active = true;
-        this.theaterMode = this.getPreferenceBoolean(
-            "theaterMode",
-            window.innerWidth < (window.innerHeight * 4) / 3 + 467, //if the video player is limited by width rather than height, then clear up some horizontal room
-        );
-        this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
-        this.showComments = !this.getPreferenceBoolean("minimizeComments", false);
-        this.showDesc = !this.getPreferenceBoolean("minimizeDescription", true);
-        this.showRecs = !this.getPreferenceBoolean("minimizeRecommendations", false);
-        this.showChapters = !this.getPreferenceBoolean("minimizeChapters", false);
+        this.initializePreferences();
         if (this.video?.duration) {
             document.title = this.video.title + " - " + this.getSiteName();
-            this.$refs.videoPlayer.loadVideo();
+            this.$refs.videoPlayer?.loadVideo();
         }
         window.addEventListener("scroll", this.handleScroll);
     },
@@ -551,10 +288,66 @@ export default {
     },
     unmounted() {
         window.removeEventListener("scroll", this.handleScroll);
-        window.removeEventListener("click", this.handleClick);
         this.dismiss();
     },
     methods: {
+        initialize() {
+            this.initializePreferences();
+            this.getVideoData().then(() => {
+                this.logToWatchHistory();
+                if (this.active) this.$refs.videoPlayer?.loadVideo();
+            });
+            this.playlistId = this.$route.query.list;
+            this.index = Number(this.$route.query.index);
+            this.getPlaylistData();
+            this.getSponsors();
+            if (this.commentsEnabled) this.getComments();
+            if (this.isEmbed) document.documentElement.style.overflow = "hidden";
+        },
+        initializePreferences() {
+             this.theaterMode = this.getPreferenceBoolean("theaterMode", false);
+             this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
+        },
+        resetAndFetchData() {
+            this.video = null;
+            this.playlist = null;
+            this.comments = null;
+            this.initialize();
+        },
+        toggleTheaterMode() {
+            this.theaterMode = !this.theaterMode;
+            this.setPreference('theaterMode', this.theaterMode);
+        },
+        cycleAutoplay() {
+            this.selectedAutoPlay = (this.selectedAutoPlay + 1) % 3;
+            this.setPreference('autoplay', this.selectedAutoPlay, true);
+        },
+        logToWatchHistory() {
+             if (window.db && this.getPreferenceBoolean("watchHistory", false) && !this.video.error) {
+                const videoId = this.getVideoId();
+                const tx = window.db.transaction("watch_history", "readwrite");
+                const store = tx.objectStore("watch_history");
+                const request = store.get(videoId);
+                request.onsuccess = (event) => {
+                    let video = event.target.result;
+                    if (video) {
+                        video.watchedAt = Date.now();
+                    } else {
+                        video = {
+                            videoId: videoId,
+                            title: this.video.title,
+                            duration: this.video.duration,
+                            thumbnail: this.video.thumbnailUrl,
+                            uploaderUrl: this.video.uploaderUrl,
+                            uploaderName: this.video.uploader,
+                            watchedAt: Date.now(),
+                        };
+                    }
+                    store.put(video);
+                };
+            }
+        },
+
         checkIfLivestreamDisabled(video) {
             // Don't consider short videos as livestreams to be disabled
             if (video.isShort === true) {
