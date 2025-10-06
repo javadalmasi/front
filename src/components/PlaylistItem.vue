@@ -2,7 +2,7 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="props.item.url" class="link inline-block">
             <div class="relative">
-                <img loading="lazy" class="w-full" :src="optimizedThumbnail" />
+                <img loading="lazy" class="w-full aspect-video object-cover rounded-lg" :src="optimizedThumbnail" />
             </div>
             <p class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
         </router-link>
