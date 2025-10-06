@@ -2,7 +2,7 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="props.item.url" class="link inline-block">
             <div class="relative">
-                <img loading="lazy" class="w-full" :src="props.item.thumbnail" />
+                <img loading="lazy" class="w-full" :src="optimizedThumbnail" />
             </div>
             <p class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
         </router-link>
@@ -36,12 +36,34 @@
 <script setup>
 import { computed } from "vue";
 import { truncateString } from "../utils/Misc";
+import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
 
 const props = defineProps({
     item: {
         type: Object,
         required: true,
     },
+});
+
+const optimizedThumbnail = computed(() => {
+    // Apply the same thumbnail optimization as used in VideoThumbnail
+    if (props.item.thumbnail) {
+        // Check if this is likely a video thumbnail by checking for common video ID patterns
+        if (props.item.thumbnail.includes("ytimg.com") || props.item.thumbnail.includes("youtube.com")) {
+            // Extract video ID from the URL and use it for the CDN transformation
+            const videoIdMatch = props.item.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+            if (videoIdMatch && videoIdMatch[1]) {
+                // Use getOptimalThumbnailUrl to automatically determine size based on device characteristics
+                return getOptimalThumbnailUrl(props.item.thumbnail);
+            } else {
+                // If we can't extract the video ID, use the original URL
+                return props.item.thumbnail;
+            }
+        }
+        // For other images (like channel avatars), return the original URL
+        return props.item.thumbnail;
+    }
+    return props.item.thumbnail;
 });
 
 const truncatedUploaderName = computed(() => {
