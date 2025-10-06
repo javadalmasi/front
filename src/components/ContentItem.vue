@@ -1,5 +1,5 @@
 <template>
-    <component :is="compName" :item="item" />
+    <component :is="compName" :item="item" :hide-channel="hideChannel" />
 </template>
 
 <script setup>
@@ -9,6 +9,10 @@ const props = defineProps({
     item: {
         type: Object,
         required: true,
+    },
+    hideChannel: {
+        type: Boolean,
+        default: false,
     },
 });
 

@@ -15,7 +15,7 @@
         <p v-if="props.item.description" v-text="props.item.description" />
 
         <router-link
-            v-if="props.item.uploaderUrl"
+            v-if="props.item.uploaderUrl && props.item.uploaderName && !props.hideChannel"
             class="link-secondary text-sm no-underline hover:underline-dashed"
             :to="props.item.uploaderUrl"
         >
@@ -25,7 +25,7 @@
             </p>
         </router-link>
         <a
-            v-else-if="props.item.uploaderName"
+            v-else-if="props.item.uploaderName && !props.hideChannel"
             class="link no-underline hover:underline-dashed"
             v-text="truncatedUploaderName"
         />
@@ -43,6 +43,10 @@ const props = defineProps({
     item: {
         type: Object,
         required: true,
+    },
+    hideChannel: {
+        type: Boolean,
+        default: false,
     },
 });
 
