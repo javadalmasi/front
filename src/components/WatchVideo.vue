@@ -72,7 +72,7 @@
                         />
                     </div>
                     <!-- video title -->
-                    <div class="mt-2 break-words text-2xl leading-[1.55] font-bold" v-text="video.title" />
+                    <div class="mt-2 break-words text-2xl font-bold leading-[1.55]" v-text="video.title" />
                     <div class="mb-3 mt-3 flex flex-wrap">
                         <!-- views / date -->
                         <div class="flex flex-auto gap-2">
@@ -229,6 +229,7 @@
                     </div>
 
                     <button
+                        v-if="!isDescriptionToggleDisabled"
                         v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
                         class="btn btn-secondary mb-2"
                         @click="showDesc = !showDesc"
@@ -267,6 +268,7 @@
                 <hr />
                 <div v-if="isMobile">
                     <a
+                        v-if="!isRecommendationsToggleDisabled"
                         v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
                         class="btn btn-secondary mb-2"
                         @click="showRecs = !showRecs"
@@ -335,6 +337,7 @@
                     :prefer-listen="isListening"
                 />
                 <a
+                    v-if="!isRecommendationsToggleDisabled"
                     v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
                     class="btn btn-secondary mb-2"
                     @click="showRecs = !showRecs"
@@ -434,6 +437,14 @@ export default {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+        isDescriptionToggleDisabled() {
+            // Check if description toggle button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_DESCRIPTION_TOGGLE === "true";
+        },
+        isRecommendationsToggleDisabled() {
+            // Check if recommendations toggle button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_RECOMMENDATIONS_TOGGLE === "true";
         },
         likesDislikesEnabled() {
             // Check if likes/dislikes are disabled via environment variable
@@ -535,8 +546,12 @@ export default {
         );
         this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
         this.showComments = !this.getPreferenceBoolean("minimizeComments", false);
-        this.showDesc = !this.getPreferenceBoolean("minimizeDescription", true);
-        this.showRecs = !this.getPreferenceBoolean("minimizeRecommendations", false);
+        this.showDesc = this.isDescriptionToggleDisabled
+            ? true
+            : !this.getPreferenceBoolean("minimizeDescription", true);
+        this.showRecs = this.isRecommendationsToggleDisabled
+            ? true
+            : !this.getPreferenceBoolean("minimizeRecommendations", false);
         this.showChapters = !this.getPreferenceBoolean("minimizeChapters", false);
         if (this.video?.duration) {
             document.title = this.video.title + " - " + this.getSiteName();
