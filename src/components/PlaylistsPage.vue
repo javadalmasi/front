@@ -21,7 +21,7 @@
         <div v-for="playlist in playlists" :key="playlist.id">
             <router-link :to="`/playlist?list=${playlist.id}`">
                 <img class="w-full rounded-lg" :src="getOptimalThumbnailUrl(playlist.thumbnail)" alt="thumbnail" />
-                <div class="relative text-sm">
+                <div class="relative text-sm leading-[1.65]">
                     <span
                         class="thumbnail-overlay thumbnail-right"
                         v-text="`${playlist.videos} ${$t('video.videos')}`"
@@ -73,7 +73,7 @@
             :to="`/playlist?list=${playlist.playlistId}`"
         >
             <img class="w-full rounded-lg" :src="getOptimalThumbnailUrl(playlist.thumbnail)" alt="thumbnail" />
-            <div class="relative text-sm">
+            <div class="relative text-sm leading-[1.65]">
                 <span class="thumbnail-overlay thumbnail-right" v-text="`${playlist.videos} ${$t('video.videos')}`" />
                 <div class="absolute bottom-100px right-5px z-100 px-5px" @click.prevent="removeBookmark(index)">
                     <i class="i-fa6-solid:bookmark mr-3" />

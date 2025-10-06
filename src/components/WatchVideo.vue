@@ -72,7 +72,7 @@
                         />
                     </div>
                     <!-- video title -->
-                    <div class="mt-2 break-words text-2xl font-bold" v-text="video.title" />
+                    <div class="mt-2 break-words text-2xl leading-[1.55] font-bold" v-text="video.title" />
                     <div class="mb-3 mt-3 flex flex-wrap">
                         <!-- views / date -->
                         <div class="flex flex-auto gap-2">

@@ -24,7 +24,7 @@
                 <i v-if="item.verified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
-        <p v-if="item.description" class="pt-1 text-sm" v-text="item.description" />
+        <p v-if="item.description" class="pt-1 text-sm leading-[1.65]" v-text="item.description" />
         <router-link v-if="item.uploaderUrl" class="link" :to="item.uploaderUrl">
             <p>
                 <span v-text="item.uploader" />

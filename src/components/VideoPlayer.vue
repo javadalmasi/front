@@ -24,13 +24,13 @@
             <canvas id="preview" ref="preview" class="direction-ltr rounded-sm" dir="ltr" />
             <span
                 v-if="(video?.chapters?.length ?? 0) > 1"
-                class="direction-ltr mt-2 text-sm drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black]"
+                class="direction-ltr mt-2 text-sm leading-[1.65] drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black]"
                 dir="ltr"
             >
                 {{ video.chapters.findLast(chapter => chapter.start < currentTime)?.title }}
             </span>
             <span
-                class="direction-ltr mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm .dark:bg-dark-700"
+                class="direction-ltr mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm leading-[1.65] .dark:bg-dark-700"
                 dir="ltr"
                 v-text="timeFormat(currentTime)"
             />
@@ -50,7 +50,7 @@
         <span
             v-if="error > 0"
             v-t="{ path: 'player.failed', args: [error] }"
-            class="direction-ltr absolute top-8 rounded bg-black/80 p-2 text-lg backdrop-blur-sm"
+            class="direction-ltr absolute top-8 rounded bg-black/80 p-2 text-lg leading-[1.7] backdrop-blur-sm"
             dir="ltr"
         />
         <div
@@ -1175,11 +1175,11 @@ export default {
 }
 
 .shaka-video-container .material-icons-round {
-    @apply !text-xl;
+    @apply !text-xl leading-[1.65];
 }
 
 .shaka-current-time {
-    @apply !text-base;
+    @apply !text-base leading-[1.65];
 }
 
 .shaka-video-container:-webkit-full-screen {

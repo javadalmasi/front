@@ -1,7 +1,7 @@
 <template>
     <ModalComponent @close="$emit('close')">
         <div>
-            <h3 class="text-xl" v-text="message" />
+            <h3 class="text-xl leading-[1.65]" v-text="message" />
             <div class="mr-auto mt-8 w-min flex gap-2">
                 <button v-t="'actions.cancel'" class="btn" @click="$emit('close')" />
                 <button v-t="'actions.okay'" class="btn" @click="$emit('confirm')" />

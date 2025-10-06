@@ -2,7 +2,7 @@
     <ErrorHandler v-if="playlist && playlist.error" :message="playlist.message" :error="playlist.error" />
 
     <LoadingIndicatorPage v-show="!playlist?.error" :show-content="playlist">
-        <h1 class="mb-1 mr-1 mt-4 text-3xl!" v-text="playlist.name" />
+        <h1 class="mb-1 mr-1 mt-4 text-3xl leading-[1.45]!" v-text="playlist.name" />
 
         <CollapsableText v-if="playlist?.description" :text="playlist.description" />
 

@@ -2,7 +2,7 @@
     <ModalComponent @close="$emit('close')">
         <div class="min-w-[50vw] flex flex-col">
             <div class="h-[70vh] overflow-y-scroll pr-4">
-                <span v-t="'actions.add_to_group'" class="mb-3 inline-block w-max text-2xl" />
+                <span v-t="'actions.add_to_group'" class="mb-3 inline-block w-max text-2xl leading-[1.55]" />
                 <div v-for="(group, index) in channelGroups" :key="group.groupName" class="px-1">
                     <div class="flex items-center justify-between">
                         <span>{{ group.groupName }}</span>

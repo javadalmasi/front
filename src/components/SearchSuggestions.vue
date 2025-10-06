@@ -91,7 +91,7 @@ export default {
 }
 
 .suggestion {
-    @apply block w-full px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-400 cursor-pointer;
+    @apply block w-full px-4 py-2 text-sm leading-[1.65] text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-400 cursor-pointer;
 }
 
 .suggestion-selected {

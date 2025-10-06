@@ -8,7 +8,7 @@
                 <select
                     id="ddlSearchFilters"
                     v-model="selectedFilter"
-                    class="select mb-2 h-12 w-full border border-gray-300 rounded-md bg-white px-3 text-base md:mb-0 md:mr-2 md:w-auto dark:border-dark-200 dark:bg-dark-600"
+                    class="select mb-2 h-12 w-full border border-gray-300 rounded-md bg-white px-3 text-base leading-[1.65] md:mb-0 md:mr-2 md:w-auto dark:border-dark-200 dark:bg-dark-600"
                     @change="updateFilter()"
                 >
                     <option v-for="filter in availableFilters" :key="filter" v-t="`search.${filter}`" :value="filter" />
@@ -17,7 +17,7 @@
                     <input
                         ref="searchInput"
                         v-model="searchQueryText"
-                        class="input h-12 w-full border border-gray-300 rounded-md px-5 pr-12 text-lg shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="input h-12 w-full border border-gray-300 rounded-md px-5 pr-12 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                         type="text"
                         role="search"
                         :title="$t('actions.search')"
@@ -39,7 +39,7 @@
                     class="btn mt-2 h-12 flex items-center justify-center rounded-lg bg-gray-100 px-5 md:mt-0 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
                     @click="submitSearch"
                 >
-                    <div class="i-fa6-solid:magnifying-glass text-base" />
+                    <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
                 </button>
             </div>
             <div class="relative mt-1 w-full">
@@ -59,7 +59,7 @@
         <hr />
 
         <div v-if="results && results.corrected">
-            <i18n-t keypath="search.did_you_mean" tag="div" class="text-lg">
+            <i18n-t keypath="search.did_you_mean" tag="div" class="text-lg leading-[1.7]">
                 <router-link :to="{ name: 'SearchResults', query: { search_query: results.suggestion } }">
                     <em v-text="results.suggestion" />
                 </router-link>

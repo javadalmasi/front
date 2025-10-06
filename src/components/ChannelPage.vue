@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1">
-                    <h1 class="!text-xl" v-text="channel.name" />
+                    <h1 class="!text-xl leading-[1.65]" v-text="channel.name" />
                 </div>
             </div>
 

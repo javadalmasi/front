@@ -17,7 +17,10 @@
         <div class="h-full overflow-y-auto">
             <!-- Public items section -->
             <div class="mt-4">
-                <div v-if="sidebarState === 'open'" class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                <div
+                    v-if="sidebarState === 'open'"
+                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                >
                     آیتم‌های عمومی
                 </div>
                 <div
@@ -26,10 +29,10 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div :class="item.icon" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
                         {{ item.name }}
                     </span>
                 </div>
@@ -37,7 +40,10 @@
 
             <!-- Categories section -->
             <div v-if="sidebarState !== 'semi-open'" class="mt-4">
-                <div v-if="sidebarState === 'open'" class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                <div
+                    v-if="sidebarState === 'open'"
+                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                >
                     دسته‌بندی‌ها
                 </div>
                 <div
@@ -46,10 +52,12 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="searchCategory(category.name)"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div :class="getIconForCategory(category.name)" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">{{ category.name }}</span>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">{{
+                        category.name
+                    }}</span>
                 </div>
 
                 <!-- Show more button -->
@@ -62,13 +70,18 @@
                         class="w-10 flex items-center justify-center text-lg"
                         :class="[showMoreCategories ? 'i-fa6-solid:chevron-up' : 'i-fa6-solid:chevron-down']"
                     />
-                    <span class="mr-4 text-base">{{ showMoreCategories ? "نمایش کمتر" : "نمایش بیشتر" }}</span>
+                    <span class="mr-4 text-base leading-[1.65]">{{
+                        showMoreCategories ? "نمایش کمتر" : "نمایش بیشتر"
+                    }}</span>
                 </div>
             </div>
 
             <!-- Theme toggle section -->
             <div class="mt-4">
-                <div v-if="sidebarState === 'open'" class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                <div
+                    v-if="sidebarState === 'open'"
+                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                >
                     حالت پوسته
                 </div>
                 <div
@@ -76,10 +89,10 @@
                     data-testid="theme-toggle"
                     @click="emitToggleTheme"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div :class="theme === 'light' ? 'i-fa6-solid:moon' : 'i-fa6-solid:sun'" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
                         {{ theme === "light" ? "حالت تاریک" : "حالت روشن" }}
                     </span>
                 </div>
@@ -87,7 +100,10 @@
 
             <!-- Auth section -->
             <div class="mt-4">
-                <div v-if="!authenticated && sidebarState === 'open'" class="px-4 py-2 text-sm text-gray-500">
+                <div
+                    v-if="!authenticated && sidebarState === 'open'"
+                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500"
+                >
                     حساب کاربری
                 </div>
                 <div
@@ -95,30 +111,30 @@
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/login')"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div class="i-fa6-solid:right-to-bracket" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">ورود</span>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ورود</span>
                 </div>
                 <div
                     v-if="!authenticated"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/register')"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div class="i-fa6-solid:user-plus" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">ثبت نام</span>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ثبت نام</span>
                 </div>
                 <div
                     v-if="authenticated"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="logout"
                 >
-                    <div class="w-10 flex items-center justify-center text-lg" :class="[]">
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div class="i-fa6-solid:right-from-bracket" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base">خروج از حساب</span>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">خروج از حساب</span>
                 </div>
             </div>
         </div>

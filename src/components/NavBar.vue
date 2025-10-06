@@ -10,9 +10,12 @@
                     aria-label="Toggle sidebar"
                     @click="toggleSidebar"
                 >
-                    <div class="i-fa6-solid:bars text-lg" />
+                    <div class="i-fa6-solid:bars text-lg leading-[1.7]" />
                 </button>
-                <router-link class="ml-4 flex items-center text-3xl font-bold font-sans" :to="homePagePath">
+                <router-link
+                    class="ml-4 flex items-center text-3xl leading-[1.45] font-bold font-sans"
+                    :to="homePagePath"
+                >
                     <img alt="logo" src="/img/icons/logo.svg" height="32" width="32" class="bold w-10" />
                     <span class="hidden sm:inline">ویدیو</span>
                 </router-link>
@@ -26,7 +29,7 @@
                     aria-label="Search"
                     @click="$router.push({ name: 'SearchResults' })"
                 >
-                    <div class="i-fa6-solid:magnifying-glass text-lg" />
+                    <div class="i-fa6-solid:magnifying-glass text-lg leading-[1.7]" />
                 </button>
             </div>
             <SearchSuggestions
@@ -163,7 +166,7 @@ export default {
     @apply relative flex items-center;
 }
 .delete-search {
-    @apply absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-[#ccc] w-4 h-4 text-center text-black opacity-50 hover:opacity-70 text-sm;
+    @apply absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-[#ccc] w-4 h-4 text-center text-black opacity-50 hover:opacity-70 text-sm leading-[1.65];
 }
 #search-btn {
     @apply rounded-l-none rounded-r-3xl;

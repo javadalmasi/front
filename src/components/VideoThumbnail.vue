@@ -36,7 +36,7 @@
                 v-if="!item.isShort && item.duration >= 0"
                 ref="durationIndicator"
                 :class="[
-                    'duration-indicator absolute flex items-center gap-1 bottom-2 right-2 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white',
+                    'duration-indicator absolute flex items-center gap-1 bottom-2 right-2 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs leading-[1.6] text-white',
                     { 'indicator-hidden': isHovered },
                 ]"
             >
@@ -49,7 +49,7 @@
                 v-if="item.isShort"
                 ref="shortsIndicator"
                 :class="[
-                    'shorts-indicator absolute flex items-center gap-1 bottom-2 right-2 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white',
+                    'shorts-indicator absolute flex items-center gap-1 bottom-2 right-2 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs leading-[1.6] text-white',
                     { 'indicator-hidden': isHovered },
                 ]"
             >
@@ -68,12 +68,12 @@
                 :title="$t('video.watched')"
             >
                 <i class="i-fa6-solid:eye text-xl text-gray-300"></i>
-                <span class="text-xs text-white">{{ $t("video.watched") }}</span>
+                <span class="text-xs leading-[1.6] text-white">{{ $t("video.watched") }}</span>
             </div>
         </div>
     </div>
 
-    <div class="relative" :class="small ? 'text-xs' : 'text-sm'">
+    <div class="relative" :class="small ? 'text-xs leading-[1.6]' : 'text-sm leading-[1.65]'">
         <i18n-t
             v-if="!isLiveStreamDisabled() && isLivestream(item)"
             keypath="video.live"

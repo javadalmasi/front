@@ -1,9 +1,9 @@
 <template>
     <div>
         <router-link :to="{ path: '/playlist', query: { list: playlistId } }"
-            ><h1 class="font-bold !text-lg hover:underline" v-text="playlist.name"
+            ><h1 class="font-bold !text-lg leading-[1.7] hover:underline" v-text="playlist.name"
         /></router-link>
-        <span class="text-sm">
+        <span class="text-sm leading-[1.65]">
             <template v-if="playlist.uploader">
                 <router-link class="link-secondary" :to="playlist.uploaderUrl" :title="playlist.uploader">
                     {{ playlist.uploader }}
@@ -34,7 +34,7 @@
                     },
                 }"
             >
-                <span class="min-w-5 flex-none text-xs" v-text="index + 1" />
+                <span class="min-w-5 flex-none text-xs leading-[1.6]" v-text="index + 1" />
                 <div class="w-24 flex-none">
                     <VideoThumbnail :item="related" :small="true" />
                 </div>
@@ -44,7 +44,7 @@
                     <div class="flex-1">
                         <router-link
                             v-if="related.uploaderUrl && related.uploaderName && !hideChannel"
-                            class="link-secondary block overflow-hidden text-xs no-underline hover:underline-dashed"
+                            class="link-secondary block overflow-hidden text-xs leading-[1.6] no-underline hover:underline-dashed"
                             :to="related.uploaderUrl"
                             :title="related.uploaderName"
                         >

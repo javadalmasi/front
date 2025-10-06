@@ -310,6 +310,79 @@ b {
     @apply font-sans;
 }
 
+/* Persian Typography Standards - Updated for better readability */
+h1 {
+    @apply !text-[2.25rem] leading-[1.2] font-bold; /* Larger for Persian titles */
+}
+h2 {
+    @apply !text-[1.875rem] leading-[1.25] font-bold; /* Larger for Persian subtitles */
+}
+h3 {
+    @apply !text-[1.5rem] leading-[1.3] font-semibold; /* Larger for Persian headings */
+}
+h4 {
+    @apply !text-[1.25rem] leading-[1.35] font-semibold; /* Larger for Persian subheadings */
+}
+h5 {
+    @apply !text-[1.125rem] leading-[1.4] font-medium; /* Larger for Persian minor headings */
+}
+h6 {
+    @apply !text-[1rem] leading-[1.45] font-medium; /* Larger for Persian text headings */
+}
+
+/* Persian body text standards */
+.text-xs {
+    @apply text-[0.75rem] leading-[1.6]; /* 12px, line height 1.6 for Persian */
+}
+.text-sm {
+    @apply text-[0.875rem] leading-[1.65]; /* 14px, line height 1.65 for Persian */
+}
+.text-base {
+    @apply text-[1rem] leading-[1.7]; /* 16px, line height 1.7 for Persian */
+}
+.text-lg {
+    @apply text-[1.125rem] leading-[1.7]; /* 18px, line height 1.7 for Persian */
+}
+.text-xl {
+    @apply text-[1.25rem] leading-[1.65]; /* 20px, line height 1.65 for Persian */
+}
+.text-2xl {
+    @apply text-[1.5rem] leading-[1.55]; /* 24px, line height 1.55 for Persian */
+}
+.text-3xl {
+    @apply text-[1.875rem] leading-[1.45]; /* 30px, line height 1.45 for Persian */
+}
+.text-4xl {
+    @apply text-[2.25rem] leading-[1.35]; /* 36px, line height 1.35 for Persian */
+}
+.text-5xl {
+    @apply text-[3rem] leading-[1.25]; /* 48px, line height 1.25 for Persian */
+}
+.text-9xl {
+    @apply text-[4.5rem] leading-[1.15]; /* 72px, line height 1.15 for Persian */
+}
+
+/* Adjusted for Persian typography */
+.table {
+    @apply w-full text-lg leading-[1.7] text-left font-light border; /* Better line height for Persian */
+}
+
+.link {
+    @apply focus:text-red-500 hover:text-red-500 leading-[1.5]; /* Better line height for Persian links */
+}
+
+.link-secondary {
+    @apply hover:text-dark-400 focus:text-dark-400 underline underline-dark-400 leading-[1.5]; /* Better line height for Persian links */
+}
+
+.dark .link {
+    @apply focus:text-red-400 hover:text-red-400 leading-[1.5]; /* Better line height for Persian links */
+}
+
+.dark .link-secondary {
+    @apply text-gray-300 hover:(text-gray-400 underline underline-gray-400) leading-[1.5]; /* Better line height for Persian links */
+}
+
 .video-grid {
     @apply grid grid-cols-1 mx-2 sm:mx-0 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 col-auto lt-md:gap-x-3 md:gap-x-6 gap-y-5;
 }
@@ -364,22 +437,22 @@ b {
 
 /* Small button size */
 .btn-sm {
-    @apply py-1 px-3 text-sm;
+    @apply py-1 px-3 text-sm leading-[1.6];
 }
 
 /* Large button size */
 .btn-lg {
-    @apply py-3 px-6 text-lg;
+    @apply py-3 px-6 text-lg leading-[1.7];
 }
 
 /* Extra small button size */
 .btn-xs {
-    @apply py-0.5 px-2 text-xs;
+    @apply py-0.5 px-2 text-xs leading-[1.6];
 }
 
 /* Extra large button size */
 .btn-xl {
-    @apply py-4 px-8 text-xl;
+    @apply py-4 px-8 text-xl leading-[1.65];
 }
 
 /* Block button - full width */
@@ -399,15 +472,15 @@ b {
 
 /* Responsive button sizes for different screen sizes */
 .btn-responsive-sm {
-    @apply py-1 px-2 text-sm lt-md:py-0.5 lt-md:px-1.5 lt-md:text-xs;
+    @apply py-1 px-2 text-sm leading-[1.6] lt-md:py-0.5 lt-md:px-1.5 lt-md:text-xs;
 }
 
 .btn-responsive-md {
-    @apply py-2 px-4 text-base lt-md:py-1.5 lt-md:px-3 lt-md:text-sm;
+    @apply py-2 px-4 text-base leading-[1.65] lt-md:py-1.5 lt-md:px-3 lt-md:text-sm;
 }
 
 .btn-responsive-lg {
-    @apply py-3 px-6 text-lg lt-md:py-2 lt-md:px-4 lt-md:text-base;
+    @apply py-3 px-6 text-lg leading-[1.7] lt-md:py-2 lt-md:px-4 lt-md:text-base;
 }
 
 /* Full width button on mobile */
@@ -528,32 +601,8 @@ h2 {
     @apply m-0 font-bold;
 }
 
-h1 {
-    @apply !text-5xl;
-}
-
-h2 {
-    @apply !text-3xl;
-}
-
 .table {
     @apply w-full text-lg text-left font-light border;
-}
-
-.link {
-    @apply focus:text-red-500 hover:text-red-500;
-}
-
-.link-secondary {
-    @apply hover:text-dark-400 focus:text-dark-400 underline underline-dark-400;
-}
-
-.dark .link {
-    @apply focus:text-red-400 hover:text-red-400;
-}
-
-.dark .link-secondary {
-    @apply text-gray-300 hover:(text-gray-400 underline underline-gray-400);
 }
 
 .line {

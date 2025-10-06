@@ -48,7 +48,7 @@
             <div class="flex-1 px-2">
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
-                    class="link-secondary overflow-hidden text-sm no-underline hover:underline-dashed"
+                    class="link-secondary overflow-hidden text-sm leading-[1.65] no-underline hover:underline-dashed"
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
@@ -250,7 +250,7 @@ export default {
 
 <style>
 .video-info {
-    @apply mt-1 text-xs text-gray-600 font-normal;
+    @apply mt-1 text-xs leading-[1.6] text-gray-600 font-normal;
 }
 
 .dark .video-info {

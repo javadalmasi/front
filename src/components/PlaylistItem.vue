@@ -4,7 +4,7 @@
             <div class="relative">
                 <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
                 <div
-                    class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white"
+                    class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs leading-[1.6] text-white"
                 >
                     <i class="i-fa6-solid:bars text-2xs"></i>
                     <span>{{ props.item.videos }} {{ $t("video.videos") }}</span>
@@ -16,7 +16,7 @@
 
         <router-link
             v-if="props.item.uploaderUrl && props.item.uploaderName && !props.hideChannel"
-            class="link-secondary text-sm no-underline hover:underline-dashed"
+            class="link-secondary text-sm leading-[1.65] no-underline hover:underline-dashed"
             :to="props.item.uploaderUrl"
         >
             <p>

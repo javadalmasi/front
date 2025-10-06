@@ -627,7 +627,7 @@ export default {
 }
 
 .tooltip-hover:hover::after {
-    @apply absolute bottom-full left-1/2 z-50 px-4 py-1.5 text-sm font-normal text-white bg-[#333] rounded shadow-lg -translate-x-1/2 mb-2 min-w-[200px] max-w-[350px] text-center break-words border border-gray-500;
+    @apply absolute bottom-full left-1/2 z-50 px-4 py-1.5 text-sm leading-[1.65] font-normal text-white bg-[#333] rounded shadow-lg -translate-x-1/2 mb-2 min-w-[200px] max-w-[350px] text-center break-words border border-gray-500;
     content: attr(title);
     word-wrap: break-word;
     hyphens: auto;

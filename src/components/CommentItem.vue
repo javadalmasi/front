@@ -34,7 +34,7 @@
                     <router-link class="link font-bold" :to="comment.commentorUrl">{{ comment.author }}</router-link>
                     <i v-if="comment.verified" class="i-fa6-solid:check mr-1.5" />
                 </div>
-                <div class="comment-meta mb-1.5 text-sm" v-text="comment.commentedTime" />
+                <div class="comment-meta mb-1.5 text-sm leading-[1.65]" v-text="comment.commentedTime" />
             </div>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <CollapsableText :text="comment.commentText" :visible-limit="500" />
