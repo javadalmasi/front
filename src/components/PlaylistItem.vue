@@ -3,6 +3,12 @@
         <router-link :to="props.item.url" class="link inline-block">
             <div class="relative">
                 <img loading="lazy" class="w-full aspect-video object-cover rounded-lg" :src="optimizedThumbnail" />
+                <div
+                    class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white"
+                >
+                    <i class="i-fa6-solid:bars text-2xs"></i>
+                    <span>{{ props.item.videos }} {{ $t("video.videos") }}</span>
+                </div>
             </div>
             <p class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
         </router-link>
@@ -23,11 +29,6 @@
             class="link no-underline hover:underline-dashed"
             v-text="truncatedUploaderName"
         />
-
-        <template v-if="props.item.videos >= 0">
-            <br v-if="props.item.uploaderName" />
-            <span class="text-sm" v-text="`${props.item.videos} ${$t('video.videos')}`" />
-        </template>
 
         <br />
     </div>
