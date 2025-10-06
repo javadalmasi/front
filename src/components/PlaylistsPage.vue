@@ -13,7 +13,7 @@
                 multiple="multiple"
                 @change="importPlaylists"
             />
-            <label v-t="'actions.import_from_json_csv'" for="fileSelector" class="btn mr-2" />
+            <label v-t="'actions.import_from_json_csv'" for="fileSelector" class="mr-2 btn" />
         </div>
     </div>
 
@@ -34,8 +34,8 @@
                     v-text="playlist.name"
                 />
             </router-link>
-            <button v-t="'actions.edit_playlist'" class="btn h-auto" @click="showPlaylistEditModal(playlist)" />
-            <button v-t="'actions.delete_playlist'" class="btn mr-2 h-auto" @click="playlistToDelete = playlist.id" />
+            <button v-t="'actions.edit_playlist'" class="h-auto btn" @click="showPlaylistEditModal(playlist)" />
+            <button v-t="'actions.delete_playlist'" class="mr-2 h-auto btn" @click="playlistToDelete = playlist.id" />
             <ModalComponent v-if="playlist.id == playlistToEdit" @close="playlistToEdit = null">
                 <div class="flex flex-col gap-2">
                     <h2 v-t="'actions.edit_playlist'" />
@@ -51,7 +51,7 @@
                         type="text"
                         :placeholder="$t('actions.playlist_description')"
                     />
-                    <button v-t="'actions.okay'" class="btn mr-auto" @click="editPlaylist(playlist)" />
+                    <button v-t="'actions.okay'" class="mr-auto btn" @click="editPlaylist(playlist)" />
                 </div>
             </ModalComponent>
             <ConfirmModal

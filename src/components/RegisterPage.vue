@@ -27,7 +27,7 @@
                     :aria-label="$t('login.password')"
                     @keyup.enter="register"
                 />
-                <button type="button" class="btn mr-2" @click="showPassword = !showPassword">
+                <button type="button" class="mr-2 btn" @click="showPassword = !showPassword">
                     <div class="i-fa6-solid:eye" />
                 </button>
             </div>
@@ -41,12 +41,12 @@
                     :aria-label="$t('login.password_confirm')"
                     @keyup.enter="register"
                 />
-                <button type="button" class="btn mr-2" @click="showConfirmPassword = !showConfirmPassword">
+                <button type="button" class="mr-2 btn" @click="showConfirmPassword = !showConfirmPassword">
                     <div class="i-fa6-solid:eye" />
                 </button>
             </div>
             <div>
-                <a v-t="'titles.register'" class="btn w-auto" @click="register" />
+                <a v-t="'titles.register'" class="w-auto btn" @click="register" />
             </div>
         </form>
     </div>

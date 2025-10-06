@@ -29,7 +29,7 @@
                 />
             </div>
             <div>
-                <a v-t="'titles.login'" class="btn w-auto" @click="login" />
+                <a v-t="'titles.login'" class="w-auto btn" @click="login" />
             </div>
         </form>
     </div>

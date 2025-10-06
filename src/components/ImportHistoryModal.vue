@@ -5,7 +5,7 @@
             <form>
                 <br />
                 <div>
-                    <input ref="fileSelector" class="btn mb-2 mr-2" type="file" @change="fileChange" />
+                    <input ref="fileSelector" class="mb-2 mr-2 btn" type="file" @change="fileChange" />
                 </div>
                 <div>
                     <strong
@@ -28,7 +28,7 @@
                 </div>
                 <br />
                 <div>
-                    <a class="btn w-auto" @click="handleImport" v-text="$t('actions.import')" />
+                    <a class="w-auto btn" @click="handleImport" v-text="$t('actions.import')" />
                 </div>
             </form>
         </div>

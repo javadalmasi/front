@@ -57,7 +57,7 @@
                     role="button"
                     :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${channel.id}`"
                     target="_blank"
-                    class="btn btn-secondary flex-col"
+                    class="btn flex-col btn-secondary"
                 >
                     <i class="i-fa6-solid:rss" />
                 </a>
@@ -72,14 +72,14 @@
             <button
                 v-for="(tab, index) in tabs"
                 :key="tab.name"
-                class="btn btn-secondary mr-2"
+                class="mr-2 btn btn-secondary"
                 :class="{ active: selectedTab == index }"
                 @click="loadTab(index)"
             >
                 <span v-text="tab.translatedName"></span>
             </button>
             <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                <button class="btn btn-primary mr-2">پخش همه</button>
+                <button class="mr-2 btn btn-primary">پخش همه</button>
             </router-link>
         </div>
 

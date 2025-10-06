@@ -5,7 +5,7 @@
             <input ref="input" v-model="playlistName" type="text" class="input mt-2" />
             <div class="mr-auto mt-3 w-min flex">
                 <button v-t="'actions.cancel'" class="btn" @click="$emit('close')" />
-                <button v-t="'actions.okay'" class="btn mr-2" @click="onCreatePlaylist" />
+                <button v-t="'actions.okay'" class="mr-2 btn" @click="onCreatePlaylist" />
             </div>
         </div>
     </ModalComponent>

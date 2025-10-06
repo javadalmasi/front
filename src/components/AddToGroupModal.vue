@@ -15,7 +15,7 @@
                     <hr class="h-1 w-full" />
                 </div>
             </div>
-            <button v-t="'actions.create_group'" class="btn mr-auto w-max" @click="showCreateGroupModal = true" />
+            <button v-t="'actions.create_group'" class="mr-auto w-max btn" @click="showCreateGroupModal = true" />
         </div>
     </ModalComponent>
 

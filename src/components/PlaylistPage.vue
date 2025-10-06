@@ -34,17 +34,17 @@
                         `${playlist.videos} ${$t('video.videos')} - ${timeFormat(totalDuration)}${playlist.nextpage ? '+' : ''}`
                     "
                 />
-                <button v-if="!isPipedPlaylist" class="btn mx-1" @click="bookmarkPlaylist">
+                <button v-if="!isPipedPlaylist" class="mx-1 btn" @click="bookmarkPlaylist">
                     {{ $t(`actions.${isBookmarked ? "playlist_bookmarked" : "bookmark_playlist"}`)
                     }}<i class="i-fa6-solid:bookmark mr-3" />
                 </button>
-                <button v-if="authenticated && !isPipedPlaylist" class="btn btn-secondary mr-1" @click="clonePlaylist">
+                <button v-if="authenticated && !isPipedPlaylist" class="mr-1 btn btn-secondary" @click="clonePlaylist">
                     {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone mr-3" />
                 </button>
-                <button class="btn mr-1" @click="downloadPlaylistAsTxt">
+                <button class="mr-1 btn" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}
                 </button>
-                <a v-if="!isRssFeedDisabled" class="btn mr-1" :href="getRssUrl">
+                <a v-if="!isRssFeedDisabled" class="mr-1 btn" :href="getRssUrl">
                     <i class="i-fa6-solid:rss" />
                 </a>
                 <WatchOnButton :link="`https://www.youtube.com/playlist?list=${$route.query.list}`" />

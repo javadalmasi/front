@@ -335,7 +335,7 @@
             <a v-t="'actions.logout'" class="btn btn-secondary" @click="logout" />
             <a
                 v-t="'actions.invalidate_session'"
-                class="btn btn-warning"
+                class="btn-warning btn"
                 style="margin-left: 0.5em"
                 @click="invalidateSession"
             />
@@ -345,8 +345,8 @@
     <br />
     <p v-t="'info.preferences_note'" />
     <br />
-    <button v-t="'actions.reset_preferences'" class="btn btn-warning" @click="showConfirmResetPrefsDialog = true" />
-    <button v-t="'actions.backup_preferences'" class="btn btn-secondary mx-4" @click="backupPreferences()" />
+    <button v-t="'actions.reset_preferences'" class="btn-warning btn" @click="showConfirmResetPrefsDialog = true" />
+    <button v-t="'actions.backup_preferences'" class="mx-4 btn btn-secondary" @click="backupPreferences()" />
     <label
         v-t="'actions.restore_preferences'"
         for="fileSelector"

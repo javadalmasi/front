@@ -13,7 +13,7 @@
                 /></strong>
             </div>
             <div>
-                <a v-t="'actions.import'" class="btn w-auto" @click="handleImport" />
+                <a v-t="'actions.import'" class="w-auto btn" @click="handleImport" />
             </div>
         </form>
         <br />

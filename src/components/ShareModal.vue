@@ -34,7 +34,7 @@
             <a
                 :href="`https://wa.me/?text=${encodeURIComponent(generatedLink)}`"
                 target="_blank"
-                class="btn btn-success flex items-center justify-center"
+                class="btn-success btn flex items-center justify-center"
             >
                 <i class="i-fa6-brands:whatsapp mr-2" />
                 <span v-t="'actions.share_on_whatsapp'" />
@@ -42,7 +42,7 @@
             <a
                 :href="`https://t.me/share/url?url=${encodeURIComponent(generatedLink)}`"
                 target="_blank"
-                class="btn btn-primary flex items-center justify-center"
+                class="btn flex items-center justify-center btn-primary"
             >
                 <i class="i-fa6-brands:telegram mr-2" />
                 <span v-t="'actions.share_on_telegram'" />
@@ -52,7 +52,7 @@
         <!-- Copy link button -->
         <button
             v-t="'actions.copy_link'"
-            class="btn btn-primary mb-3 w-full flex items-center justify-center"
+            class="mb-3 w-full btn flex items-center justify-center btn-primary"
             @click="copyLink()"
         >
             <i class="i-fa6-solid:link mr-2" />
@@ -66,7 +66,7 @@
             </div>
             <button
                 v-t="'actions.copy_embed' + ''"
-                class="btn btn-secondary w-full flex items-center justify-center"
+                class="w-full btn flex items-center justify-center btn-secondary"
                 @click="copyEmbedCode()"
             >
                 <i class="i-fa6-solid:code mr-2" />

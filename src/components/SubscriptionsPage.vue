@@ -49,7 +49,7 @@
         <button
             v-for="group in channelGroups"
             :key="group.groupName"
-            class="btn mx-1 w-max"
+            class="mx-1 w-max btn"
             :class="{ selected: selectedGroup === group }"
             @click="selectGroup(group)"
         >
@@ -65,7 +65,7 @@
             @close="groupToDelete = null"
             @confirm="deleteGroup(groupToDelete)"
         />
-        <button class="btn mx-1" @click="showCreateGroupModal = true">
+        <button class="mx-1 btn" @click="showCreateGroupModal = true">
             <i class="i-fa6-solid:circle-plus" />
         </button>
     </div>
@@ -86,7 +86,7 @@
             <!-- subscribe / unsubscribe btn -->
             <button
                 v-t="`actions.${subscription.subscribed ? 'unsubscribe' : 'subscribe'}`"
-                class="btn mt-2 w-full"
+                class="mt-2 w-full btn"
                 @click="handleButton(subscription)"
             />
         </div>
