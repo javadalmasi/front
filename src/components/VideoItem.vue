@@ -140,7 +140,7 @@ import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
-import { truncateString } from "../utils/Misc";
+import { truncateStringByWidth } from "../utils/Misc";
 
 export default {
     components: { PlaylistAddModal, ConfirmModal, ShareModal, VideoThumbnail },
@@ -181,10 +181,12 @@ export default {
             return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
         },
         truncatedUploaderName() {
-            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
-                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
-                : 16;
-            return truncateString(this.item.uploaderName, limit);
+            // Calculate available width based on element's container
+            // Default to 100px if we can't determine the width
+            const maxWidth = this.calculateUploaderNameWidth();
+            return this.item.uploaderName
+                ? truncateStringByWidth(this.item.uploaderName, maxWidth)
+                : this.item.uploaderName;
         },
     },
     mounted() {
@@ -243,6 +245,18 @@ export default {
                     instance.shouldShowVideo();
                 };
             }
+        },
+        calculateUploaderNameWidth() {
+            // Get the container element that displays the uploader name
+            if (this.$el && this.$el.querySelector) {
+                const nameElement = this.$el.querySelector(".link-secondary");
+                if (nameElement) {
+                    // Calculate available width considering padding and margins
+                    return nameElement.clientWidth - 10; // 10px buffer
+                }
+            }
+            // Default fallback width (in pixels)
+            return 100;
         },
     },
 };

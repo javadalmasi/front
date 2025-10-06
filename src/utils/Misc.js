@@ -32,3 +32,53 @@ export const truncateString = (str, maxLength) => {
     if (!str) return str;
     return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
 };
+
+// Function to measure text width in pixels
+export const measureTextWidth = (text, font = "14px system-ui") => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.font = font;
+    return ctx.measureText(text).width;
+};
+
+// Function to truncate text based on available width in pixels
+export const truncateStringByWidth = (str, maxWidth, font = "14px system-ui") => {
+    if (!str) return str;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.font = font;
+
+    const ellipsis = "...";
+    const ellipsisWidth = ctx.measureText(ellipsis).width;
+
+    if (ellipsisWidth > maxWidth) {
+        // If even the ellipsis is too wide, return empty string or single character
+        return maxWidth > ctx.measureText("W").width ? ellipsis : "";
+    }
+
+    const fullWidth = ctx.measureText(str).width;
+    if (fullWidth <= maxWidth) {
+        return str;
+    }
+
+    // Binary search for the optimal length
+    let low = 0;
+    let high = str.length;
+    let result = str;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const testStr = str.substring(0, mid) + ellipsis;
+        const testWidth = ctx.measureText(testStr).width;
+
+        if (testWidth <= maxWidth) {
+            result = str.substring(0, mid) + (mid < str.length ? ellipsis : "");
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    return result;
+};

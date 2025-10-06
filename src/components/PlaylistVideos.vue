@@ -61,7 +61,7 @@
 <script>
 import { nextTick } from "vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
-import { truncateString } from "../utils/Misc";
+import { truncateStringByWidth } from "../utils/Misc";
 
 export default {
     components: { VideoThumbnail },
@@ -111,10 +111,15 @@ export default {
                     elems[this.selectedIndex - 1].offsetTop - this.$refs.scrollable.offsetTop;
         },
         getTruncatedUploaderName(uploaderName) {
-            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
-                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
-                : 16;
-            return truncateString(uploaderName, limit);
+            // Calculate available width based on element's container
+            // Default to 80px if we can't determine the width
+            const maxWidth = this.calculateAvailableWidth();
+            return uploaderName ? truncateStringByWidth(uploaderName, maxWidth) : uploaderName;
+        },
+        calculateAvailableWidth() {
+            // For playlist videos, we use a default width since each item has limited space
+            // We can't easily measure the specific element width here, so we use an estimated value
+            return 80; // Reasonable width for the limited space in playlist items
         },
     },
 };

@@ -20,13 +20,14 @@
             :to="props.item.uploaderUrl"
         >
             <p>
-                <span v-text="truncatedUploaderName" />
+                <span ref="uploaderNameRef" v-text="truncatedUploaderName" />
                 <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
         <a
             v-else-if="props.item.uploaderName && !props.hideChannel"
             class="link no-underline hover:underline-dashed"
+            ref="uploaderNameRef"
             v-text="truncatedUploaderName"
         />
 
@@ -35,8 +36,8 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { truncateString } from "../utils/Misc";
+import { computed, ref } from "vue";
+import { truncateStringByWidth } from "../utils/Misc";
 import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
 
 const props = defineProps({
@@ -49,6 +50,8 @@ const props = defineProps({
         default: false,
     },
 });
+
+const uploaderNameRef = ref(null);
 
 const optimizedThumbnail = computed(() => {
     // Apply the same thumbnail optimization as used in VideoThumbnail
@@ -71,8 +74,12 @@ const optimizedThumbnail = computed(() => {
     return props.item.thumbnail;
 });
 
+// For now, using a default width as we can't easily measure the element width in setup
+// We'll implement a more advanced solution with a watcher if needed
 const truncatedUploaderName = computed(() => {
-    const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT) : 16;
-    return truncateString(props.item.uploaderName, limit);
+    // Instead of using a fixed character limit, we'll use a reasonable default width in px
+    // This could be adjusted based on screen size or container width
+    const maxWidth = 120; // Default max width in pixels
+    return props.item.uploaderName ? truncateStringByWidth(props.item.uploaderName, maxWidth) : props.item.uploaderName;
 });
 </script>

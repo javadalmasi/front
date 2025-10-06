@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { truncateString } from "../utils/Misc";
+import { truncateStringByWidth } from "../utils/Misc";
 
 export default {
     props: {
@@ -72,10 +72,12 @@ export default {
             return _this.item.url.substr(-24);
         },
         truncatedUploaderName(_this) {
-            const limit = import.meta.env.VITE_CHANNEL_NAME_LIMIT
-                ? parseInt(import.meta.env.VITE_CHANNEL_NAME_LIMIT)
-                : 16;
-            return truncateString(_this.item.uploaderName, limit);
+            // Calculate available width based on element's container
+            // Default to 120px if we can't determine the width
+            const maxWidth = this.calculateAvailableWidth();
+            return _this.item.uploaderName
+                ? truncateStringByWidth(_this.item.uploaderName, maxWidth)
+                : _this.item.uploaderName;
         },
     },
     mounted() {
@@ -90,6 +92,18 @@ export default {
             this.toggleSubscriptionState(this.channelId, this.subscribed).then(success => {
                 if (success) this.subscribed = !this.subscribed;
             });
+        },
+        calculateAvailableWidth() {
+            // Get the container element that displays the uploader name
+            if (this.$el && this.$el.querySelector) {
+                const nameElement = this.$el.querySelector("a");
+                if (nameElement) {
+                    // Calculate available width considering padding and margins
+                    return nameElement.clientWidth - 10; // 10px buffer
+                }
+            }
+            // Default fallback width (in pixels)
+            return 120;
         },
     },
 };
