@@ -229,7 +229,6 @@
                     </div>
 
                     <button
-                        v-if="!isDescriptionToggleDisabled"
                         v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
                         class="btn btn-secondary mb-2"
                         @click="showDesc = !showDesc"
@@ -438,10 +437,6 @@ export default {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
         },
-        isDescriptionToggleDisabled() {
-            // Check if description toggle button is disabled via environment variable
-            return import.meta.env.VITE_DISABLE_DESCRIPTION_TOGGLE === "true";
-        },
         isRecommendationsToggleDisabled() {
             // Check if recommendations toggle button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RECOMMENDATIONS_TOGGLE === "true";
@@ -546,9 +541,7 @@ export default {
         );
         this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
         this.showComments = !this.getPreferenceBoolean("minimizeComments", false);
-        this.showDesc = this.isDescriptionToggleDisabled
-            ? true
-            : !this.getPreferenceBoolean("minimizeDescription", true);
+        this.showDesc = !this.getPreferenceBoolean("minimizeDescription", true);
         this.showRecs = this.isRecommendationsToggleDisabled
             ? true
             : !this.getPreferenceBoolean("minimizeRecommendations", false);
