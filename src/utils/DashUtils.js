@@ -1,8 +1,22 @@
 // Based of https://github.com/GilgusMaximus/yt-dash-manifest-generator/blob/master/src/DashGenerator.js
 import { XMLBuilder } from "fast-xml-parser";
+import { replaceWithCdnUrl } from "./CdnUtils.js";
 
 export function generate_dash_file_from_formats(VideoFormats, VideoLength) {
-    const generatedJSON = generate_xmljs_json_from_data(VideoFormats, VideoLength);
+    // Apply CDN replacement to video format URLs if enabled
+    const processedFormats = VideoFormats.map(format => {
+        const processedFormat = { ...format };
+        if (format.url && format.proxyUrl) {
+            processedFormat.url = replaceWithCdnUrl(
+                format.url,
+                format.proxyUrl,
+                import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/",
+            );
+        }
+        return processedFormat;
+    });
+
+    const generatedJSON = generate_xmljs_json_from_data(processedFormats, VideoLength);
     const builder = new XMLBuilder({
         ignoreAttributes: false,
         allowBooleanAttributes: true,

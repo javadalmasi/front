@@ -90,6 +90,7 @@
 <script>
 import "shaka-player/dist/controls.css";
 import { parseTimeParam } from "@/utils/Misc";
+import { replaceWithCdnUrl } from "@/utils/CdnUtils.js";
 import ModalComponent from "./ModalComponent.vue";
 
 const shaka = import("shaka-player/dist/shaka-player.ui.js");
@@ -412,8 +413,14 @@ export default {
                 !this.getPreferenceBoolean("preferHls", false)
             ) {
                 if (!this.video.dash) {
+                    // Add proxyUrl to each stream format for CDN replacement
+                    const streamsWithProxy = streams.map(stream => ({
+                        ...stream,
+                        proxyUrl: this.video.proxyUrl,
+                    }));
+
                     const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
-                        streams,
+                        streamsWithProxy,
                         this.video.duration,
                     );
 
@@ -492,6 +499,13 @@ export default {
                                 request.headers = {};
                                 request.uris[0] = url.toString();
                             }
+                        }
+
+                        // Apply CDN replacement if enabled
+                        if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true") {
+                            const cdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
+                            const processedUrl = replaceWithCdnUrl(request.uris[0], proxyURL.toString(), cdnUrl);
+                            request.uris[0] = processedUrl;
                         }
                     });
 
