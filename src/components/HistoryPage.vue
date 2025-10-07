@@ -34,7 +34,7 @@
     <hr />
 
     <div class="video-grid">
-        <VideoItem v-for="video in videos" :key="video.url" :item="video" />
+        <VideoItem v-for="video in videos" :key="video.url" :item="video" :clamp-title-lines="true" />
     </div>
 
     <br />

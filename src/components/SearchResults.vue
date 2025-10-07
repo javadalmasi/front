@@ -71,7 +71,7 @@
             class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2"
         >
             <template v-for="result in results.items" :key="result.url">
-                <ContentItem :item="result" height="94" width="168" />
+                <ContentItem :item="result" :clamp-title-lines="true" height="94" width="168" />
             </template>
         </LoadingIndicatorPage>
     </div>

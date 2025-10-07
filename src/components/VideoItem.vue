@@ -16,7 +16,7 @@
 
             <div>
                 <p
-                    style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
+                    :style="lineClampStyle"
                     class="link flex overflow-hidden pt-2 font-bold"
                     :title="title"
                     v-text="title"
@@ -162,6 +162,7 @@ export default {
         playlistId: { type: String, default: null },
         preferListen: { type: Boolean, default: false },
         admin: { type: Boolean, default: false },
+        clampTitleLines: { type: Boolean, default: true },
     },
     emits: ["update:watched", "remove"],
     data() {
@@ -187,6 +188,18 @@ export default {
             return this.item.uploaderName
                 ? truncateStringByWidth(this.item.uploaderName, maxWidth)
                 : this.item.uploaderName;
+        },
+        lineClampStyle() {
+            // Apply line clamping only if the prop is true
+            if (this.clampTitleLines) {
+                return {
+                    display: "-webkit-box",
+                    "-webkit-line-clamp": "2",
+                    "-webkit-box-orient": "vertical",
+                };
+            }
+            // Return an empty style object when not clamping
+            return {};
         },
     },
     mounted() {

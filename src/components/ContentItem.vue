@@ -1,5 +1,11 @@
 <template>
-    <component :is="compName" :item="item" :hide-channel="hideChannel" />
+    <component
+        :is="compName"
+        :item="item"
+        :hide-channel="hideChannel"
+        :clamp-title-lines="clampTitleLines"
+        v-bind="$attrs"
+    />
 </template>
 
 <script setup>
@@ -13,6 +19,10 @@ const props = defineProps({
     hideChannel: {
         type: Boolean,
         default: false,
+    },
+    clampTitleLines: {
+        type: Boolean,
+        default: true,
     },
 });
 

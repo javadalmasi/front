@@ -48,7 +48,13 @@
 
     <LoadingIndicatorPage :show-content="videosStore != null" class="video-grid">
         <template v-for="video in filteredVideos" :key="video.url">
-            <VideoItem v-if="shouldShowVideo(video)" :is-feed="true" :item="video" @update:watched="onUpdateWatched" />
+            <VideoItem
+                v-if="shouldShowVideo(video)"
+                :is-feed="true"
+                :item="video"
+                :clamp-title-lines="true"
+                @update:watched="onUpdateWatched"
+            />
         </template>
     </LoadingIndicatorPage>
 </template>

@@ -90,6 +90,7 @@
                 v-for="item in contentItems"
                 :key="item.url"
                 :item="item"
+                :clamp-title-lines="true"
                 height="94"
                 width="168"
                 hide-channel

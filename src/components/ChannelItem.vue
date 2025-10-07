@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </div>
-            <p>
+            <p :style="titleStyle">
                 <span v-text="item.name" />
                 <i v-if="item.verified" class="i-fa6-solid:check mr-1.5" />
             </p>
@@ -61,6 +61,10 @@ export default {
             type: Object,
             required: true,
         },
+        clampTitleLines: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
@@ -68,6 +72,19 @@ export default {
         };
     },
     computed: {
+        titleStyle(_this) {
+            // Apply line clamping only if the prop is true
+            if (_this.clampTitleLines) {
+                return {
+                    display: "-webkit-box",
+                    "-webkit-line-clamp": "2",
+                    "-webkit-box-orient": "vertical",
+                    overflow: "hidden",
+                };
+            }
+            // Return an empty style object when not clamping
+            return {};
+        },
         channelId(_this) {
             return _this.item.url.substr(-24);
         },

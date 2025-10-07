@@ -10,7 +10,7 @@
                     <span>{{ props.item.videos }} {{ $t("video.videos") }}</span>
                 </div>
             </div>
-            <p class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
+            <p :style="titleStyle" class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
         </router-link>
         <p v-if="props.item.description" v-text="props.item.description" />
 
@@ -49,6 +49,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    clampTitleLines: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const uploaderNameRef = ref(null);
@@ -72,6 +76,20 @@ const optimizedThumbnail = computed(() => {
         return props.item.thumbnail;
     }
     return props.item.thumbnail;
+});
+
+const titleStyle = computed(() => {
+    // Apply line clamping only if the prop is true
+    if (props.clampTitleLines) {
+        return {
+            display: "-webkit-box",
+            "-webkit-line-clamp": "2",
+            "-webkit-box-orient": "vertical",
+            overflow: "hidden",
+        };
+    }
+    // Return an empty style object when not clamping
+    return {};
 });
 
 // For now, using a default width as we can't easily measure the element width in setup

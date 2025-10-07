@@ -4,7 +4,14 @@
     <hr />
 
     <LoadingIndicatorPage :show-content="videos.length != 0" class="video-grid">
-        <VideoItem v-for="video in videos" :key="video.url" :item="video" height="118" width="210" />
+        <VideoItem
+            v-for="video in videos"
+            :key="video.url"
+            :item="video"
+            :clamp-title-lines="true"
+            height="118"
+            width="210"
+        />
     </LoadingIndicatorPage>
 </template>
 

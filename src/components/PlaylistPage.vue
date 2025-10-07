@@ -58,6 +58,7 @@
                 v-for="(video, index) in playlist.relatedStreams"
                 :key="video.url"
                 :item="video"
+                :clamp-title-lines="true"
                 :index="index"
                 :playlist-id="$route.query.list"
                 :admin="admin"
