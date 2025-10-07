@@ -1,17 +1,20 @@
 <template>
     <div
         :class="[
-            'fixed top-16 right-0 h-full z-50 transition-all duration-300 ease-in-out',
+            'fixed top-16 h-full z-50 transition-all duration-300 ease-in-out',
             'bg-gray-50 dark:bg-dark-800 border-l border-gray-200 dark:border-dark-100',
             {
-                'w-64': sidebarState === 'open',
-                'w-20': sidebarState === 'semi-open' && !isWatchPage,
-                'w-0 overflow-hidden': sidebarState === 'closed',
-                'z-40': !isWatchPage, // Lower z-index on other pages
+                'right-0': !isMobile, // Desktop: align to right
+                'left-0': isMobile, // Mobile: overlay from left
+                'w-64': sidebarState === 'open' && !isMobile,
+                'w-20': sidebarState === 'semi-open' && !isWatchPage && !isMobile,
+                'w-screen': isMobile && sidebarState !== 'closed', // Mobile: full width when open
+                'w-0 overflow-hidden': sidebarState === 'closed' || (isMobile && sidebarState === 'closed'),
+                'z-50': !isWatchPage, // Consistent z-index on other pages
                 'z-60': isWatchPage && sidebarState !== 'closed', // Higher z-index on watch page
             },
         ]"
-        :style="{ height: 'calc(100vh - 4rem)', direction: 'rtl' }"
+        :style="{ height: isMobile ? '100vh' : 'calc(100vh - 4rem)', direction: 'rtl' }"
     >
         <!-- Scrollable content area -->
         <div class="h-full overflow-y-auto">
@@ -140,10 +143,10 @@
         </div>
     </div>
 
-    <!-- Overlay for watch page and mobile -->
+    <!-- Overlay for watch page and mobile (only show overlay when it should close the sidebar) -->
     <div
         v-if="(isWatchPage || isMobile) && sidebarState !== 'closed'"
-        class="fixed inset-0 z-50 bg-black bg-opacity-50"
+        class="fixed inset-0 z-40 bg-black bg-opacity-50"
         @click="closeSidebar"
     ></div>
 </template>
@@ -163,6 +166,10 @@ export default {
         theme: {
             type: String,
             required: true,
+        },
+        isMobile: {
+            type: Boolean,
+            default: false,
         },
     },
     emits: ["toggle-theme"],
@@ -222,10 +229,6 @@ export default {
                 return this.categories;
             }
             return this.categories.slice(0, 5);
-        },
-        isMobile() {
-            if (typeof window === "undefined") return false;
-            return window.innerWidth < 768;
         },
     },
     methods: {

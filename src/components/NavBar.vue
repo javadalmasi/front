@@ -1,6 +1,6 @@
 <template>
     <nav
-        class="sticky top-0 z-60 h-16 w-full border-b border-gray-200 bg-gray-50 lt-md:static dark:border-dark-100 dark:bg-dark-800"
+        class="sticky top-0 z-70 h-16 w-full border-b border-gray-200 bg-gray-50 dark:border-dark-100 dark:bg-dark-800"
     >
         <div class="mx-auto h-full flex items-center justify-between px-2 sm:px-4">
             <!-- Left side: Menu button and Logo -->

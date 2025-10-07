@@ -8,7 +8,7 @@
                     :sidebar-state="sidebarState"
                     :is-watch-page="isWatchPage"
                     :theme="theme"
-                    class="lt-md:hidden"
+                    :is-mobile="isMobile"
                     @toggle-theme="toggleTheme"
                 />
                 <div
@@ -18,6 +18,7 @@
                         'md:pr-64 mr-1vw': sidebarState === 'open' && !isWatchPage,
                         'md:pr-20 mr-1vw': sidebarState === 'semi-open' && !isWatchPage,
                         'md:pr-1vw p-0 m-0': sidebarState === 'closed' || isWatchPage,
+                        'lt-md:pr-0': isMobile,
                     }"
                 >
                     <router-view v-slot="{ Component }">
@@ -59,6 +60,8 @@ export default {
             sidebarState: "semi-open",
             isWatchPage: false,
             isMobile: false,
+            routeChangeTimeout: null,
+            previousSidebarState: "semi-open", // Track previous state when leaving non-watch pages
         };
     },
     computed: {
@@ -68,12 +71,29 @@ export default {
     },
     watch: {
         $route(to) {
-            this.isWatchPage = to.name === "WatchVideo" || to.name === "SearchResults";
-            if (this.isWatchPage) {
-                this.sidebarState = "closed";
-            } else if (this.sidebarState === "closed" && !this.isMobile) {
-                this.sidebarState = "semi-open";
+            // Debounce to prevent rapid state changes
+            if (this.routeChangeTimeout) {
+                clearTimeout(this.routeChangeTimeout);
             }
+
+            this.routeChangeTimeout = setTimeout(() => {
+                const wasWatchPage = this.isWatchPage;
+                const previousState = this.sidebarState; // Preserve current state before changing isWatchPage
+                this.isWatchPage = to.name === "WatchVideo" || to.name === "SearchResults";
+
+                if (this.isWatchPage) {
+                    // On watch pages, always close the sidebar, but remember previous state
+                    this.previousSidebarState = previousState;
+                    this.sidebarState = "closed";
+                } else if (wasWatchPage && !this.isMobile && this.previousSidebarState) {
+                    // When returning from watch page, restore previous state (open or semi-open)
+                    this.sidebarState = this.previousSidebarState;
+                } else if (!wasWatchPage && this.sidebarState === "closed" && !this.isMobile && !this.isMobile) {
+                    // Only set to semi-open if we're not coming from a watch page
+                    // This prevents state conflicts when switching from watch to non-watch pages
+                    this.sidebarState = "semi-open";
+                }
+            }, 100); // Small delay to prevent rapid toggling
         },
     },
     mounted() {
@@ -86,6 +106,7 @@ export default {
 
         this.isWatchPage = this.$route.name === "WatchVideo" || this.$route.name === "SearchResults";
         if (this.isWatchPage) {
+            this.previousSidebarState = this.sidebarState; // Remember the state before switching to watch
             this.sidebarState = "closed";
         }
 
@@ -167,6 +188,9 @@ export default {
         window.removeEventListener("sidebarStateChanged", this.updateSidebarState);
         darkModePreference.removeEventListener("change", this.setTheme);
         window.removeEventListener("resize", this.checkIsMobile);
+        if (this.routeChangeTimeout) {
+            clearTimeout(this.routeChangeTimeout);
+        }
     },
     methods: {
         checkIsMobile() {
@@ -182,6 +206,11 @@ export default {
                 const states = ["open", "semi-open", "closed"];
                 const currentIndex = states.indexOf(this.sidebarState);
                 this.sidebarState = states[(currentIndex + 1) % states.length];
+
+                // Update previous state when toggling on non-watch pages
+                if (!this.isWatchPage && this.sidebarState !== "closed") {
+                    this.previousSidebarState = this.sidebarState;
+                }
             }
         },
         updateSidebarState(event) {
