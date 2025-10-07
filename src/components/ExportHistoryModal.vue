@@ -1,7 +1,7 @@
 <template>
     <ModalComponent>
         <div class="min-w-max flex flex-col">
-            <h2 v-t="'actions.export_history'" class="mb-4 text-center text-xl leading-[1.65] font-bold" />
+            <h2 v-t="'actions.export_history'" class="mb-4 text-center text-xl font-bold leading-[1.65]" />
             <form>
                 <div>
                     <label v-t="'actions.file_format'" class="mr-2" for="export-format" />

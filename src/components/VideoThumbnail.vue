@@ -68,7 +68,7 @@
                 :title="$t('video.watched')"
             >
                 <i class="i-fa6-solid:eye text-xl text-gray-300"></i>
-                <span class="text-xs leading-[1.6] text-white">{{ $t("video.watched") }}</span>
+                <span class="text-xs text-white leading-[1.6]">{{ $t("video.watched") }}</span>
             </div>
         </div>
     </div>

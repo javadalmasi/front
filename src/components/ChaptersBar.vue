@@ -16,7 +16,7 @@
                 <img class="shrink-0" :src="chapter.image" :alt="chapter.title" />
                 <div class="m-2 flex flex-col">
                     <span class="text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                    <span class="text-sm leading-[1.65] text-blue-500 font-bold" v-text="timeFormat(chapter.start)" />
+                    <span class="text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                 <img class="shrink-0" :src="chapter.image" :alt="chapter.title" />
                 <div class="m-2 flex flex-col">
                     <span class="text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                    <span class="text-sm leading-[1.65] text-blue-500 font-bold" v-text="timeFormat(chapter.start)" />
+                    <span class="text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
             <img :src="chapter.image" :alt="chapter.title" />
             <div class="m-1 flex">
                 <span class="text-truncate text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                <span class="px-1 text-sm leading-[1.65] text-blue-500 font-bold" v-text="timeFormat(chapter.start)" />
+                <span class="px-1 text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
             </div>
         </div>
     </div>

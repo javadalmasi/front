@@ -1,7 +1,7 @@
 <template>
     <div>
         <router-link :to="{ path: '/playlist', query: { list: playlistId } }"
-            ><h1 class="font-bold !text-lg leading-[1.7] hover:underline" v-text="playlist.name"
+            ><h1 class="font-bold leading-[1.7] !text-lg hover:underline" v-text="playlist.name"
         /></router-link>
         <span class="text-sm leading-[1.65]">
             <template v-if="playlist.uploader">

@@ -22,7 +22,7 @@
             <div class="mt-4">
                 <div
                     v-if="sidebarState === 'open'"
-                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                 >
                     آیتم‌های عمومی
                 </div>
@@ -45,7 +45,7 @@
             <div v-if="sidebarState !== 'semi-open'" class="mt-4">
                 <div
                     v-if="sidebarState === 'open'"
-                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                 >
                     دسته‌بندی‌ها
                 </div>
@@ -83,7 +83,7 @@
             <div class="mt-4">
                 <div
                     v-if="sidebarState === 'open'"
-                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500 dark:text-gray-400"
+                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                 >
                     حالت پوسته
                 </div>
@@ -105,7 +105,7 @@
             <div class="mt-4">
                 <div
                     v-if="!authenticated && sidebarState === 'open'"
-                    class="px-4 py-2 text-sm leading-[1.65] text-gray-500"
+                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65]"
                 >
                     حساب کاربری
                 </div>

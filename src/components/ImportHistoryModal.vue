@@ -1,7 +1,7 @@
 <template>
     <ModalComponent>
         <div class="text-center">
-            <h2 v-t="'actions.import_history'" class="mb-4 text-center text-xl leading-[1.65] font-bold" />
+            <h2 v-t="'actions.import_history'" class="mb-4 text-center text-xl font-bold leading-[1.65]" />
             <form>
                 <br />
                 <div>

@@ -1,6 +1,6 @@
 <template>
     <ModalComponent>
-        <div v-t="'actions.share'" class="mb-5 text-2xl leading-[1.55] font-bold" />
+        <div v-t="'actions.share'" class="mb-5 text-2xl font-bold leading-[1.55]" />
 
         <!-- Timecode and playlist options -->
         <div class="flex justify-between">
@@ -25,7 +25,7 @@
         <!-- Generated share link -->
         <div class="mb-3 overflow-x-auto rounded bg-gray-100 p-2 dark:bg-dark-700">
             <a :href="generatedLink" target="_blank" class="break-all text-blue-500 hover:underline">
-                <div class="text-sm leading-[1.65] font-bold" v-text="generatedLink" />
+                <div class="text-sm font-bold leading-[1.65]" v-text="generatedLink" />
             </a>
         </div>
 
@@ -60,7 +60,7 @@
 
         <!-- Embed code section (only on desktop) -->
         <div v-if="!isMobile" class="border-t border-gray-200 pt-3 dark:border-gray-700">
-            <div v-t="'actions.embed_video'" class="mb-2 text-lg leading-[1.7] font-bold" />
+            <div v-t="'actions.embed_video'" class="mb-2 text-lg font-bold leading-[1.7]" />
             <div class="mb-2 overflow-x-auto rounded bg-gray-100 p-2 dark:bg-dark-700">
                 <code class="break-all text-xs leading-[1.6]">{{ generatedEmbedCode }}</code>
             </div>

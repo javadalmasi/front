@@ -231,12 +231,25 @@ export default {
                 document.documentElement.classList.remove("dark");
             }
             this.changeTitleBarColor();
+            this.updateFavicon();
         },
         changeTitleBarColor() {
             const currentColor = { dark: "#0F0F0F", light: "#FFF" };
             const themeColor = document.querySelector("meta[name='theme-color']");
             if (themeColor) {
                 themeColor.setAttribute("content", currentColor[this.theme]);
+            }
+        },
+        updateFavicon() {
+            // Get the current favicon link element
+            const favicon = document.querySelector("link[rel='icon']");
+            if (favicon) {
+                // Update the favicon based on current theme
+                if (this.theme === "dark") {
+                    favicon.href = "/img/icons/dark-logo-32x32.png"; // Use dark logo for dark theme
+                } else {
+                    favicon.href = "/img/icons/light-logo-32x32.png"; // Use light logo for light theme
+                }
             }
         },
     },
