@@ -23,7 +23,9 @@
 
             <!-- Search container that appears when clicking search button or when on search results page -->
             <div v-if="showSearchBox || isOnSearchResultsPage" class="flex flex-1 justify-center px-4">
-                <div class="search-controls-container max-w-3xl w-full flex flex-col gap-2 md:flex-row md:items-center">
+                <div
+                    class="search-controls-container max-w-3xl w-full flex flex-col gap-2 md:flex-row md:items-center relative"
+                >
                     <select
                         id="ddlSearchFilters"
                         v-model="selectedFilter"
@@ -65,13 +67,15 @@
                     >
                         <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
                     </button>
+                    <div class="absolute w-full top-full mt-1">
+                        <SearchSuggestions
+                            ref="searchSuggestions"
+                            :search-text="searchText"
+                            :is-visible="suggestionsVisible"
+                            @searchchange="onSearchTextChange"
+                        />
+                    </div>
                 </div>
-                <SearchSuggestions
-                    ref="searchSuggestions"
-                    :search-text="searchText"
-                    :limit="5"
-                    @searchchange="onSearchTextChange"
-                />
             </div>
 
             <!-- Right side: User actions -->
@@ -171,6 +175,9 @@ export default {
         this.updateSearchTextFromURLSearchParams();
         this.focusOnSearchBar();
         this.homePagePath = this.getHomePage(this);
+
+        // Add click event listener to detect clicks outside the search area
+        document.addEventListener("click", this.handleOutsideClick);
     },
     methods: {
         updateSearchTextFromURLSearchParams() {
@@ -200,9 +207,15 @@ export default {
         onKeyUp(e) {
             if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                 e.preventDefault();
-            }
-            if (this.showSearchBox && this.$refs.searchSuggestions) {
-                this.$refs.searchSuggestions.onKeyUp(e);
+                if (this.showSearchBox && this.$refs.searchSuggestions) {
+                    this.$refs.searchSuggestions.onKeyUp(e);
+                    this.suggestionsVisible = true;
+                }
+            } else {
+                if (this.showSearchBox && this.$refs.searchSuggestions) {
+                    this.$refs.searchSuggestions.onKeyUp(e);
+                    this.suggestionsVisible = !!this.searchText;
+                }
             }
         },
         onKeyPress(e) {
@@ -212,7 +225,7 @@ export default {
         },
         onInputFocus() {
             if (this.showSearchBox && this.$refs.searchSuggestions) {
-                if (this.showSearchHistory) this.$refs.searchSuggestions.refreshSuggestions();
+                this.$refs.searchSuggestions.refreshSuggestions();
                 this.suggestionsVisible = true;
             }
         },
@@ -222,6 +235,8 @@ export default {
         },
         onSearchTextChange(searchText) {
             this.searchText = searchText;
+            // Keep suggestions visible when text is selected from suggestions
+            this.suggestionsVisible = true;
         },
         async fetchAuthConfig() {
             this.fetchJson(this.authApiUrl() + "/config").then(config => {
@@ -249,12 +264,28 @@ export default {
                     },
                 });
                 this.showSearchBox = false;
+                this.suggestionsVisible = false;
             } else {
                 this.$router.push("/");
             }
         },
         toggleSidebar() {
             this.$emit("toggle-sidebar");
+        },
+        handleOutsideClick(event) {
+            // Check if the click is outside the search container and suggestions
+            const searchContainer = this.$el.querySelector(".search-container");
+            const suggestionsContainer = this.$el.querySelector(".suggestions-container");
+
+            if (
+                searchContainer &&
+                suggestionsContainer &&
+                !searchContainer.contains(event.target) &&
+                !suggestionsContainer.contains(event.target)
+            ) {
+                // Hide suggestions when clicking outside
+                this.suggestionsVisible = false;
+            }
         },
     },
 };

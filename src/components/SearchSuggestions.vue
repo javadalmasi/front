@@ -1,5 +1,5 @@
 <template>
-    <div class="suggestions-container absolute left-0 right-0 top-full mt-1">
+    <div v-show="isVisible" class="suggestions-container absolute left-0 right-0 top-full mt-1">
         <ul>
             <li
                 v-for="(suggestion, i) in searchSuggestions"
@@ -22,6 +22,7 @@
 export default {
     props: {
         searchText: { type: String, default: "" },
+        isVisible: { type: Boolean, default: true },
     },
     emits: ["searchchange"],
     data() {
@@ -54,6 +55,7 @@ export default {
             if (!this.searchText) {
                 if (this.getPreferenceBoolean("searchHistory", false))
                     this.searchSuggestions = JSON.parse(localStorage.getItem("search_history")) ?? [];
+                else this.searchSuggestions = [];
             } else if (this.getPreferenceBoolean("searchSuggestions", true)) {
                 this.searchSuggestions =
                     (
@@ -65,7 +67,10 @@ export default {
                 this.searchSuggestions = [];
                 return;
             }
-            this.searchSuggestions.unshift(this.searchText);
+            if (this.searchText) {
+                // Add current search text as first suggestion
+                this.searchSuggestions.unshift(this.searchText);
+            }
             this.setSelected(0);
         },
         onMouseOver(i) {
