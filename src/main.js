@@ -63,6 +63,36 @@ const mixin = {
                 for (var param in params) url.searchParams.set(param, params[param]);
             }
             return fetch(url, options).then(response => {
+                // Check if response status is 500 or greater (server error)
+                if (!response.ok) {
+                    // Try to parse the JSON response to get the error message
+                    return response
+                        .json()
+                        .then(json => {
+                            // If the response has a message field, return an error object
+                            if (json.message) {
+                                return {
+                                    error: true,
+                                    message: json.message,
+                                    status: response.status,
+                                };
+                            }
+                            // If no message field, return a generic error with status text
+                            return {
+                                error: true,
+                                message: response.statusText || `HTTP ${response.status} Error`,
+                                status: response.status,
+                            };
+                        })
+                        .catch(() => {
+                            // If JSON parsing fails, return error with status text
+                            return {
+                                error: true,
+                                message: response.statusText || `HTTP ${response.status} Error`,
+                                status: response.status,
+                            };
+                        });
+                }
                 return response.json();
             });
         },
