@@ -58,6 +58,15 @@
                         </button>
                     </div>
                 </div>
+                <!-- Mobile search suggestions - only show when there's text and not on mobile devices -->
+                <div class="md:hidden absolute w-full top-full mt-1">
+                    <SearchSuggestions
+                        ref="searchSuggestions"
+                        :search-text="searchText"
+                        :is-visible="suggestionsVisible && searchText.length > 0"
+                        @searchchange="onSearchTextChange"
+                    />
+                </div>
                 <!-- Desktop search controls (existing) -->
                 <div class="hidden md:flex flex-1 justify-center px-4">
                     <div
@@ -258,7 +267,12 @@ export default {
             } else {
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.onKeyUp(e);
-                    this.suggestionsVisible = !!this.searchText;
+                    // Only show suggestions if there's text, and handle mobile differently
+                    if (this.isMobileDevice()) {
+                        this.suggestionsVisible = !!this.searchText && this.searchText.length > 0;
+                    } else {
+                        this.suggestionsVisible = !!this.searchText;
+                    }
                 }
             }
         },
@@ -268,9 +282,22 @@ export default {
             }
         },
         onInputFocus() {
-            if (this.showSearchBox && this.$refs.searchSuggestions) {
-                this.$refs.searchSuggestions.refreshSuggestions();
-                this.suggestionsVisible = true;
+            // On mobile devices, delay showing suggestions to prevent keyboard overlap issues
+            if (this.isMobileDevice()) {
+                // Small delay to allow keyboard to appear before showing suggestions
+                setTimeout(() => {
+                    if (this.showSearchBox && this.$refs.searchSuggestions) {
+                        this.$refs.searchSuggestions.refreshSuggestions();
+                        // Only show suggestions if there's text to search
+                        this.suggestionsVisible = this.searchText.length > 0;
+                    }
+                }, 300);
+            } else {
+                // Desktop behavior - show immediately
+                if (this.showSearchBox && this.$refs.searchSuggestions) {
+                    this.$refs.searchSuggestions.refreshSuggestions();
+                    this.suggestionsVisible = true;
+                }
             }
         },
         onInputBlur() {
@@ -280,7 +307,12 @@ export default {
         onSearchTextChange(searchText) {
             this.searchText = searchText;
             // Keep suggestions visible when text is selected from suggestions
-            this.suggestionsVisible = true;
+            if (this.isMobileDevice()) {
+                // On mobile, only show suggestions if there's text
+                this.suggestionsVisible = !!searchText && searchText.length > 0;
+            } else {
+                this.suggestionsVisible = !!searchText;
+            }
         },
         async fetchAuthConfig() {
             this.fetchJson(this.authApiUrl() + "/config").then(config => {
@@ -356,6 +388,9 @@ export default {
         },
         clearSearchText() {
             this.searchText = "";
+        },
+        isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         },
     },
 };
