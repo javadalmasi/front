@@ -154,7 +154,7 @@
                             <!-- Subscribe Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
-                                class="btn btn-primary flex items-center gap-1 <md:hidden"
+                                class="btn btn-danger flex items-center gap-1 <md:hidden"
                                 @click="downloadCurrentFrame"
                             >
                                 {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
@@ -163,7 +163,7 @@
                                 {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
                             </button>
                             <button
-                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-primary'"
+                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
                                 @click="subscribeHandler"
                             >
                                 <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />

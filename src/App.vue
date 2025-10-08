@@ -444,7 +444,7 @@ h6 {
 
 /* Primary button variant - for main actions */
 .btn-primary {
-    @apply bg-red-600 text-white hover:bg-red-700;
+    @apply bg-blue-600 text-white hover:bg-blue-700;
 }
 
 /* Secondary button variant - for supporting actions */

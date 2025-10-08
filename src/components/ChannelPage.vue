@@ -32,7 +32,7 @@
             </div>
 
             <div class="flex gap-2">
-                <button :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-primary'" @click="subscribeHandler">
+                <button :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'" @click="subscribeHandler">
                     <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
                     <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
                     {{
@@ -79,7 +79,7 @@
                 <span v-text="tab.translatedName"></span>
             </button>
             <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                <button class="btn btn-primary mr-2">پخش همه</button>
+                <button class="btn btn-secondary mr-2">پخش همه</button>
             </router-link>
         </div>
 
