@@ -299,9 +299,3 @@ export default {
     },
 };
 </script>
-
-<style>
-.active {
-    border: 0.1rem outset red;
-}
-</style>
