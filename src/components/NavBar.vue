@@ -267,7 +267,8 @@ export default {
                 e.preventDefault();
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.onKeyUp(e);
-                    this.suggestionsVisible = true;
+                    // Only show suggestions if there are actual suggestions to show
+                    this.suggestionsVisible = this.searchText && this.searchText.length > 0;
                 }
             } else {
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
@@ -276,7 +277,7 @@ export default {
                     if (this.isMobileDevice()) {
                         this.suggestionsVisible = !!this.searchText && this.searchText && this.searchText.length > 0;
                     } else {
-                        this.suggestionsVisible = !!this.searchText;
+                        this.suggestionsVisible = !!this.searchText && this.searchText && this.searchText.length > 0;
                     }
                 }
             }
@@ -301,7 +302,8 @@ export default {
                 // Desktop behavior - show immediately
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.refreshSuggestions();
-                    this.suggestionsVisible = true;
+                    // Only show suggestions if there's already text in the input
+                    this.suggestionsVisible = this.searchText && this.searchText.length > 0;
                 }
             }
         },
@@ -310,7 +312,10 @@ export default {
             setTimeout(() => (this.suggestionsVisible = false), 200);
         },
         onSearchTextChange(searchText) {
-            this.searchText = searchText || "";
+            // Only update searchText if it's a different value, to avoid overwriting user input
+            if (searchText && searchText !== this.searchText) {
+                this.searchText = searchText;
+            }
             // Keep suggestions visible when text is selected from suggestions
             if (this.isMobileDevice()) {
                 // On mobile, only show suggestions if there's text

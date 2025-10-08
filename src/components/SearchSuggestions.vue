@@ -27,7 +27,7 @@ export default {
     emits: ["searchchange"],
     data() {
         return {
-            selected: 0,
+            selected: -1,
             searchSuggestions: [],
         };
     },
@@ -41,7 +41,7 @@ export default {
                 }
                 e.preventDefault();
             } else if (e.key === "ArrowDown") {
-                if (this.selected >= this.searchSuggestions.length - 1) {
+                if (this.selected < 0 || this.selected >= this.searchSuggestions.length - 1) {
                     this.setSelected(0);
                 } else {
                     this.setSelected(this.selected + 1);
@@ -74,7 +74,11 @@ export default {
                 // Add current search text as first suggestion
                 this.searchSuggestions.unshift(currentSearchText);
             }
-            this.setSelected(0);
+            // Only set selected to 0 if there are suggestions and we're not just showing the current search text
+            if (this.searchSuggestions.length > 0) {
+                // Don't automatically select the first item (current search text) to allow users to continue typing
+                this.selected = -1; // Set to -1 to indicate no selection
+            }
         },
         onMouseOver(i) {
             if (i !== this.selected) {
@@ -83,8 +87,9 @@ export default {
         },
         setSelected(val) {
             this.selected = val;
-            if (this.searchSuggestions && this.searchSuggestions[this.selected] !== undefined) {
-                this.$emit("searchchange", this.searchSuggestions[this.selected]);
+            // Only emit searchchange if there's a valid suggestion selected
+            if (val >= 0 && this.searchSuggestions && this.searchSuggestions[val] !== undefined) {
+                this.$emit("searchchange", this.searchSuggestions[val]);
             }
         },
     },

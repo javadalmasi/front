@@ -73,7 +73,7 @@ export default {
 
         (async () => {
             try {
-                if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+                if (window.db) {
                     var tx = window.db.transaction("watch_history", "readwrite");
                     var store = tx.objectStore("watch_history");
                     const cursorRequest = store.index("watchedAt").openCursor(null, "prev");
