@@ -431,7 +431,7 @@ h6 {
 
 /* Base button styles with consistent sizing, spacing, and hover effects */
 .btn {
-    @apply py-2 px-4 rounded-3xl cursor-pointer inline-block transition-all duration-200 ease-in-out;
+    @apply py-2 px-4 rounded-xl cursor-pointer inline-block transition-all duration-200 ease-in-out;
 }
 
 .btn:hover {
