@@ -47,7 +47,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label v-if="!isAutoPlayNextCountdownDisabled" class="pref" for="chkAutoPlayNextCountdown">
+    <label class="pref" for="chkAutoPlayNextCountdown">
         <strong
             v-t="'actions.autoplay_next_countdown'"
             class="tooltip-hover"
@@ -65,18 +65,18 @@
         <strong v-t="'actions.audio_only'" class="tooltip-hover" :title="$t('tooltips.audio_only')" />
         <input id="chkAudioOnly" v-model="listen" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
-    <label v-if="!isPreferHlsDisabled" class="pref" for="chkPreferHls">
+    <label class="pref" for="chkPreferHls">
         <strong v-t="'actions.prefer_hls'" class="tooltip-hover" :title="$t('tooltips.prefer_hls')" />
         <input id="chkPreferHls" v-model="preferHls" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
-    <label v-if="!isDefaultQualityDisabled" class="pref" for="ddlDefaultQuality">
+    <label class="pref" for="ddlDefaultQuality">
         <strong v-t="'actions.default_quality'" class="tooltip-hover" :title="$t('tooltips.default_quality')" />
         <select id="ddlDefaultQuality" v-model="defaultQuality" class="select w-auto" @change="onChange($event)">
             <option v-t="'actions.auto'" value="0" />
             <option v-for="resolution in resolutions" :key="resolution" :value="resolution" v-text="`${resolution}p`" />
         </select>
     </label>
-    <label v-if="!isBufferingGoalDisabled" class="pref" for="txtBufferingGoal">
+    <label class="pref" for="txtBufferingGoal">
         <strong v-t="'actions.buffering_goal'" class="tooltip-hover" :title="$t('tooltips.buffering_goal')" />
         <input
             id="txtBufferingGoal"
@@ -86,7 +86,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label v-if="!isMinimizeCommentsDisabled" class="pref" for="chkMinimizeComments">
+    <label class="pref" for="chkMinimizeComments">
         <strong
             v-t="'actions.minimize_comments_default'"
             class="tooltip-hover"
@@ -100,7 +100,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label v-if="!isMinimizeDescriptionDisabled" class="pref" for="chkMinimizeDescription">
+    <label class="pref" for="chkMinimizeDescription">
         <strong
             v-t="'actions.minimize_description_default'"
             class="tooltip-hover"
@@ -114,7 +114,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label v-if="!isMinimizeRecommendationsDisabled" class="pref" for="chkMinimizeRecommendations">
+    <label class="pref" for="chkMinimizeRecommendations">
         <strong
             v-t="'actions.minimize_recommendations_default'"
             class="tooltip-hover"
@@ -128,7 +128,7 @@
             @change="onChange($event)"
         />
     </label>
-    <label v-if="!isMinimizeChaptersDisabled" class="pref" for="chkMinimizeChapters">
+    <label class="pref" for="chkMinimizeChapters">
         <strong
             v-t="'actions.minimize_chapters_default'"
             class="tooltip-hover"
@@ -155,7 +155,7 @@
             <option v-t="'video.chapters_vertical'" value="Vertical" />
         </select>
     </label>
-    <label v-if="!isWatchOnYouTubeDisabled && !isShowWatchOnYouTubeDisabled" class="pref" for="chkShowWatchOnYouTube">
+    <label v-if="!isWatchOnYouTubeDisabled" class="pref" for="chkShowWatchOnYouTube">
         <strong
             v-t="'actions.show_watch_on_youtube'"
             class="tooltip-hover"
@@ -211,7 +211,7 @@
         <strong v-t="'actions.hide_watched'" class="tooltip-hover" :title="$t('tooltips.hide_watched')" />
         <input id="chkHideWatched" v-model="hideWatched" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
-    <label v-if="!isEnabledCodecsDisabled" class="pref" for="ddlEnabledCodecs">
+    <label class="pref" for="ddlEnabledCodecs">
         <strong v-t="'actions.enabled_codecs'" class="tooltip-hover" :title="$t('tooltips.enabled_codecs')" />
         <select
             id="ddlEnabledCodecs"
@@ -258,7 +258,7 @@
     <p class="text-center">
         <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
     </p>
-    <label v-if="!isSponsorBlockDisabled" class="pref" for="chkEnableSponsorblock">
+    <label class="pref" for="chkEnableSponsorblock">
         <strong v-t="'actions.enable_sponsorblock'" class="tooltip-hover" :title="$t('tooltips.enable_sponsorblock')" />
         <input
             id="chkEnableSponsorblock"
@@ -268,7 +268,7 @@
             @change="onChange($event)"
         />
     </label>
-    <div v-if="sponsorBlock && !isSkipSponsorOptionsDisabled">
+    <div v-if="sponsorBlock">
         <label v-for="[name, item] in skipOptions" :key="name" class="pref" :for="'ddlSkip_' + name">
             <strong v-t="item.label" class="tooltip-hover" :title="getTooltipByActionLabel(item.label)" />
             <select :id="'ddlSkip_' + name" v-model="item.value" class="select w-auto" @change="onChange($event)">
@@ -277,7 +277,7 @@
                 <option v-t="'actions.skip_automatically'" value="auto" />
             </select>
         </label>
-        <label v-if="!isShowMarkersDisabled" class="pref" for="chkShowMarkers">
+        <label class="pref" for="chkShowMarkers">
             <strong v-t="'actions.show_markers'" class="tooltip-hover" :title="$t('tooltips.show_markers')" />
             <input
                 id="chkShowMarkers"
@@ -371,104 +371,41 @@ export default {
     data() {
         return {
             mobileChapterLayout: "Vertical",
-            sponsorBlock:
-                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === undefined ||
-                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true",
+            sponsorBlock: true,
             skipOptions: new Map([
-                [
-                    "sponsor",
-                    {
-                        value: import.meta.env.VITE_SKIP_SPONSOR_DEFAULT || "auto",
-                        label: "actions.skip_sponsors",
-                    },
-                ],
-                [
-                    "intro",
-                    {
-                        value: import.meta.env.VITE_SKIP_INTRO_DEFAULT || "no",
-                        label: "actions.skip_intro",
-                    },
-                ],
-                [
-                    "outro",
-                    {
-                        value: import.meta.env.VITE_SKIP_OUTRO_DEFAULT || "no",
-                        label: "actions.skip_outro",
-                    },
-                ],
-                [
-                    "preview",
-                    {
-                        value: import.meta.env.VITE_SKIP_PREVIEW_DEFAULT || "no",
-                        label: "actions.skip_preview",
-                    },
-                ],
-                [
-                    "interaction",
-                    {
-                        value: import.meta.env.VITE_SKIP_INTERACTION_DEFAULT || "auto",
-                        label: "actions.skip_interaction",
-                    },
-                ],
-                [
-                    "selfpromo",
-                    {
-                        value: import.meta.env.VITE_SKIP_SELF_PROMO_DEFAULT || "auto",
-                        label: "actions.skip_self_promo",
-                    },
-                ],
-                [
-                    "music_offtopic",
-                    {
-                        value: import.meta.env.VITE_SKIP_NON_MUSIC_DEFAULT || "auto",
-                        label: "actions.skip_non_music",
-                    },
-                ],
-                [
-                    "poi_highlight",
-                    {
-                        value: import.meta.env.VITE_SKIP_HIGHLIGHT_DEFAULT || "no",
-                        label: "actions.skip_highlight",
-                    },
-                ],
-                [
-                    "filler",
-                    {
-                        value: import.meta.env.VITE_SKIP_FILLER_DEFAULT || "no",
-                        label: "actions.skip_filler_tangent",
-                    },
-                ],
+                ["sponsor", { value: "auto", label: "actions.skip_sponsors" }],
+                ["intro", { value: "no", label: "actions.skip_intro" }],
+                ["outro", { value: "no", label: "actions.skip_outro" }],
+                ["preview", { value: "no", label: "actions.skip_preview" }],
+                ["interaction", { value: "auto", label: "actions.skip_interaction" }],
+                ["selfpromo", { value: "auto", label: "actions.skip_self_promo" }],
+                ["music_offtopic", { value: "auto", label: "actions.skip_non_music" }],
+                ["poi_highlight", { value: "no", label: "actions.skip_highlight" }],
+                ["filler", { value: "no", label: "actions.skip_filler_tangent" }],
             ]),
-            showMarkers:
-                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === undefined ||
-                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true",
+            showMarkers: true,
             minSegmentLength: 0,
             dearrow: false,
             selectedTheme: "dark",
             autoPlayVideo: true,
             autoDisplayCaptions: false,
-            autoPlayNextCountdown: parseInt(import.meta.env.VITE_AUTOPLAY_NEXT_COUNTDOWN_DEFAULT) || 7,
+            autoPlayNextCountdown: 5,
             listen: false,
             resolutions: [144, 240, 360, 480, 720, 1080, 1440, 2160, 4320],
-            preferHls: import.meta.env.VITE_PREFER_HLS_DEFAULT === "true" || false,
-            defaultQuality: parseInt(import.meta.env.VITE_DEFAULT_QUALITY_DEFAULT) || 720,
-            bufferingGoal: parseFloat(import.meta.env.VITE_BUFFERING_GOAL_DEFAULT) || 30,
+            preferHls: false,
+            defaultQuality: 0,
+            bufferingGoal: import.meta.env.VITE_BUFFERING_GOAL || 10,
             defaultHomepage: "trending",
-            minimizeComments: import.meta.env.VITE_MINIMIZE_COMMENTS_DEFAULT === "true" || false,
-            minimizeDescription:
-                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === undefined ||
-                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true",
-            minimizeRecommendations: import.meta.env.VITE_MINIMIZE_RECOMMENDATIONS_DEFAULT === "true" || false,
-            minimizeChapters:
-                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === undefined ||
-                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true",
-            showWatchOnYouTube: import.meta.env.VITE_SHOW_WATCH_ON_YOUTUBE_DEFAULT === "true" || false,
+            minimizeComments: false,
+            minimizeDescription: true,
+            minimizeRecommendations: false,
+            minimizeChapters: false,
+            showWatchOnYouTube: false,
             searchSuggestions: true,
             watchHistory: false,
             searchHistory: false,
             hideWatched: false,
-            enabledCodecs:
-                import.meta.env.VITE_ENABLED_CODECS_DEFAULT === "all" ? ["av1", "vp9", "avc"] : ["vp9", "avc"],
+            enabledCodecs: ["vp9", "avc"],
             disableLBRY: false,
             proxyLBRY: false,
             prefetchLimit: 2,
@@ -505,45 +442,6 @@ export default {
         isDeArrowIntegrationDisabled() {
             return import.meta.env.VITE_DISABLE_DEARROW_INTEGRATION === "true";
         },
-        isShowWatchOnYouTubeDisabled() {
-            return import.meta.env.VITE_DISABLE_SHOW_WATCH_ON_YOUTUBE === "true";
-        },
-        isSponsorBlockDisabled() {
-            return import.meta.env.VITE_DISABLE_SPONSORBLOCK === "true";
-        },
-        isSkipSponsorOptionsDisabled() {
-            return import.meta.env.VITE_DISABLE_SKIP_SPONSOR_OPTIONS === "true";
-        },
-        isEnabledCodecsDisabled() {
-            return import.meta.env.VITE_DISABLE_ENABLED_CODECS === "true";
-        },
-        isMinimizeChaptersDisabled() {
-            return import.meta.env.VITE_DISABLE_MINIMIZE_CHAPTERS === "true";
-        },
-        isMinimizeRecommendationsDisabled() {
-            return import.meta.env.VITE_DISABLE_MINIMIZE_RECOMMENDATIONS === "true";
-        },
-        isMinimizeCommentsDisabled() {
-            return import.meta.env.VITE_DISABLE_MINIMIZE_COMMENTS === "true";
-        },
-        isAutoPlayNextCountdownDisabled() {
-            return import.meta.env.VITE_DISABLE_AUTOPLAY_NEXT_COUNTDOWN === "true";
-        },
-        isPreferHlsDisabled() {
-            return import.meta.env.VITE_DISABLE_PREFER_HLS === "true";
-        },
-        isDefaultQualityDisabled() {
-            return import.meta.env.VITE_DISABLE_DEFAULT_QUALITY === "true";
-        },
-        isBufferingGoalDisabled() {
-            return import.meta.env.VITE_DISABLE_BUFFERING_GOAL === "true";
-        },
-        isMinimizeDescriptionDisabled() {
-            return import.meta.env.VITE_DISABLE_MINIMIZE_DESCRIPTION === "true";
-        },
-        isShowMarkersDisabled() {
-            return import.meta.env.VITE_DISABLE_SHOW_MARKERS === "true";
-        },
     },
     activated() {
         document.title = this.$t("titles.preferences") + " - " + this.getSiteName();
@@ -552,11 +450,7 @@ export default {
         if (Object.keys(this.$route.query).length > 0) this.$router.replace({ query: {} });
 
         if (this.testLocalStorage) {
-            this.sponsorBlock = this.getPreferenceBoolean(
-                "sponsorblock",
-                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === undefined ||
-                    import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true",
-            );
+            this.sponsorBlock = this.getPreferenceBoolean("sponsorblock", true);
             var skipOptions, skipList;
             if ((skipOptions = this.getPreferenceJSON("skipOptions")) !== undefined) {
                 Object.entries(skipOptions).forEach(([key, value]) => {
@@ -574,60 +468,30 @@ export default {
                 });
             }
 
-            this.showMarkers = this.getPreferenceBoolean(
-                "showMarkers",
-                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === undefined ||
-                    import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true",
-            );
+            this.showMarkers = this.getPreferenceBoolean("showMarkers", true);
             this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
             this.dearrow = this.getPreferenceBoolean("dearrow", false);
             this.selectedTheme = this.getPreferenceString("theme", "dark");
             this.autoPlayVideo = this.getPreferenceBoolean("playerAutoPlay", true);
             this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
-            this.autoPlayNextCountdown = this.getPreferenceNumber(
-                "autoPlayNextCountdown",
-                parseInt(import.meta.env.VITE_AUTOPLAY_NEXT_COUNTDOWN_DEFAULT) || 7,
-            );
+            this.autoPlayNextCountdown = this.getPreferenceNumber("autoPlayNextCountdown", 5);
             this.listen = this.getPreferenceBoolean("listen", false);
-            this.defaultQuality =
-                Number(localStorage.getItem("quality")) ||
-                parseInt(import.meta.env.VITE_DEFAULT_QUALITY_DEFAULT) ||
-                720;
+            this.defaultQuality = Number(localStorage.getItem("quality"));
             this.bufferingGoal = Math.max(
                 Number(localStorage.getItem("bufferGoal")),
-                parseFloat(import.meta.env.VITE_BUFFERING_GOAL_DEFAULT) || 30,
+                import.meta.env.VITE_BUFFERING_GOAL || 10,
             );
             this.defaultHomepage = this.getPreferenceString("homepage", "trending");
-            this.minimizeComments = this.getPreferenceBoolean(
-                "minimizeComments",
-                import.meta.env.VITE_MINIMIZE_COMMENTS_DEFAULT === "true" || false,
-            );
-            this.minimizeDescription = this.getPreferenceBoolean(
-                "minimizeDescription",
-                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === undefined ||
-                    import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true",
-            );
-            this.minimizeRecommendations = this.getPreferenceBoolean(
-                "minimizeRecommendations",
-                import.meta.env.VITE_MINIMIZE_RECOMMENDATIONS_DEFAULT === "true" || false,
-            );
-            this.minimizeChapters = this.getPreferenceBoolean(
-                "minimizeChapters",
-                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === undefined ||
-                    import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true",
-            );
-            this.showWatchOnYouTube = this.getPreferenceBoolean(
-                "showWatchOnYouTube",
-                import.meta.env.VITE_SHOW_WATCH_ON_YOUTUBE_DEFAULT === "true" || false,
-            );
+            this.minimizeComments = this.getPreferenceBoolean("minimizeComments", false);
+            this.minimizeDescription = this.getPreferenceBoolean("minimizeDescription", true);
+            this.minimizeRecommendations = this.getPreferenceBoolean("minimizeRecommendations", false);
+            this.minimizeChapters = this.getPreferenceBoolean("minimizeChapters", false);
+            this.showWatchOnYouTube = this.getPreferenceBoolean("showWatchOnYouTube", false);
             this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
             this.watchHistory = this.getPreferenceBoolean("watchHistory", false);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
             // Persian (fa) is the default language, no need to save in local storage
-            this.enabledCodecs = this.getPreferenceString(
-                "enabledCodecs",
-                import.meta.env.VITE_ENABLED_CODECS_DEFAULT === "all" ? "av1,vp9,avc" : "vp9,avc",
-            ).split(",");
+            this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
             this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);

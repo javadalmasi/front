@@ -60,7 +60,7 @@
                             </keep-alive>
                         </div>
                     </Teleport>
-                    <div v-if="video && isMobile">
+                    <div v-if="video && isMobile" class="px-2">
                         <ChaptersBar
                             v-if="video?.chapters?.length > 0 && showChapters && !chaptersDisabled"
                             :mobile-layout="isMobile"
@@ -77,8 +77,8 @@
                         />
                     </div>
                     <!-- video title -->
-                    <div class="mt-2 break-words text-2xl font-bold leading-[1.55]" v-text="video.title" />
-                    <div class="mb-3 mt-3 flex flex-wrap">
+                    <div class="mt-2 break-words text-2xl font-bold leading-[1.55] px-2" v-text="video.title" />
+                    <div class="mb-3 mt-3 flex flex-wrap px-2">
                         <!-- views / date -->
                         <div class="flex flex-auto gap-2">
                             <span v-t="{ path: 'video.views', args: { views: addCommas(video.views) } }" />
@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <!-- Channel info & options flex container -->
-                    <div class="flex flex-wrap gap-1">
+                    <div class="flex flex-wrap gap-1 px-2">
                         <!-- Channel Image & Info -->
                         <div class="flex items-center">
                             <router-link :to="video.uploaderUrl" class="mr-1.5">
@@ -219,12 +219,12 @@
                         </div>
                     </div>
 
-                    <hr class="mb-2" />
+                    <hr class="mb-2 px-2" />
 
                     <div
                         v-for="metaInfo in video?.metaInfo ?? []"
                         :key="metaInfo.title"
-                        class="btn btn-secondary my-3 flex flex-wrap cursor-default gap-2 px-4 py-2"
+                        class="btn btn-secondary my-3 flex flex-wrap cursor-default gap-2 px-2 py-2 mx-2"
                     >
                         <span>{{ metaInfo.description ?? metaInfo.title }}</span>
                         <a v-for="(link, linkIndex) in metaInfo.urls" :key="linkIndex" :href="link" class="underline">{{
@@ -233,31 +233,34 @@
                         <br />
                     </div>
 
-                    <button
-                        v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
-                        class="btn btn-secondary mb-2"
-                        @click="showDesc = !showDesc"
-                    />
+                    <div class="px-2">
+                        <button
+                            v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
+                            class="btn btn-secondary mb-2"
+                            @click="showDesc = !showDesc"
+                        />
 
-                    <span v-show="video?.chapters?.length > 0 && !chaptersDisabled" class="btn btn-secondary mr-2">
-                        <input id="showChapters" v-model="showChapters" type="checkbox" />
-                        <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
-                    </span>
+                        <span v-show="video?.chapters?.length > 0 && !chaptersDisabled" class="btn btn-secondary mr-2">
+                            <input id="showChapters" v-model="showChapters" type="checkbox" />
+                            <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
+                        </span>
+                    </div>
 
                     <template v-if="showDesc">
                         <!-- eslint-disable-next-line vue/no-v-html -->
-                        <div class="description break-words" v-html="purifiedDescription" />
+                        <div class="description break-words px-2" v-html="purifiedDescription" />
                         <br />
 
                         <div
                             v-if="sponsors && sponsors.segments"
                             v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
+                            class="px-2"
                         />
-                        <div v-if="video.category" v-text="`${$t('video.category')}: ${video.category}`" />
-                        <div v-text="`${$t('video.license')}: ${video.license}`" />
-                        <div class="capitalize" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
+                        <div v-if="video.category" class="px-2" v-text="`${$t('video.category')}: ${video.category}`" />
+                        <div class="px-2" v-text="`${$t('video.license')}: ${video.license}`" />
+                        <div class="capitalize px-2" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
 
-                        <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2">
+                        <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2 px-2">
                             <router-link
                                 v-for="tag in video.tags"
                                 :key="tag"
@@ -269,16 +272,16 @@
                     </template>
                 </div>
 
-                <hr />
+                <hr class="px-2" />
                 <div v-if="isMobile">
                     <a
                         v-if="!isRecommendationsToggleDisabled"
                         v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                        class="btn btn-secondary mb-2"
+                        class="btn btn-secondary mb-2 px-2 mt-2"
                         @click="showRecs = !showRecs"
                     />
-                    <hr v-show="showRecs" />
-                    <div v-show="showRecs">
+                    <hr v-show="showRecs" class="px-2" />
+                    <div v-show="showRecs" class="px-2">
                         <ContentItem
                             v-for="related in video.relatedStreams"
                             :key="related.url"
@@ -293,8 +296,8 @@
                     <hr class="" />
                 </div>
 
-                <div v-if="commentsEnabled" class="flex flex-col">
-                    <div class="">
+                <div v-if="commentsEnabled" class="flex flex-col px-2">
+                    <div class="mt-2">
                         <button
                             v-if="!comments?.disabled"
                             class="btn btn-secondary mb-2"
