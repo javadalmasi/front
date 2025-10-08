@@ -449,7 +449,7 @@ h6 {
 
 /* Secondary button variant - for supporting actions */
 .btn-secondary {
-    @apply bg-gray-300 text-gray-800 hover:bg-gray-400;
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-800;
 }
 
 /* Danger button variant - for destructive actions */
@@ -592,7 +592,7 @@ h6 {
 }
 
 .dark .btn-secondary {
-    @apply bg-dark-400 text-gray-200 hover:bg-dark-300;
+    @apply bg-dark-300 text-gray-200 hover:bg-dark-100 hover:text-gray-300;
 }
 
 .dark .btn-danger {
