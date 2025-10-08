@@ -22,8 +22,8 @@
             :prefer-listen="preferListen"
         >
             <router-link
-                class="flex rounded px-2 py-1 hover:bg-gray-50 .dark:hover:bg-neutral-800"
-                :class="{ 'bg-gray-200 .dark:bg-neutral-700': index === selectedIndex - 1 }"
+                class="flex rounded px-2 py-1 hover:bg-gray-50 dark:hover:bg-neutral-800"
+                :class="{ 'bg-gray-200 dark:bg-neutral-700': index === selectedIndex - 1 }"
                 :to="{
                     path: '/watch',
                     query: {

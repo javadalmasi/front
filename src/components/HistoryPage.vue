@@ -72,36 +72,49 @@ export default {
         this.autoDeleteDelayHours = this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24");
 
         (async () => {
-            if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
-                var tx = window.db.transaction("watch_history", "readwrite");
-                var store = tx.objectStore("watch_history");
-                const cursorRequest = store.index("watchedAt").openCursor(null, "prev");
-                const cursorPromise = new Promise(resolve => {
-                    cursorRequest.onsuccess = e => {
-                        const cursor = e.target.result;
-                        if (cursor) {
-                            const video = cursor.value;
-                            if (!this.shouldRemoveVideo(video)) {
-                                this.videosStore.push({
-                                    url: "/watch?v=" + video.videoId,
-                                    title: video.title,
-                                    uploaderName: video.uploaderName,
-                                    uploaderUrl: video.uploaderUrl ?? "", // Router doesn't like undefined
-                                    duration: video.duration ?? 0, // Undefined duration shows "Live"
-                                    thumbnail: video.thumbnail,
-                                    watchedAt: video.watchedAt,
-                                    watched: true,
-                                    currentTime: video.currentTime,
-                                });
-                            } else {
-                                store.delete(video.videoId);
+            try {
+                if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+                    var tx = window.db.transaction("watch_history", "readwrite");
+                    var store = tx.objectStore("watch_history");
+                    const cursorRequest = store.index("watchedAt").openCursor(null, "prev");
+                    const cursorPromise = new Promise((resolve, reject) => {
+                        cursorRequest.onsuccess = e => {
+                            try {
+                                const cursor = e.target.result;
+                                if (cursor) {
+                                    const video = cursor.value;
+                                    if (!this.shouldRemoveVideo(video)) {
+                                        this.videosStore.push({
+                                            url: "/watch?v=" + video.videoId,
+                                            title: video.title,
+                                            uploaderName: video.uploaderName,
+                                            uploaderUrl: video.uploaderUrl ?? "", // Router doesn't like undefined
+                                            duration: video.duration ?? 0, // Undefined duration shows "Live"
+                                            thumbnail: video.thumbnail,
+                                            watchedAt: video.watchedAt,
+                                            watched: true,
+                                            currentTime: video.currentTime,
+                                        });
+                                    } else {
+                                        store.delete(video.videoId);
+                                    }
+                                    if (this.videosStore.length < 1000) cursor.continue();
+                                    else resolve();
+                                } else resolve();
+                            } catch (error) {
+                                console.error("Error processing history cursor:", error);
+                                reject(error);
                             }
-                            if (this.videosStore.length < 1000) cursor.continue();
-                            else resolve();
-                        } else resolve();
-                    };
-                });
-                await cursorPromise;
+                        };
+                        cursorRequest.onerror = e => {
+                            console.error("Error opening history cursor:", e.target.error);
+                            reject(e.target.error);
+                        };
+                    });
+                    await cursorPromise;
+                }
+            } catch (error) {
+                console.error("Error initializing watch history:", error);
             }
         })().then(() => {
             this.loadMoreVideos();

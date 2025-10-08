@@ -1,23 +1,25 @@
 <template>
     <!-- desktop view -->
-    <div v-if="!mobileLayout" class="max-h-75vh max-w-35vw min-h-64 flex-col overflow-y-auto lt-lg:hidden">
-        <h2 class="mb-2 bg-gray-500/50 p-2" aria-label="chapters" title="chapters">
-            {{ $t("video.chapters") }} ({{ chapters.length }})
-        </h2>
+    <div
+        v-if="!mobileLayout"
+        class="max-h-75vh max-w-auto min-h-64 flex-col overflow-y-auto border rounded-xl p-3 lt-lg:hidden"
+    >
+        <span class="mb-2 rounded-md bg-gray-500/30 px-1.5 text-lg" aria-label="video-sections" title="video-sections">
+            {{ $t("info.video_sections") }}
+        </span>
         <div
             v-for="(chapter, index) in chapters"
             :key="chapter.start"
-            class="chapter-vertical"
-            :class="{ 'bg-red-500/50': isCurrentChapter(index) }"
+            class="chapter-vertical cursor-pointer rounded-md px-1 py-1.5 transition-colors duration-150 hover:bg-gray-500/20"
+            :class="{ 'text-blue-500 font-bold': isCurrentChapter(index) }"
             @click="$emit('seek', chapter.start)"
         >
-            <div class="flex">
-                <span class="mr-2 mt-5 text-current" v-text="index + 1" />
-                <img class="shrink-0" :src="chapter.image" :alt="chapter.title" />
-                <div class="m-2 flex flex-col">
-                    <span class="text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                    <span class="text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
-                </div>
+            <div class="flex flex-col">
+                <span class="text-xs font-medium leading-tight" :title="chapter.title" v-text="chapter.title" />
+                <span
+                    class="mt-0.5 text-xs text-gray-500 font-medium leading-tight"
+                    v-text="timeFormat(chapter.start)"
+                />
             </div>
         </div>
     </div>
@@ -25,41 +27,46 @@
     <!-- mobile vertical view -->
     <div
         v-if="mobileLayout && getPreferenceString('mobileChapterLayout') == 'Vertical'"
-        class="max-h-64 flex flex-col overflow-y-auto"
+        class="max-h-64 flex flex-col overflow-y-auto border rounded-xl p-3"
     >
-        <h2 class="mb-2 bg-gray-500/50 p-2" aria-label="chapters" title="chapters">
-            {{ $t("video.chapters") }} ({{ chapters.length }})
-        </h2>
+        <span class="mb-2 rounded-md bg-gray-500/30 p-1.5 text-xs" aria-label="video-sections" title="video-sections">
+            {{ $t("info.video_sections") }}
+        </span>
         <div
             v-for="(chapter, index) in chapters"
             :key="chapter.start"
-            class="chapter-vertical"
-            :class="{ 'bg-red-500/50': isCurrentChapter(index) }"
+            class="chapter-vertical cursor-pointer rounded-md px-1 py-1.5 transition-colors duration-150 hover:bg-gray-500/20"
+            :class="{ 'text-blue-500 font-bold': isCurrentChapter(index) }"
             @click="$emit('seek', chapter.start)"
         >
-            <div class="flex">
-                <span class="mr-2 mt-5 text-current" v-text="index + 1" />
-                <img class="shrink-0" :src="chapter.image" :alt="chapter.title" />
-                <div class="m-2 flex flex-col">
-                    <span class="text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                    <span class="text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
-                </div>
+            <div class="flex flex-col">
+                <span class="text-xs font-medium leading-tight" :title="chapter.title" v-text="chapter.title" />
+                <span
+                    class="mt-0.5 text-xs text-gray-500 font-medium leading-tight"
+                    v-text="timeFormat(chapter.start)"
+                />
             </div>
         </div>
     </div>
     <!-- mobile Horizontal view -->
-    <div v-if="getPreferenceString('mobileChapterLayout') == 'Horizontal' && mobileLayout" class="flex overflow-x-auto">
+    <div
+        v-if="getPreferenceString('mobileChapterLayout') == 'Horizontal' && mobileLayout"
+        class="flex overflow-x-auto border rounded-xl p-3"
+    >
         <div
             v-for="(chapter, index) in chapters"
             :key="chapter.start"
-            class="chapter"
-            :class="{ 'bg-red-500/50': isCurrentChapter(index) }"
+            class="chapter min-w-max cursor-pointer rounded-md px-2 py-1.5 transition-colors duration-150 hover:bg-gray-500/20"
+            :class="{ 'text-blue-500 font-bold': isCurrentChapter(index) }"
             @click="$emit('seek', chapter.start)"
         >
-            <img :src="chapter.image" :alt="chapter.title" />
-            <div class="m-1 flex">
-                <span class="text-truncate text-sm leading-[1.65]" :title="chapter.title" v-text="chapter.title" />
-                <span class="px-1 text-sm text-blue-500 font-bold leading-[1.65]" v-text="timeFormat(chapter.start)" />
+            <div class="flex flex-col">
+                <span
+                    class="text-truncate text-xs font-medium leading-tight"
+                    :title="chapter.title"
+                    v-text="chapter.title"
+                />
+                <span class="px-1 text-xs text-gray-500 font-medium leading-tight" v-text="timeFormat(chapter.start)" />
             </div>
         </div>
     </div>

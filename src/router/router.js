@@ -86,6 +86,7 @@ const routes = [
         name: "Watch History",
         component: () => import("../components/HistoryPage.vue"),
     },
+
     {
         path: "/playlists",
         name: "Playlists",

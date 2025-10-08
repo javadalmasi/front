@@ -24,13 +24,13 @@
             <canvas id="preview" ref="preview" class="direction-ltr rounded-sm" dir="ltr" />
             <span
                 v-if="(video?.chapters?.length ?? 0) > 1"
-                class="direction-ltr mt-2 text-sm leading-[1.65] drop-shadow-[0_0_2px_white] -mb-2 .dark:drop-shadow-[0_0_2px_black]"
+                class="direction-ltr -mb-2 mt-2 text-sm leading-[1.65] drop-shadow-[0_0_2px_white] dark:drop-shadow-[0_0_2px_black]"
                 dir="ltr"
             >
                 {{ video.chapters.findLast(chapter => chapter.start < currentTime)?.title }}
             </span>
             <span
-                class="direction-ltr mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm leading-[1.65] .dark:bg-dark-700"
+                class="direction-ltr mt-2 w-min rounded-xl bg-white px-2 pb-1 pt-1.5 text-sm leading-[1.65] dark:bg-dark-700"
                 dir="ltr"
                 v-text="timeFormat(currentTime)"
             />
@@ -50,12 +50,12 @@
         <span
             v-if="error > 0"
             v-t="{ path: 'player.failed', args: [error] }"
-            class="direction-rtl absolute top-8 rounded bg-white/80 p-2 text-lg leading-[1.7] backdrop-blur-lg text-black"
+            class="direction-rtl absolute top-8 p-2 rounded bg-white/80 text-lg leading-[1.7] text-black backdrop-blur-lg"
             dir="ltr"
         />
         <div
             v-if="showCurrentSpeed"
-            class="text-l direction-ltr absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80"
+            class="direction-ltr absolute left-1/2 top-1/2 flex flex-col items-center gap-6 px-8 py-4 rounded-8 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 dark:bg-dark-700/80 text-l"
             dir="ltr"
         >
             <i class="i-fa6-solid:gauge-high h-25 w-25 p-5" />
@@ -63,7 +63,7 @@
         </div>
         <div
             v-if="showCurrentVolume"
-            class="text-l direction-ltr absolute left-1/2 top-1/2 flex flex-col transform items-center gap-6 rounded-8 bg-white/80 px-8 py-4 -translate-x-1/2 -translate-y-1/2 .dark:bg-dark-700/80"
+            class="direction-ltr absolute left-1/2 top-1/2 flex flex-col items-center gap-6 px-8 py-4 rounded-8 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 dark:bg-dark-700/80 text-l"
             dir="ltr"
         >
             <i v-if="$refs.videoEl.volume > 0" class="i-fa6-solid:volume-high h-25 w-25 p-5" />

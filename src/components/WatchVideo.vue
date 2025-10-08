@@ -62,7 +62,7 @@
                     </Teleport>
                     <div v-if="video && isMobile">
                         <ChaptersBar
-                            v-if="video?.chapters?.length > 0 && showChapters"
+                            v-if="video?.chapters?.length > 0 && showChapters && !chaptersDisabled"
                             :mobile-layout="isMobile"
                             :chapters="video.chapters"
                             :player-position="currentTime"
@@ -192,7 +192,7 @@
                                     class="btn btn-secondary flex items-center"
                                     @click="showShareModal = !showShareModal"
                                 >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="strong"></i18n-t>
+                                    <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="span"></i18n-t>
                                     <i class="i-fa6-solid:share mx-1.5" />
                                 </button>
                                 <!-- YouTube -->
@@ -239,7 +239,7 @@
                         @click="showDesc = !showDesc"
                     />
 
-                    <span v-show="video?.chapters?.length > 0" class="btn btn-secondary mr-2">
+                    <span v-show="video?.chapters?.length > 0 && !chaptersDisabled" class="btn btn-secondary mr-2">
                         <input id="showChapters" v-model="showChapters" type="checkbox" />
                         <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
                     </span>
@@ -328,7 +328,7 @@
             </div>
             <div v-if="video && !isMobile" class="max-w-96 flex-none">
                 <ChaptersBar
-                    v-if="video?.chapters?.length > 0 && showChapters"
+                    v-if="video?.chapters?.length > 0 && showChapters && !chaptersDisabled"
                     :mobile-layout="isMobile"
                     :chapters="video.chapters"
                     :player-position="currentTime"
@@ -448,6 +448,10 @@ export default {
             // Check if recommendations toggle button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RECOMMENDATIONS_TOGGLE === "true";
         },
+        chaptersDisabled() {
+            // Check if chapters are disabled via environment variable
+            return import.meta.env.VITE_DISABLE_CHAPTERS === "true";
+        },
         likesDislikesEnabled() {
             // Check if likes/dislikes are disabled via environment variable
             return (
@@ -552,7 +556,7 @@ export default {
         this.showRecs = this.isRecommendationsToggleDisabled
             ? true
             : !this.getPreferenceBoolean("minimizeRecommendations", false);
-        this.showChapters = !this.getPreferenceBoolean("minimizeChapters", false);
+        this.showChapters = !this.chaptersDisabled && !this.getPreferenceBoolean("minimizeChapters", false);
         if (this.video?.duration) {
             document.title = this.video.title + " - " + this.getSiteName();
             this.$refs.videoPlayer.loadVideo();

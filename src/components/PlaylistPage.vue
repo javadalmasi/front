@@ -41,7 +41,7 @@
                 <button v-if="authenticated && !isPipedPlaylist" class="btn btn-secondary mr-1" @click="clonePlaylist">
                     {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone mr-3" />
                 </button>
-                <button class="btn mr-1" @click="downloadPlaylistAsTxt">
+                <button v-if="!isTxtDownloadDisabled" class="btn mr-1" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}
                 </button>
                 <a v-if="!isRssFeedDisabled" class="btn mr-1" :href="getRssUrl">
@@ -100,6 +100,10 @@ export default {
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+        },
+        isTxtDownloadDisabled() {
+            // Check if TXT download button is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_PLAYLIST_TXT_DOWNLOAD === "true";
         },
 
         isPipedPlaylist: _this => {
