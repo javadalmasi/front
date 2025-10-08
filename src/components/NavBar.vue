@@ -58,12 +58,12 @@
                         </button>
                     </div>
                 </div>
-                <!-- Mobile search suggestions - only show when there's text and not on mobile devices -->
+                <!-- Mobile search suggestions - show when suggestions are visible on mobile devices -->
                 <div class="absolute top-full mt-1 w-full md:hidden">
                     <SearchSuggestions
                         ref="searchSuggestions"
                         :search-text="searchText"
-                        :is-visible="suggestionsVisible && searchText && searchText.length > 0"
+                        :is-visible="suggestionsVisible"
                         @searchchange="onSearchTextChange"
                     />
                 </div>
@@ -267,17 +267,17 @@ export default {
                 e.preventDefault();
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.onKeyUp(e);
-                    // Only show suggestions if there are actual suggestions to show
-                    this.suggestionsVisible = this.searchText && this.searchText.length > 0;
+                    // Show suggestions when navigating with arrows
+                    this.suggestionsVisible = true;
                 }
             } else {
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.onKeyUp(e);
-                    // Only show suggestions if there's text, and handle mobile differently
+                    // On mobile, show suggestions whenever there's text or when actively typing
                     if (this.isMobileDevice()) {
-                        this.suggestionsVisible = !!this.searchText && this.searchText && this.searchText.length > 0;
+                        this.suggestionsVisible = true;
                     } else {
-                        this.suggestionsVisible = !!this.searchText && this.searchText && this.searchText.length > 0;
+                        this.suggestionsVisible = !!this.searchText && this.searchText.length > 0;
                     }
                 }
             }
@@ -294,8 +294,8 @@ export default {
                 setTimeout(() => {
                     if (this.showSearchBox && this.$refs.searchSuggestions) {
                         this.$refs.searchSuggestions.refreshSuggestions();
-                        // Only show suggestions if there's text to search, with safe check
-                        this.suggestionsVisible = this.searchText && this.searchText.length > 0;
+                        // Show suggestions even when there's no text on mobile
+                        this.suggestionsVisible = true;
                     }
                 }, 300);
             } else {
@@ -318,9 +318,8 @@ export default {
             }
             // Keep suggestions visible when text is selected from suggestions
             if (this.isMobileDevice()) {
-                // On mobile, only show suggestions if there's text
-                const textToCheck = searchText || "";
-                this.suggestionsVisible = !!textToCheck && textToCheck.length > 0;
+                // On mobile, show suggestions even when searchText is empty to allow user to see history
+                this.suggestionsVisible = true;
             } else {
                 this.suggestionsVisible = !!searchText;
             }
