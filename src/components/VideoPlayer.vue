@@ -1185,7 +1185,29 @@ export default {
 }
 
 .player-container {
-    @apply max-h-75vh min-h-64 bg-black;
+    @apply max-h-75vh min-h-64 bg-black w-full;
+    aspect-ratio: 16 / 9;
+    position: relative;
+}
+
+.player-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Apply rounded corners only on desktop (not on mobile) */
+@media (min-width: 1024px) {
+    .player-container {
+        @apply rounded-xl;
+    }
+}
+
+/* Override rounded corners on mobile */
+@media (max-width: 1023px) {
+    .player-container {
+        @apply rounded-none;
+    }
 }
 
 .shaka-video-container .material-icons-round {
