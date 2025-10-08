@@ -50,7 +50,7 @@
         <span
             v-if="error > 0"
             v-t="{ path: 'player.failed', args: [error] }"
-            class="direction-ltr absolute top-8 rounded bg-black/80 p-2 text-lg leading-[1.7] backdrop-blur-sm"
+            class="direction-rtl absolute top-8 rounded bg-white/80 p-2 text-lg leading-[1.7] backdrop-blur-lg text-black"
             dir="ltr"
         />
         <div
