@@ -25,9 +25,9 @@
             <div v-if="showSearchBox || isOnSearchResultsPage" class="flex flex-1 justify-center px-4">
                 <!-- Mobile search input with cancel button -->
                 <div
-                    class="md:hidden absolute top-0 left-0 right-0 z-70 h-16 w-full border-b border-gray-200 bg-gray-50 dark:border-dark-100 dark:bg-dark-800 flex items-center px-2 sm:px-4"
+                    class="absolute left-0 right-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 md:hidden dark:border-dark-100 dark:bg-dark-800 sm:px-4"
                 >
-                    <div class="flex-1 mx-2 flex items-center relative">
+                    <div class="relative mx-2 flex flex-1 items-center">
                         <span
                             v-if="searchText"
                             class="delete-search absolute left-4 top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
@@ -38,7 +38,7 @@
                         <input
                             ref="searchInput"
                             v-model="searchText"
-                            class="input w-full h-12 border border-gray-300 rounded-md px-12 pr-16 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="input h-12 w-full border border-gray-300 rounded-md px-12 pr-16 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                             type="search"
                             role="search"
                             autocomplete="off"
@@ -59,18 +59,18 @@
                     </div>
                 </div>
                 <!-- Mobile search suggestions - only show when there's text and not on mobile devices -->
-                <div class="md:hidden absolute w-full top-full mt-1">
+                <div class="absolute top-full mt-1 w-full md:hidden">
                     <SearchSuggestions
                         ref="searchSuggestions"
                         :search-text="searchText"
-                        :is-visible="suggestionsVisible && searchText.length > 0"
+                        :is-visible="suggestionsVisible && searchText && searchText.length > 0"
                         @searchchange="onSearchTextChange"
                     />
                 </div>
                 <!-- Desktop search controls (existing) -->
-                <div class="hidden md:flex flex-1 justify-center px-4">
+                <div class="hidden flex-1 justify-center px-4 md:flex">
                     <div
-                        class="search-controls-container max-w-3xl w-full flex flex-col gap-2 md:flex-row md:items-center relative"
+                        class="search-controls-container relative max-w-3xl w-full flex flex-col gap-2 md:flex-row md:items-center"
                     >
                         <select
                             id="ddlSearchFilters"
@@ -114,7 +114,7 @@
                         >
                             <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
                         </button>
-                        <div class="absolute w-full top-full mt-1">
+                        <div class="absolute top-full mt-1 w-full">
                             <SearchSuggestions
                                 ref="searchSuggestions"
                                 :search-text="searchText"
@@ -161,7 +161,7 @@ export default {
     emits: ["toggle-sidebar"],
     data() {
         return {
-            searchText: this.$route.query.search_query ?? "",
+            searchText: this.$route.query?.search_query ?? "",
             suggestionsVisible: false,
             homePagePath: import.meta.env.BASE_URL,
             registrationDisabled: false,
@@ -177,7 +177,7 @@ export default {
                 "music_playlists",
                 "music_artists",
             ],
-            selectedFilter: this.$route.query.filter ?? "videos", // Default to videos or use filter from URL
+            selectedFilter: this.$route.query?.filter ?? "videos", // Default to videos or use filter from URL
         };
     },
     computed: {
@@ -213,8 +213,8 @@ export default {
         $route(to, from) {
             this.updateSearchTextFromURLSearchParams();
             if (this.isOnSearchResultsPage) {
-                this.searchText = this.$route.query.search_query ?? "";
-                this.selectedFilter = this.$route.query.filter ?? "videos";
+                this.searchText = this.$route.query?.search_query ?? "";
+                this.selectedFilter = this.$route.query?.filter ?? "videos";
             } else if (from.name === "SearchResults" && to.name !== "SearchResults") {
                 // Clear search when navigating away from search results page
                 this.showSearchBox = false;
@@ -232,15 +232,20 @@ export default {
         // Add click event listener to detect clicks outside the search area
         document.addEventListener("click", this.handleOutsideClick);
     },
+    beforeUnmount() {
+        // Remove event listener when component is destroyed to prevent memory leaks
+        document.removeEventListener("click", this.handleOutsideClick);
+    },
     methods: {
         updateSearchTextFromURLSearchParams() {
-            const query = new URLSearchParams(window.location.search).get("search_query");
-            if (query) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get("search_query");
+            if (query && typeof query === "string") {
                 this.searchText = query;
                 if (this.isOnSearchResultsPage) {
                     // Update filter from URL if on search results page
-                    const filter = new URLSearchParams(window.location.search).get("filter");
-                    this.selectedFilter = filter || "videos";
+                    const filter = urlParams.get("filter");
+                    this.selectedFilter = filter && typeof filter === "string" ? filter : "videos";
                 }
             }
         },
@@ -269,7 +274,7 @@ export default {
                     this.$refs.searchSuggestions.onKeyUp(e);
                     // Only show suggestions if there's text, and handle mobile differently
                     if (this.isMobileDevice()) {
-                        this.suggestionsVisible = !!this.searchText && this.searchText.length > 0;
+                        this.suggestionsVisible = !!this.searchText && this.searchText && this.searchText.length > 0;
                     } else {
                         this.suggestionsVisible = !!this.searchText;
                     }
@@ -288,8 +293,8 @@ export default {
                 setTimeout(() => {
                     if (this.showSearchBox && this.$refs.searchSuggestions) {
                         this.$refs.searchSuggestions.refreshSuggestions();
-                        // Only show suggestions if there's text to search
-                        this.suggestionsVisible = this.searchText.length > 0;
+                        // Only show suggestions if there's text to search, with safe check
+                        this.suggestionsVisible = this.searchText && this.searchText.length > 0;
                     }
                 }, 300);
             } else {
@@ -305,11 +310,12 @@ export default {
             setTimeout(() => (this.suggestionsVisible = false), 200);
         },
         onSearchTextChange(searchText) {
-            this.searchText = searchText;
+            this.searchText = searchText || "";
             // Keep suggestions visible when text is selected from suggestions
             if (this.isMobileDevice()) {
                 // On mobile, only show suggestions if there's text
-                this.suggestionsVisible = !!searchText && searchText.length > 0;
+                const textToCheck = searchText || "";
+                this.suggestionsVisible = !!textToCheck && textToCheck.length > 0;
             } else {
                 this.suggestionsVisible = !!searchText;
             }
@@ -320,7 +326,7 @@ export default {
             });
         },
         updateFilter() {
-            if (this.isOnSearchResultsPage && this.searchText) {
+            if (this.isOnSearchResultsPage && this.searchText && typeof this.searchText === "string") {
                 // Update the route with new filter while keeping the search query
                 this.$router.replace({
                     query: {
@@ -331,7 +337,7 @@ export default {
             }
         },
         submitSearch() {
-            if (this.searchText) {
+            if (this.searchText && typeof this.searchText === "string" && this.searchText.trim() !== "") {
                 this.$router.push({
                     name: "SearchResults",
                     query: {
@@ -350,16 +356,27 @@ export default {
         },
         handleOutsideClick(event) {
             // Check if the click is outside the search container and suggestions
-            const searchContainer = this.$el.querySelector(".search-container");
-            const suggestionsContainer = this.$el.querySelector(".suggestions-container");
+            const searchInput = this.$refs.searchInput;
+            const searchSuggestions = this.$refs.searchSuggestions;
+
+            // Check if the clicked element is inside the search container or suggestions
+            let isClickInsideSearch = false;
+
+            if (searchInput && searchInput.contains && searchInput.contains(event.target)) {
+                isClickInsideSearch = true;
+            }
 
             if (
-                searchContainer &&
-                suggestionsContainer &&
-                !searchContainer.contains(event.target) &&
-                !suggestionsContainer.contains(event.target)
+                searchSuggestions &&
+                searchSuggestions.$el &&
+                searchSuggestions.$el.contains &&
+                searchSuggestions.$el.contains(event.target)
             ) {
-                // Hide suggestions when clicking outside
+                isClickInsideSearch = true;
+            }
+
+            // If the click is outside both the search input and suggestions, hide suggestions
+            if (!isClickInsideSearch) {
                 this.suggestionsVisible = false;
             }
         },

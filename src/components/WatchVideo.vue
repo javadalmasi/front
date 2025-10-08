@@ -20,10 +20,10 @@
     </div>
     <div id="theaterModeSpot" class="-mx-1vw"></div>
     <PageNotFound v-if="video && checkIfLivestreamDisabled(video)" />
-    <div v-else-if="video && video.error" class="flex flex-col items-center justify-center min-h-[80vh]">
-        <h1 class="font-bold text-3xl" v-t="'info.error'"></h1>
-        <p class="text-xl mt-4">{{ video.message || $t("info.video_not_found") }}</p>
-        <a :href="homeUrl" class="btn mt-4" v-t="'actions.back_to_home'"></a>
+    <div v-else-if="video && video.error" class="min-h-[80vh] flex flex-col items-center justify-center">
+        <h1 v-t="'info.error'" class="text-3xl font-bold"></h1>
+        <p class="mt-4 text-xl">{{ video.message || $t("info.video_not_found") }}</p>
+        <a v-t="'actions.back_to_home'" :href="homeUrl" class="btn mt-4"></a>
     </div>
     <LoadingIndicatorPage v-else :show-content="video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
         <Transition>

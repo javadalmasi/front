@@ -52,7 +52,10 @@ export default {
             }
         },
         async refreshSuggestions() {
-            if (!this.searchText) {
+            // Ensure searchText is defined and is a string
+            const currentSearchText = this.searchText || "";
+
+            if (!currentSearchText) {
                 if (this.getPreferenceBoolean("searchHistory", false))
                     this.searchSuggestions = JSON.parse(localStorage.getItem("search_history")) ?? [];
                 else this.searchSuggestions = [];
@@ -60,16 +63,16 @@ export default {
                 this.searchSuggestions =
                     (
                         await this.fetchJson(this.apiUrl() + "/opensearch/suggestions", {
-                            query: this.searchText,
+                            query: currentSearchText,
                         })
                     )?.[1] ?? [];
             } else {
                 this.searchSuggestions = [];
                 return;
             }
-            if (this.searchText) {
+            if (currentSearchText) {
                 // Add current search text as first suggestion
-                this.searchSuggestions.unshift(this.searchText);
+                this.searchSuggestions.unshift(currentSearchText);
             }
             this.setSelected(0);
         },
@@ -80,7 +83,9 @@ export default {
         },
         setSelected(val) {
             this.selected = val;
-            this.$emit("searchchange", this.searchSuggestions[this.selected]);
+            if (this.searchSuggestions && this.searchSuggestions[this.selected] !== undefined) {
+                this.$emit("searchchange", this.searchSuggestions[this.selected]);
+            }
         },
     },
 };
