@@ -371,7 +371,9 @@ export default {
     data() {
         return {
             mobileChapterLayout: "Vertical",
-            sponsorBlock: import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true" || true,
+            sponsorBlock:
+                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === undefined ||
+                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true",
             skipOptions: new Map([
                 [
                     "sponsor",
@@ -437,7 +439,9 @@ export default {
                     },
                 ],
             ]),
-            showMarkers: import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true" || true,
+            showMarkers:
+                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === undefined ||
+                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true",
             minSegmentLength: 0,
             dearrow: false,
             selectedTheme: "dark",
@@ -451,9 +455,13 @@ export default {
             bufferingGoal: parseFloat(import.meta.env.VITE_BUFFERING_GOAL_DEFAULT) || 30,
             defaultHomepage: "trending",
             minimizeComments: import.meta.env.VITE_MINIMIZE_COMMENTS_DEFAULT === "true" || false,
-            minimizeDescription: import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true" || true,
+            minimizeDescription:
+                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === undefined ||
+                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true",
             minimizeRecommendations: import.meta.env.VITE_MINIMIZE_RECOMMENDATIONS_DEFAULT === "true" || false,
-            minimizeChapters: import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true" || true,
+            minimizeChapters:
+                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === undefined ||
+                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true",
             showWatchOnYouTube: import.meta.env.VITE_SHOW_WATCH_ON_YOUTUBE_DEFAULT === "true" || false,
             searchSuggestions: true,
             watchHistory: false,
@@ -546,7 +554,8 @@ export default {
         if (this.testLocalStorage) {
             this.sponsorBlock = this.getPreferenceBoolean(
                 "sponsorblock",
-                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true" || true,
+                import.meta.env.VITE_SPONSORBLOCK_DEFAULT === undefined ||
+                    import.meta.env.VITE_SPONSORBLOCK_DEFAULT === "true",
             );
             var skipOptions, skipList;
             if ((skipOptions = this.getPreferenceJSON("skipOptions")) !== undefined) {
@@ -567,7 +576,8 @@ export default {
 
             this.showMarkers = this.getPreferenceBoolean(
                 "showMarkers",
-                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true" || true,
+                import.meta.env.VITE_SHOW_MARKERS_DEFAULT === undefined ||
+                    import.meta.env.VITE_SHOW_MARKERS_DEFAULT === "true",
             );
             this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
             this.dearrow = this.getPreferenceBoolean("dearrow", false);
@@ -594,7 +604,8 @@ export default {
             );
             this.minimizeDescription = this.getPreferenceBoolean(
                 "minimizeDescription",
-                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true" || true,
+                import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === undefined ||
+                    import.meta.env.VITE_MINIMIZE_DESCRIPTION_DEFAULT === "true",
             );
             this.minimizeRecommendations = this.getPreferenceBoolean(
                 "minimizeRecommendations",
@@ -602,7 +613,8 @@ export default {
             );
             this.minimizeChapters = this.getPreferenceBoolean(
                 "minimizeChapters",
-                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true" || true,
+                import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === undefined ||
+                    import.meta.env.VITE_MINIMIZE_CHAPTERS_DEFAULT === "true",
             );
             this.showWatchOnYouTube = this.getPreferenceBoolean(
                 "showWatchOnYouTube",
