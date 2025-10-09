@@ -3,7 +3,7 @@
         ref="container"
         data-shaka-player-container
         class="direction-ltr relative max-h-screen w-full flex justify-center"
-        :class="{ 'player-container': !isEmbed }"
+        :class="{ 'player-container': !isEmbed, 'theater-mode': theaterMode }"
         dir="ltr"
     >
         <video
@@ -1196,18 +1196,29 @@ export default {
     object-fit: contain;
 }
 
-/* Apply rounded corners only on desktop (not on mobile) */
+/* Apply rounded corners only on desktop (not on mobile) and not in theater mode */
 @media (min-width: 1024px) {
-    .player-container {
+    .player-container:not(.theater-mode) {
+        @apply rounded-xl;
+    }
+    .player-container:not(.theater-mode) video {
         @apply rounded-xl;
     }
 }
 
-/* Override rounded corners on mobile */
+/* Override rounded corners on mobile and in theater mode */
 @media (max-width: 1023px) {
     .player-container {
         @apply rounded-none;
     }
+    .player-container video {
+        @apply rounded-none;
+    }
+}
+
+.player-container.theater-mode,
+.player-container.theater-mode video {
+    @apply rounded-none;
 }
 
 .shaka-video-container .material-icons-round {
