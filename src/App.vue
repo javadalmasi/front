@@ -602,14 +602,12 @@ h6 {
 /* Dark theme select styles */
 .dark .select {
     @apply text-gray-300 bg-dark-500 border-dark-400;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 .dark .select:focus {
-    @apply outline-red-400;
-    outline-style: solid;
+    @apply outline-style: solid;
     outline-width: 2px;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
 }
 
 .dark .btn:hover {
