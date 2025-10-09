@@ -21,70 +21,22 @@
                 </router-link>
             </div>
 
-            <!-- Search container that appears when clicking search button or when on search results page -->
-            <div v-if="showSearchBox || isOnSearchResultsPage" class="flex flex-1 justify-center px-4">
-                <!-- Mobile search input with cancel button -->
-                <div
-                    class="absolute left-0 right-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 md:hidden dark:border-dark-100 dark:bg-dark-800 sm:px-4"
-                >
-                    <div class="relative mx-2 flex flex-1 items-center">
-                        <span
-                            v-if="searchText"
-                            class="delete-search absolute left-4 top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
-                            @click="clearSearchText()"
-                        >
-                            ×
-                        </span>
-                        <input
-                            ref="searchInput"
-                            v-model="searchText"
-                            class="input h-12 w-full border border-gray-300 rounded-md px-12 pr-16 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="search"
-                            role="search"
-                            autocomplete="off"
-                            :title="$t('actions.search')"
-                            :placeholder="$t('actions.search')"
-                            @blur="onInputBlur"
-                            @focus="onInputFocus"
-                            @keypress="onKeyPress"
-                            @keyup="onKeyUp"
-                        />
-                        <button
-                            class="absolute right-3 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
-                            aria-label="Cancel search"
-                            @click="cancelSearch"
-                        >
-                            <div class="i-fa6-solid:xmark text-lg leading-[1.7]" />
-                        </button>
-                    </div>
-                </div>
-                <!-- Mobile search suggestions - show when suggestions are visible on mobile devices -->
-                <div class="absolute top-full mt-1 w-full md:hidden">
-                    <SearchSuggestions
-                        ref="searchSuggestions"
-                        :search-text="searchText"
-                        :is-visible="suggestionsVisible"
-                        @searchchange="onSearchTextChange"
-                    />
-                </div>
-                <!-- Desktop search controls (existing) -->
-                <div class="hidden flex-1 justify-center px-4 md:flex">
-                    <div
-                        class="search-controls-container relative max-w-3xl w-full flex flex-col gap-2 md:flex-row md:items-center"
+            <!-- Search container - now responsive -->
+            <div
+                v-if="showSearchBox || isOnSearchResultsPage"
+                class="absolute left-0 right-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 dark:border-dark-100 dark:bg-dark-800 sm:px-4 md:static md:h-auto md:border-none md:bg-transparent"
+            >
+                <div class="relative max-w-3xl w-full flex flex-1 items-center gap-2">
+                    <!-- Cancel button for mobile -->
+                    <button
+                        class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 md:hidden dark:hover:bg-dark-100"
+                        aria-label="Cancel search"
+                        @click="cancelSearch"
                     >
-                        <select
-                            id="ddlSearchFilters"
-                            v-model="selectedFilter"
-                            class="select mb-2 h-12 w-full border border-gray-300 rounded-md bg-white px-3 text-base leading-[1.65] md:mb-0 md:mr-2 md:w-auto dark:border-dark-200 dark:bg-dark-600"
-                            @change="updateFilter()"
-                        >
-                            <option
-                                v-for="filter in availableFilters"
-                                :key="filter"
-                                v-t="`search.${filter}`"
-                                :value="filter"
-                            />
-                        </select>
+                        <div class="i-fa6-solid:arrow-left text-lg leading-[1.7]" />
+                    </button>
+                    <!-- Search input and suggestions -->
+                    <div class="relative w-full flex-1">
                         <div class="search-container relative w-full flex-1 md:w-auto">
                             <span
                                 v-if="searchText"
@@ -108,12 +60,6 @@
                                 @keyup="onKeyUp"
                             />
                         </div>
-                        <button
-                            class="btn mt-2 h-12 flex items-center justify-center rounded-lg bg-gray-100 px-5 md:mt-0 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
-                            @click="submitSearch"
-                        >
-                            <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
-                        </button>
                         <div class="absolute top-full mt-1 w-full">
                             <SearchSuggestions
                                 ref="searchSuggestions"
@@ -123,6 +69,13 @@
                             />
                         </div>
                     </div>
+                    <!-- Search button -->
+                    <button
+                        class="btn h-12 flex items-center justify-center rounded-lg bg-gray-100 px-5 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
+                        @click="submitSearch"
+                    >
+                        <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
+                    </button>
                 </div>
             </div>
 
@@ -267,20 +220,11 @@ export default {
                 e.preventDefault();
                 if (this.showSearchBox && this.$refs.searchSuggestions) {
                     this.$refs.searchSuggestions.onKeyUp(e);
-                    // Show suggestions when navigating with arrows
-                    this.suggestionsVisible = true;
                 }
-            } else {
-                if (this.showSearchBox && this.$refs.searchSuggestions) {
-                    this.$refs.searchSuggestions.onKeyUp(e);
-                    // On mobile, show suggestions whenever there's text or when actively typing
-                    if (this.isMobileDevice()) {
-                        this.suggestionsVisible = true;
-                    } else {
-                        this.suggestionsVisible = !!this.searchText && this.searchText.length > 0;
-                    }
-                }
+            } else if (this.showSearchBox && this.$refs.searchSuggestions) {
+                this.$refs.searchSuggestions.onKeyUp(e);
             }
+            this.suggestionsVisible = true;
         },
         onKeyPress(e) {
             if (e.key === "Enter") {
@@ -288,23 +232,9 @@ export default {
             }
         },
         onInputFocus() {
-            // On mobile devices, delay showing suggestions to prevent keyboard overlap issues
-            if (this.isMobileDevice()) {
-                // Small delay to allow keyboard to appear before showing suggestions
-                setTimeout(() => {
-                    if (this.showSearchBox && this.$refs.searchSuggestions) {
-                        this.$refs.searchSuggestions.refreshSuggestions();
-                        // Show suggestions even when there's no text on mobile
-                        this.suggestionsVisible = true;
-                    }
-                }, 300);
-            } else {
-                // Desktop behavior - show immediately
-                if (this.showSearchBox && this.$refs.searchSuggestions) {
-                    this.$refs.searchSuggestions.refreshSuggestions();
-                    // Only show suggestions if there's already text in the input
-                    this.suggestionsVisible = this.searchText && this.searchText.length > 0;
-                }
+            if (this.showSearchBox && this.$refs.searchSuggestions) {
+                this.$refs.searchSuggestions.refreshSuggestions();
+                this.suggestionsVisible = true;
             }
         },
         onInputBlur() {
@@ -312,17 +242,10 @@ export default {
             setTimeout(() => (this.suggestionsVisible = false), 200);
         },
         onSearchTextChange(searchText) {
-            // Only update searchText if it's a different value, to avoid overwriting user input
             if (searchText && searchText !== this.searchText) {
                 this.searchText = searchText;
             }
-            // Keep suggestions visible when text is selected from suggestions
-            if (this.isMobileDevice()) {
-                // On mobile, show suggestions even when searchText is empty to allow user to see history
-                this.suggestionsVisible = true;
-            } else {
-                this.suggestionsVisible = !!searchText;
-            }
+            this.suggestionsVisible = true;
         },
         async fetchAuthConfig() {
             this.fetchJson(this.authApiUrl() + "/config").then(config => {
@@ -410,9 +333,6 @@ export default {
         clearSearchText() {
             this.searchText = "";
         },
-        isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        },
     },
 };
 </script>
@@ -430,41 +350,4 @@ export default {
 .dark #search-btn:hover {
     @apply bg-dark-100;
 }
-
-/* Full-screen search box on mobile - adjust for existing mobile search */
-@media (max-width: 768px) {
-    .search-controls-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        background: white;
-        padding: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-radius: 0;
-        margin: 0;
-        width: 100%;
-    }
-
-    .dark .search-controls-container {
-        background: #15191a;
-    }
-
-    .search-controls-container .select {
-        margin-bottom: 0.5rem !important;
-        width: 100% !important;
-        margin-right: 0 !important;
-    }
-
-    .search-controls-container .search-container {
-        margin-bottom: 0.5rem;
-    }
-
-    .search-controls-container .btn {
-        margin-top: 0 !important;
-        width: 100%;
-    }
-}
-/* Additional styles can be added here if needed */
 </style>
