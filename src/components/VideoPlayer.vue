@@ -2,13 +2,13 @@
     <div
         ref="container"
         data-shaka-player-container
-        class="direction-ltr relative max-h-screen w-full flex justify-center"
+        class="direction-ltr relative max-h-screen w-full flex justify-center overflow-hidden"
         :class="{ 'player-container': !isEmbed, 'theater-mode': theaterMode }"
         dir="ltr"
     >
         <video
             ref="videoEl"
-            class="direction-ltr w-full"
+            class="direction-ltr w-full h-full"
             data-shaka-player
             :autoplay="shouldAutoPlay"
             :loop="selectedAutoLoop"
@@ -1188,6 +1188,17 @@ export default {
     @apply max-h-75vh min-h-64 bg-black w-full;
     aspect-ratio: 16 / 9;
     position: relative;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure proper constraints on mobile devices */
+@media (max-width: 767px) {
+    .player-container {
+        width: 100%;
+        max-width: 100vw;
+    }
 }
 
 .player-container video {
