@@ -5,7 +5,7 @@
             'bg-gray-50 dark:bg-dark-800 border-l border-gray-200 dark:border-dark-100',
             {
                 'right-0': !isMobile, // Desktop: align to right
-                'left-0': isMobile, // Mobile: overlay from left
+                'right-0': isMobile, // Mobile: overlay from right for RTL
                 'w-64': sidebarState === 'open' && !isMobile,
                 'w-20': sidebarState === 'semi-open' && !isWatchPage && !isMobile,
                 'w-screen': isMobile && sidebarState !== 'closed', // Mobile: full width when open
