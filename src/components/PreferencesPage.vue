@@ -613,7 +613,7 @@ export default {
 
 <style>
 .pref {
-    @apply flex justify-between items-center my-2 mx-[15vw] lt-md:mx-[2vw];
+    @apply flex justify-between items-center my-2 mx-[15vw] lt-md:mx-2;
 }
 .pref:nth-child(odd) {
     @apply bg-gray-200;

@@ -2,7 +2,7 @@
     <div
         ref="container"
         data-shaka-player-container
-        class="direction-ltr relative max-h-screen w-full flex justify-center overflow-hidden lt-md:-ml-1vw lt-md:-mr-1vw"
+        class="direction-ltr relative max-h-screen w-full flex justify-center overflow-hidden"
         :class="{ 'player-container': !isEmbed, 'theater-mode': theaterMode }"
         dir="ltr"
     >

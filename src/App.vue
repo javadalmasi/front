@@ -15,8 +15,8 @@
                     class="flex-1"
                     :class="{
                         'md:pl-1vw md:pt-1 md:pb-5 p-0 m-0': !isEmbedPage,
-                        'md:pr-64 mr-1vw': sidebarState === 'open' && !isWatchPage,
-                        'md:pr-20 mr-1vw': sidebarState === 'semi-open' && !isWatchPage,
+                        'md:pr-64': sidebarState === 'open' && !isWatchPage,
+                        'md:pr-20': sidebarState === 'semi-open' && !isWatchPage,
                         'md:pr-1vw p-0 m-0': sidebarState === 'closed' || isWatchPage,
                         'lt-md:pr-0 lt-md:pl-0': isMobile,
                     }"
