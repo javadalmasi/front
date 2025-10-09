@@ -29,7 +29,7 @@
                 <div
                     v-for="item in filteredPublicItems"
                     :key="item.name"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -52,7 +52,7 @@
                 <div
                     v-for="category in visibleCategories"
                     :key="category.name"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="searchCategory(category.name)"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -66,7 +66,7 @@
                 <!-- Show more button -->
                 <div
                     v-if="categories.length > 5 && sidebarState === 'open'"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="toggleShowMoreCategories"
                 >
                     <div
@@ -88,7 +88,7 @@
                     حالت پوسته
                 </div>
                 <div
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     data-testid="theme-toggle"
                     @click="emitToggleTheme"
                 >
@@ -111,7 +111,7 @@
                 </div>
                 <div
                     v-if="!authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/login')"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -121,7 +121,7 @@
                 </div>
                 <div
                     v-if="!authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/register')"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -131,7 +131,7 @@
                 </div>
                 <div
                     v-if="authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-medium hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="logout"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -317,5 +317,27 @@ export default {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+}
+
+/* Sidebar navigation items styling */
+.mx-2.flex.cursor-pointer.items-center.rounded-lg.px-4.py-3 {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    color: #000; /* black for light mode */
+}
+
+.mx-2.flex.cursor-pointer.items-center.rounded-lg.px-4.py-3:hover {
+    color: #000; /* black for light mode */
+    text-decoration-color: #000; /* underline appears on hover */
+}
+
+.dark .mx-2.flex.cursor-pointer.items-center.rounded-lg.px-4.py-3 {
+    color: #fff; /* white for dark mode */
+}
+
+.dark .mx-2.flex.cursor-pointer.items-center.rounded-lg.px-4.py-3:hover {
+    color: #fff; /* white for dark mode */
+    text-decoration-color: #fff; /* underline appears on hover in dark mode */
 }
 </style>

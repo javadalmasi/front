@@ -18,7 +18,7 @@
                         'md:pr-64 mr-1vw': sidebarState === 'open' && !isWatchPage,
                         'md:pr-20 mr-1vw': sidebarState === 'semi-open' && !isWatchPage,
                         'md:pr-1vw p-0 m-0': sidebarState === 'closed' || isWatchPage,
-                        'lt-md:pr-0': isMobile,
+                        'lt-md:pr-0 lt-md:pl-0': isMobile,
                     }"
                 >
                     <router-view v-slot="{ Component }">

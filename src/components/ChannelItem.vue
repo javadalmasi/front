@@ -19,9 +19,9 @@
                     </div>
                 </div>
             </div>
-            <p :style="titleStyle">
+            <p :style="titleStyle" class="mt-2">
                 <span v-text="item.name" />
-                <i v-if="item.verified" class="i-fa6-solid:check mr-1.5" />
+                <i v-if="item.verified" class="i-fa6-solid:check ml-1.5" />
             </p>
         </router-link>
         <p

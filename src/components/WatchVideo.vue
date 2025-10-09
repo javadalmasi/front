@@ -18,7 +18,7 @@
     >
         <PageNotFound />
     </div>
-    <div id="theaterModeSpot" class="-mx-1vw"></div>
+    <div id="theaterModeSpot" class="mx-0"></div>
     <PageNotFound v-if="video && checkIfLivestreamDisabled(video)" />
     <div v-else-if="video && video.error" class="min-h-[80vh] flex flex-col items-center justify-center">
         <h1 v-t="'info.error'" class="text-3xl font-bold"></h1>
@@ -77,7 +77,7 @@
                         />
                     </div>
                     <!-- video title -->
-                    <div class="mt-2 break-words text-2xl font-bold leading-[1.55] px-2" v-text="video.title" />
+                    <div class="mt-2 break-words px-2 text-2xl font-bold leading-[1.55]" v-text="video.title" />
                     <div class="mb-3 mt-3 flex flex-wrap px-2">
                         <!-- views / date -->
                         <div class="flex flex-auto gap-2">
@@ -110,7 +110,7 @@
                     <!-- Channel info & options flex container -->
                     <div class="flex flex-wrap gap-1 px-2">
                         <!-- Channel Image & Info -->
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-3">
                             <router-link :to="video.uploaderUrl" class="mr-1.5">
                                 <div class="relative inline-block">
                                     <img
@@ -159,9 +159,7 @@
                             >
                                 {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
                             </button>
-                            <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
-                                {{ $t("actions.add_to_playlist") }}<i class="i-fa6-solid:circle-plus mr-1" />
-                            </button>
+
                             <button
                                 :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
                                 @click="subscribeHandler"
@@ -215,6 +213,10 @@
                                         class="mx-1.5"
                                     />
                                 </router-link>
+                                <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
+                                    <i18n-t class="lt-lg:hidden" keypath="actions.add_to_playlist" tag="span"></i18n-t>
+                                    <i class="i-fa6-solid:circle-plus mr-1" />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -224,7 +226,7 @@
                     <div
                         v-for="metaInfo in video?.metaInfo ?? []"
                         :key="metaInfo.title"
-                        class="btn btn-secondary my-3 flex flex-wrap cursor-default gap-2 px-2 py-2 mx-2"
+                        class="btn btn-secondary mx-2 my-3 flex flex-wrap cursor-default gap-2 px-2 py-2"
                     >
                         <span>{{ metaInfo.description ?? metaInfo.title }}</span>
                         <a v-for="(link, linkIndex) in metaInfo.urls" :key="linkIndex" :href="link" class="underline">{{
@@ -253,12 +255,12 @@
 
                         <div
                             v-if="sponsors && sponsors.segments"
-                            v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
                             class="px-2"
+                            v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
                         />
                         <div v-if="video.category" class="px-2" v-text="`${$t('video.category')}: ${video.category}`" />
                         <div class="px-2" v-text="`${$t('video.license')}: ${video.license}`" />
-                        <div class="capitalize px-2" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
+                        <div class="px-2 capitalize" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
 
                         <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2 px-2">
                             <router-link
@@ -277,7 +279,7 @@
                     <a
                         v-if="!isRecommendationsToggleDisabled"
                         v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
-                        class="btn btn-secondary mb-2 px-2 mt-2"
+                        class="btn btn-secondary mb-2 mt-2 px-2"
                         @click="showRecs = !showRecs"
                     />
                     <hr v-show="showRecs" class="px-2" />

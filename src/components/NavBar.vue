@@ -24,12 +24,12 @@
             <!-- Search container - now responsive -->
             <div
                 v-if="showSearchBox || isOnSearchResultsPage"
-                class="absolute left-0 right-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 dark:border-dark-100 dark:bg-dark-800 sm:px-4 md:static md:h-auto md:border-none md:bg-transparent"
+                class="absolute left-0 right-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 md:static md:h-auto dark:border-dark-100 md:border-none dark:bg-dark-800 md:bg-transparent sm:px-4"
             >
                 <div class="relative max-w-3xl w-full flex flex-1 items-center gap-2">
                     <!-- Cancel button for mobile -->
                     <button
-                        class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 md:hidden dark:hover:bg-dark-100"
+                        class="h-10 w-10 flex items-center justify-center rounded-full md:hidden hover:bg-gray-200 dark:hover:bg-dark-100"
                         aria-label="Cancel search"
                         @click="cancelSearch"
                     >

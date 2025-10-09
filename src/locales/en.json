@@ -143,6 +143,7 @@
         "add": "Add",
         "prefer_hls": "Prefer HLS over DASH",
         "mark_as_unwatched": "Mark as Unwatched",
+        "play_all": "Play All",
         "import_history": "Import History",
         "file_format": "File Format",
         "import": "Import",

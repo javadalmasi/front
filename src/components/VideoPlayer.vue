@@ -2,13 +2,13 @@
     <div
         ref="container"
         data-shaka-player-container
-        class="direction-ltr relative max-h-screen w-full flex justify-center overflow-hidden"
+        class="direction-ltr relative max-h-screen w-full flex justify-center overflow-hidden lt-md:-ml-1vw lt-md:-mr-1vw"
         :class="{ 'player-container': !isEmbed, 'theater-mode': theaterMode }"
         dir="ltr"
     >
         <video
             ref="videoEl"
-            class="direction-ltr w-full h-full"
+            class="direction-ltr h-full w-full"
             data-shaka-player
             :autoplay="shouldAutoPlay"
             :loop="selectedAutoLoop"
@@ -381,13 +381,84 @@ export default {
                 span.textContent = "Enter Theater Mode";
             }
         },
+        getOptimalThumbnailUrlForPlayer(originalThumbnailUrl) {
+            // Get the CDN base URL from environment variable
+            const cdnBaseUrl =
+                import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL ||
+                "https://impx.global.ssl.fastly.net/fragrant-fire-439a.laagaw.workers.dev/vi/";
+
+            // Extract video ID from the original URL (common YouTube format)
+            let videoId = null;
+            if (originalThumbnailUrl) {
+                // Extract video ID from YouTube thumbnail URL patterns
+                const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+                if (videoIdMatch && videoIdMatch[1]) {
+                    videoId = videoIdMatch[1];
+                } else {
+                    // If YouTube pattern doesn't match, try other common patterns
+                    const idMatch = originalThumbnailUrl.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+                    if (idMatch && idMatch[1]) {
+                        videoId = idMatch[1];
+                    } else {
+                        console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
+                        return originalThumbnailUrl;
+                    }
+                }
+            }
+
+            // Determine optimal dimensions with 16:9 aspect ratio suitable for displays
+            // Check actual container size if available, otherwise use screen size
+            let containerWidth;
+            if (this.$refs.container) {
+                containerWidth = this.$refs.container.clientWidth || window.innerWidth;
+            } else {
+                containerWidth = window.innerWidth || screen.width;
+            }
+
+            const pixelRatio = window.devicePixelRatio || 1;
+
+            // Determine base dimensions based on container size
+            let baseWidth;
+            if (containerWidth <= 480) {
+                // Mobile: smaller thumbnail
+                baseWidth = 480; // Higher resolution for mobile displays which are often high DPI
+            } else if (containerWidth <= 768) {
+                // Tablet: medium thumbnail
+                baseWidth = 640; // Medium size for tablets
+            } else if (containerWidth <= 1024) {
+                // Small desktop: standard thumbnail
+                baseWidth = 854; // Standard size for desktop (16:9 ratio of 480p)
+            } else if (containerWidth <= 1440) {
+                // Medium desktop: higher resolution thumbnail
+                baseWidth = 1280; // 720p equivalent 16:9 ratio
+            } else {
+                // Large desktop: highest resolution thumbnail
+                baseWidth = 1920; // 1080p equivalent 16:9 ratio
+            }
+
+            // Scale dimensions by pixel ratio for high-DPI displays
+            const scaledWidth = Math.round(baseWidth * pixelRatio);
+
+            // Calculate height to maintain 16:9 aspect ratio
+            const scaledHeight = Math.round((scaledWidth * 9) / 16);
+
+            // Build the CDN URL with 16:9 aspect ratio
+            let cdnUrl = `${cdnBaseUrl}${videoId}?resize=${scaledWidth},${scaledHeight}`;
+
+            // Add quality parameter for better image quality on covers
+            cdnUrl += `&quality=90`;
+
+            return cdnUrl;
+        },
         async loadVideo() {
             this.updateSponsors();
 
             const component = this;
             const videoEl = this.$refs.videoEl;
 
-            videoEl.setAttribute("poster", this.video.thumbnailUrl);
+            // Transform the thumbnail URL to use the CDN with 16:9 aspect ratio suitable for displays
+            const cdnThumbnailUrl = this.getOptimalThumbnailUrlForPlayer(this.video.thumbnailUrl);
+            videoEl.setAttribute("poster", cdnThumbnailUrl);
 
             const noPrevPlayer = !this.$player;
 
@@ -1196,8 +1267,12 @@ export default {
 /* Ensure proper constraints on mobile devices */
 @media (max-width: 767px) {
     .player-container {
-        width: 100%;
-        max-width: 100vw;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
 }
 

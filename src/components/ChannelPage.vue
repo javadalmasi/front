@@ -9,7 +9,7 @@
             class="h-30 w-full object-cover py-1.5 md:h-50"
         />
         <div class="flex flex-col items-center justify-between md:flex-row">
-            <div class="flex place-items-center">
+            <div class="flex place-items-center gap-3">
                 <div class="relative inline-block">
                     <img
                         loading="lazy"
@@ -26,7 +26,7 @@
                         <i class="i-fa6-solid:check text-[10px] text-white" />
                     </div>
                 </div>
-                <div class="flex items-center gap-1">
+                <div class="flex items-center">
                     <h1 class="leading-[1.65] !text-xl" v-text="channel.name" />
                 </div>
             </div>
@@ -68,22 +68,25 @@
 
         <WatchOnButton :link="`https://youtube.com/channel/${channel.id}`" />
 
-        <div class="mx-1 my-2 flex">
-            <button
-                v-for="(tab, index) in tabs"
-                :key="tab.name"
-                class="btn btn-secondary mr-2"
-                :class="{ active: selectedTab == index }"
-                @click="loadTab(index)"
-            >
-                <span v-text="tab.translatedName"></span>
-            </button>
-            <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                <button class="btn btn-secondary mr-2">پخش همه</button>
-            </router-link>
+        <div class="channel-tabs-container">
+            <div class="channel-tabs-wrapper">
+                <button
+                    v-for="(tab, index) in tabs"
+                    :key="tab.name"
+                    class="channel-tab-button"
+                    :class="{ 'channel-tab-active': selectedTab == index }"
+                    @click="loadTab(index)"
+                >
+                    <span class="channel-tab-text" v-text="tab.translatedName"></span>
+                </button>
+                <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
+                    <button class="channel-tab-button">
+                        <span class="channel-tab-text" v-text="$t('actions.play_all')"></span>
+                    </button>
+                </router-link>
+            </div>
+            <div class="channel-tabs-divider"></div>
         </div>
-
-        <hr />
 
         <div class="video-grid">
             <ContentItem
@@ -299,3 +302,114 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.channel-tabs-container {
+    margin: 0.25rem 0.25rem 0.5rem;
+    position: relative;
+}
+
+.channel-tabs-wrapper {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none; /* Firefox */
+}
+
+.channel-tabs-wrapper::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.channel-tab-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    margin-right: 4px;
+    margin-left: 4px;
+    border: none;
+    background: transparent;
+    color: #000; /* black for light mode */
+    font-size: 14px;
+    font-weight: 600; /* slightly bolder */
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition:
+        color 0.2s,
+        border-color 0.2s;
+    border-radius: 0;
+    text-decoration: underline; /* underline across the entire item */
+    text-decoration-color: transparent; /* initially transparent */
+    text-underline-offset: 4px; /* spacing between text and underline */
+    position: relative;
+}
+
+.channel-tab-button::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: var(--hr-color);
+    transition: width 0.3s ease;
+}
+
+.channel-tab-button:hover::after {
+    width: 100%;
+}
+
+.channel-tab-active::after {
+    width: 100% !important;
+    background: #000 !important; /* black for light mode */
+}
+
+.dark .channel-tab-active::after {
+    background: #fff !important; /* white for dark mode */
+}
+
+.channel-tab-button:hover {
+    color: #000; /* black for light mode */
+    background: transparent;
+}
+
+.dark .channel-tab-button {
+    color: #fff; /* white for dark mode */
+}
+
+.dark .channel-tab-button:hover {
+    color: #fff; /* white for dark mode */
+}
+
+.channel-tab-active {
+    color: #000 !important; /* black for light mode */
+    border-bottom: 2px solid transparent !important; /* remove the colored border */
+}
+
+.dark .channel-tab-active {
+    color: #fff !important; /* white for dark mode */
+}
+
+.channel-tab-text {
+    font-weight: 600; /* slightly bolder */
+}
+
+.channel-tabs-divider {
+    height: 1px;
+    background: var(--hr-color);
+    margin-top: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .channel-tab-button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    .channel-tab-text {
+        font-size: 13px;
+    }
+}
+</style>
