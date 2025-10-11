@@ -153,8 +153,8 @@ const mixin = {
             return import.meta.env.VITE_PIPED_API;
         },
         authApiUrl() {
-            // Fixed to always use the custom instance for authentication
-            return import.meta.env.VITE_PIPED_API;
+            // Use dedicated user API for authentication if available, fallback to main API
+            return import.meta.env.VITE_USER_API || import.meta.env.VITE_PIPED_API;
         },
         getAuthToken() {
             return this.getPreferenceString("authToken" + this.hashCode(this.authApiUrl()));

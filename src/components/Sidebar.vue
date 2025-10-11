@@ -294,7 +294,8 @@ export default {
             return localStorage.getItem(key) || undefined;
         },
         authApiUrl() {
-            return import.meta.env.VITE_PIPED_API || "https://pipedapi.kavin.rocks";
+            // Use dedicated user API for authentication if available, fallback to main API
+            return import.meta.env.VITE_USER_API || import.meta.env.VITE_PIPED_API || "https://pipedapi.kavin.rocks";
         },
         hashCode(s) {
             return s.split("").reduce((a, b) => {
