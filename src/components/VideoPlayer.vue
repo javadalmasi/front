@@ -1081,6 +1081,8 @@ export default {
         adjustPlaybackVolume(newVolume) {
             const normalizedVolume = Math.min(1, Math.max(0, newVolume));
             this.$refs.videoEl.volume = normalizedVolume;
+            // Save the volume to localStorage
+            this.setPreference("volume", normalizedVolume, true);
             if (this.hideCurrentVolume) window.clearTimeout(this.hideCurrentVolume);
             this.showCurrentVolume = false;
             this.showCurrentVolume = true;
