@@ -10,7 +10,7 @@
                 'w-20': sidebarState === 'semi-open' && !isWatchPage && !isMobile,
                 'w-screen': isMobile && sidebarState !== 'closed', // Mobile: full width when open
                 'w-0 overflow-hidden': sidebarState === 'closed' || (isMobile && sidebarState === 'closed'),
-                'z-50': !isWatchPage, // Consistent z-index on other pages
+                'z-50': !isMobile, // Consistent z-index on other pages
                 'z-60': isWatchPage && sidebarState !== 'closed', // Higher z-index on watch page
             },
         ]"
