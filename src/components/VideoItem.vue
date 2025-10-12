@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-2.5">
+            <div v-if="!shouldHideVideoItemIcons" class="flex items-center gap-2.5">
                 <router-link
                     :to="{
                         path: '/watch',
@@ -201,6 +201,9 @@ export default {
             // Return an empty style object when not clamping
             return {};
         },
+        shouldHideVideoItemIcons() {
+            return import.meta.env.VITE_DISABLE_VIDEO_ITEM_ICONS === "true";
+        },
     },
     mounted() {
         this.shouldShowVideo();
@@ -264,12 +267,22 @@ export default {
             if (this.$el && this.$el.querySelector) {
                 const nameElement = this.$el.querySelector(".link-secondary");
                 if (nameElement) {
-                    // Calculate available width considering padding and margins
-                    return nameElement.clientWidth - 10; // 10px buffer
+                    let availableWidth = nameElement.clientWidth - 10; // 10px buffer
+
+                    // If video item icons are hidden, we have more space available
+                    if (this.shouldHideVideoItemIcons) {
+                        // Add extra space that would have been taken by the icons container
+                        // The icons container has class "flex items-center gap-2.5" which adds extra space
+                        // This means when icons are hidden, the channel name can use that space
+                        const extraSpace = 100; // Approximate width of the icons container when present
+                        availableWidth += extraSpace;
+                    }
+
+                    return availableWidth;
                 }
             }
             // Default fallback width (in pixels)
-            return 100;
+            return this.shouldHideVideoItemIcons ? 200 : 100; // More space when icons are hidden
         },
     },
 };

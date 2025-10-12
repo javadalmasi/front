@@ -259,8 +259,16 @@
                             v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
                         />
                         <div v-if="video.category" class="px-2" v-text="`${$t('video.category')}: ${video.category}`" />
-                        <div class="px-2" v-text="`${$t('video.license')}: ${video.license}`" />
-                        <div class="px-2 capitalize" v-text="`${$t('video.visibility')}: ${video.visibility}`" />
+                        <div
+                            v-if="!isLicenseInfoDisabled"
+                            class="px-2"
+                            v-text="`${$t('video.license')}: ${video.license}`"
+                        />
+                        <div
+                            v-if="!isLicenseInfoDisabled"
+                            class="px-2 capitalize"
+                            v-text="`${$t('video.visibility')}: ${video.visibility}`"
+                        />
 
                         <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2 px-2">
                             <router-link
@@ -462,6 +470,10 @@ export default {
             return (
                 !import.meta.env.VITE_DISABLE_LIKES_DISLIKES || import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "false"
             );
+        },
+        isLicenseInfoDisabled() {
+            // Check if license info is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_LICENSE_INFO === "true";
         },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
