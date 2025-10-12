@@ -24,8 +24,8 @@
             </div>
         </router-link>
 
-        <div class="flex">
-            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5">
+        <div class="flex items-center">
+            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5 flex-shrink-0">
                 <div class="relative inline-block">
                     <img
                         v-if="item.uploaderAvatar"
@@ -45,7 +45,8 @@
                 </div>
             </router-link>
 
-            <div class="flex-1 px-2">
+            <div class="flex-1 px-2 min-w-0">
+                <!-- Added min-w-0 to prevent flex item from overflowing -->
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
                     class="link-secondary overflow-hidden text-sm leading-[1.65] no-underline hover:underline-dashed"

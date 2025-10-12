@@ -36,29 +36,44 @@
                         <div class="i-fa6-solid:arrow-left text-lg leading-[1.7]" />
                     </button>
                     <!-- Search input and suggestions -->
-                    <div class="relative w-full flex-1">
-                        <div class="search-container relative w-full flex-1 md:w-auto">
-                            <span
-                                v-if="searchText"
-                                class="delete-search absolute rtl:right-auto rtl:left-4 ltr:left-4 top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
-                                @click="clearSearchText()"
+                    <div class="w-full flex-1 md:w-auto">
+                        <div class="search-container w-full flex md:flex-row items-center gap-2">
+                            <div class="relative flex-1">
+                                <span
+                                    v-if="searchText"
+                                    class="delete-search absolute rtl:right-auto rtl:left-4 ltr:left-4 top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
+                                    @click="clearSearchText()"
+                                >
+                                    ×
+                                </span>
+                                <input
+                                    ref="searchInput"
+                                    v-model="searchText"
+                                    class="input h-12 w-full border border-gray-300 rounded-md px-12 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    type="search"
+                                    role="search"
+                                    autocomplete="off"
+                                    :title="$t('actions.search')"
+                                    :placeholder="$t('actions.search')"
+                                    @blur="onInputBlur"
+                                    @focus="onInputFocus"
+                                    @keypress="onKeyPress"
+                                    @keyup="onKeyUp"
+                                />
+                            </div>
+                            <!-- Search Filters Dropdown (visible on desktop) -->
+                            <select
+                                v-model="selectedFilter"
+                                class="ddlSearchFilters h-12 rounded-md border border-gray-300 bg-gray-100 px-2 text-base leading-[1.7] dark:border-dark-200 dark:bg-dark-400 hidden md:block min-w-[100px]"
+                                @change="updateFilter"
                             >
-                                ×
-                            </span>
-                            <input
-                                ref="searchInput"
-                                v-model="searchText"
-                                class="input h-12 w-full border border-gray-300 rounded-md px-12 pr-5 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                type="search"
-                                role="search"
-                                autocomplete="off"
-                                :title="$t('actions.search')"
-                                :placeholder="$t('actions.search')"
-                                @blur="onInputBlur"
-                                @focus="onInputFocus"
-                                @keypress="onKeyPress"
-                                @keyup="onKeyUp"
-                            />
+                                <option
+                                    v-for="filter in availableFilters"
+                                    :key="filter"
+                                    :value="filter"
+                                    v-t="`search.${filter}`"
+                                />
+                            </select>
                         </div>
                         <div class="absolute top-full mt-1 w-full rtl:right-0 rtl:left-auto ltr:left-0 ltr:right-auto">
                             <SearchSuggestions
