@@ -736,7 +736,16 @@ export default {
                 await this.fetchJson(this.apiUrl() + "/nextpage/playlists/" + this.playlistId, {
                     nextpage: this.playlist.nextpage,
                 }).then(json => {
-                    this.playlist.relatedStreams.push(...json.relatedStreams);
+                    // Filter out duplicate items based on URL before adding them
+                    const newItems = json.relatedStreams.filter(newItem => 
+                        !this.playlist.relatedStreams.some(existingItem => existingItem.url === newItem.url)
+                    );
+                    
+                    // Only add items if there are non-duplicate ones
+                    if (newItems.length > 0) {
+                        this.playlist.relatedStreams.push(...newItems);
+                    }
+                    
                     this.playlist.nextpage = json.nextpage;
                     this.fetchDeArrowContent(json.relatedStreams);
                 });

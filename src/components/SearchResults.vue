@@ -107,7 +107,16 @@ export default {
 
                 this.fetchJson(this.apiUrl() + "/nextpage/search", params).then(json => {
                     if (json && json.items) {
-                        json.items.forEach(item => this.results.items.push(item));
+                        // Filter out duplicate items based on URL before adding them
+                        const newItems = json.items.filter(newItem => 
+                            !this.results.items.some(existingItem => existingItem.url === newItem.url)
+                        );
+                        
+                        // Only add items if there are non-duplicate ones
+                        if (newItems.length > 0) {
+                            newItems.forEach(item => this.results.items.push(item));
+                        }
+                        
                         this.results.nextpage = json.nextpage;
                     } else {
                         this.results.nextpage = null;
