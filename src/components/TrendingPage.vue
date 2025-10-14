@@ -1,18 +1,20 @@
 <template>
-    <h1 v-t="'titles.trending'" class="my-4 text-center font-bold" />
+    <div class="container mx-auto px-2">
+        <h1 v-t="'titles.trending'" class="my-4 text-center font-bold" />
 
-    <hr />
+        <hr />
 
-    <LoadingIndicatorPage :show-content="videos.length != 0" class="video-grid">
-        <VideoItem
-            v-for="video in videos"
-            :key="video.url"
-            :item="video"
-            :clamp-title-lines="true"
-            height="118"
-            width="210"
-        />
-    </LoadingIndicatorPage>
+        <LoadingIndicatorPage :show-content="videos.length != 0" class="video-grid">
+            <VideoItem
+                v-for="video in videos"
+                :key="video.url"
+                :item="video"
+                :clamp-title-lines="true"
+                height="118"
+                width="210"
+            />
+        </LoadingIndicatorPage>
+    </div>
 </template>
 
 <script>

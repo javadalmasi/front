@@ -1,27 +1,34 @@
 <template>
     <h1 v-t="'titles.feed'" class="my-4 text-center font-bold" />
 
-    <div class="flex flex-col flex-wrap gap-2 children:(flex items-center gap-1) md:flex-row md:items-center">
-        <span>
-            <label for="filters">
+    <div
+        class="flex flex-col flex-wrap gap-2 children:(flex flex-col items-center gap-1 md:flex-row) md:flex-row md:items-center"
+    >
+        <span class="w-full md:w-auto">
+            <label for="filters" class="block md:inline">
                 <strong v-text="`${$t('actions.filter')}:`" />
             </label>
             <select
                 id="filters"
                 v-model="selectedFilter"
                 default="all"
-                class="select flex-grow"
+                class="select mt-1 w-full flex-grow md:mt-0 md:w-auto"
                 @change="onFilterChange()"
             >
                 <option v-for="filter in availableFilters" :key="filter" v-t="`video.${filter}`" :value="filter" />
             </select>
         </span>
 
-        <span>
-            <label for="group-selector">
+        <span class="w-full md:w-auto">
+            <label for="group-selector" class="block md:inline">
                 <strong v-text="`${$t('titles.channel_groups')}:`" />
             </label>
-            <select id="group-selector" v-model="selectedGroupName" default="" class="select flex-grow">
+            <select
+                id="group-selector"
+                v-model="selectedGroupName"
+                default=""
+                class="select mt-1 w-full flex-grow md:mt-0 md:w-auto"
+            >
                 <option v-t="`video.all`" value="" />
                 <option
                     v-for="group in channelGroups"
@@ -32,18 +39,26 @@
             </select>
         </span>
 
-        <span class="md:mr-auto">
-            <SortingSelector by-key="uploaded" @apply="order => videos.sort(order)" />
+        <span class="w-full md:mr-auto md:w-auto">
+            <SortingSelector
+                by-key="uploaded"
+                class="mt-1 w-full md:mt-0 md:w-auto"
+                @apply="order => videos.sort(order)"
+            />
         </span>
     </div>
     <hr />
 
-    <span class="flex gap-2">
-        <router-link v-t="'titles.subscriptions'" class="btn btn-secondary" to="/subscriptions" />
-        <a v-if="!isRssFeedDisabled" :href="getRssUrl" class="btn btn-secondary">
+    <div class="flex flex-wrap justify-center gap-2 md:justify-start">
+        <router-link v-t="'titles.subscriptions'" class="btn btn-secondary min-w-[120px] flex-1" to="/subscriptions" />
+        <a
+            v-if="!isRssFeedDisabled"
+            :href="getRssUrl"
+            class="btn btn-secondary min-w-[40px] flex items-center justify-center"
+        >
             <i class="i-fa6-solid:rss" />
         </a>
-    </span>
+    </div>
     <hr />
 
     <LoadingIndicatorPage :show-content="videosStore != null" class="video-grid">
