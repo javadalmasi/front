@@ -36,6 +36,7 @@ export default {
         return {
             results: null,
             selectedFilter: this.$route.query.filter ?? "videos", // Default to videos
+            loadingNextPage: false, // Flag to prevent multiple simultaneous requests
         };
     },
     computed: {
@@ -94,8 +95,10 @@ export default {
             });
         },
         handleScroll() {
-            if (!this.results || !this.results.nextpage) return;
+            if (!this.results || !this.results.nextpage || this.loadingNextPage) return;
             if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 600) {
+                this.loadingNextPage = true; // Set loading flag to prevent multiple simultaneous requests
+                
                 const params = {
                     nextpage: this.results.nextpage,
                     q: this.$route.query.search_query,
@@ -109,6 +112,8 @@ export default {
                     } else {
                         this.results.nextpage = null;
                     }
+                }).finally(() => {
+                    this.loadingNextPage = false; // Reset loading flag after request completes
                 });
             }
         },
