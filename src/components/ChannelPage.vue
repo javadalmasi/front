@@ -224,17 +224,17 @@ export default {
                     json.relatedStreams = this.filterLivestreams(json.relatedStreams);
                 }
                 this.updateWatched(json.relatedStreams);
-                
+
                 // Filter out duplicate items based on URL before adding them
-                const newItems = json.relatedStreams.filter(newItem => 
-                    !this.contentItems.some(existingItem => existingItem.url === newItem.url)
+                const newItems = json.relatedStreams.filter(
+                    newItem => !this.contentItems.some(existingItem => existingItem.url === newItem.url),
                 );
-                
+
                 // Only add items if there are non-duplicate ones
                 if (newItems.length > 0) {
                     this.contentItems.push(...newItems);
                 }
-                
+
                 this.fetchDeArrowContent(json.relatedStreams);
             });
         },
@@ -249,17 +249,17 @@ export default {
                 if (this.filterLivestreams) {
                     json.content = this.filterLivestreams(json.content);
                 }
-                
+
                 // Filter out duplicate items based on URL before adding them
-                const newItems = json.content.filter(newItem => 
-                    !this.contentItems.some(existingItem => existingItem.url === newItem.url)
+                const newItems = json.content.filter(
+                    newItem => !this.contentItems.some(existingItem => existingItem.url === newItem.url),
                 );
-                
+
                 // Only add items if there are non-duplicate ones
                 if (newItems.length > 0) {
                     this.contentItems.push(...newItems);
                 }
-                
+
                 this.fetchDeArrowContent(json.content);
                 this.tabs[this.selectedTab].content = this.contentItems;
             });

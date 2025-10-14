@@ -98,32 +98,34 @@ export default {
             if (!this.results || !this.results.nextpage || this.loadingNextPage) return;
             if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 600) {
                 this.loadingNextPage = true; // Set loading flag to prevent multiple simultaneous requests
-                
+
                 const params = {
                     nextpage: this.results.nextpage,
                     q: this.$route.query.search_query,
                     filter: this.selectedFilter,
                 };
 
-                this.fetchJson(this.apiUrl() + "/nextpage/search", params).then(json => {
-                    if (json && json.items) {
-                        // Filter out duplicate items based on URL before adding them
-                        const newItems = json.items.filter(newItem => 
-                            !this.results.items.some(existingItem => existingItem.url === newItem.url)
-                        );
-                        
-                        // Only add items if there are non-duplicate ones
-                        if (newItems.length > 0) {
-                            newItems.forEach(item => this.results.items.push(item));
+                this.fetchJson(this.apiUrl() + "/nextpage/search", params)
+                    .then(json => {
+                        if (json && json.items) {
+                            // Filter out duplicate items based on URL before adding them
+                            const newItems = json.items.filter(
+                                newItem => !this.results.items.some(existingItem => existingItem.url === newItem.url),
+                            );
+
+                            // Only add items if there are non-duplicate ones
+                            if (newItems.length > 0) {
+                                newItems.forEach(item => this.results.items.push(item));
+                            }
+
+                            this.results.nextpage = json.nextpage;
+                        } else {
+                            this.results.nextpage = null;
                         }
-                        
-                        this.results.nextpage = json.nextpage;
-                    } else {
-                        this.results.nextpage = null;
-                    }
-                }).finally(() => {
-                    this.loadingNextPage = false; // Reset loading flag after request completes
-                });
+                    })
+                    .finally(() => {
+                        this.loadingNextPage = false; // Reset loading flag after request completes
+                    });
             }
         },
         handleRedirect() {

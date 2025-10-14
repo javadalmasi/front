@@ -131,18 +131,18 @@ export default {
                 nextpage: this.nextpage || this.comment.repliesPage,
             }).then(json => {
                 // Filter out duplicate comments based on commentId before adding them
-                const newComments = json.comments.filter(newComment => 
-                    !this.replies.some(existingComment => existingComment.commentId === newComment.commentId)
+                const newComments = json.comments.filter(
+                    newComment =>
+                        !this.replies.some(existingComment => existingComment.commentId === newComment.commentId),
                 );
-                
+
                 // Only add comments if there are non-duplicate ones
                 if (newComments.length > 0) {
                     this.replies = this.replies.concat(newComments);
                 }
-                
+
                 this.nextpage = json.nextpage;
             });
-        },
         },
         async hideReplies() {
             this.showingReplies = false;
