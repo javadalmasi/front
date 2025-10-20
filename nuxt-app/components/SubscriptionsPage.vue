@@ -5,7 +5,7 @@
         <div class="flex gap-1">
             <!-- import json/csv -->
             <button class="btn">
-                <router-link v-t="'actions.import_from_json_csv'" to="/import" />
+                <NuxtLink v-t="'actions.import_from_json_csv'" to="/import" />
             </button>
             <!-- export to json -->
             <button v-t="'actions.export_to_json'" class="btn" @click="exportHandler" />
@@ -79,10 +79,10 @@
             :key="subscription.url"
             class="col m-2 border border-gray-500 rounded-lg p-1"
         >
-            <router-link :to="subscription.url" class="text-4x4 flex p-2 font-bold">
+            <NuxtLink :to="subscription.url" class="text-4x4 flex p-2 font-bold">
                 <img :src="subscription.avatar" class="h-[fit-content] rounded-full" width="48" height="48" />
                 <span class="mx-2 self-center" v-text="subscription.name" />
-            </router-link>
+            </NuxtLink>
             <!-- subscribe / unsubscribe btn -->
             <button
                 v-t="`actions.${subscription.subscribed ? 'unsubscribe' : 'subscribe'}`"
@@ -170,7 +170,7 @@ export default {
         this.loadChannelGroups();
     },
     activated() {
-        document.title = "Subscriptions - " + this.getSiteName();
+        document.title = this.$t("titles.subscriptions") + " - " + this.getSiteName();
     },
     methods: {
         async loadChannelGroups() {

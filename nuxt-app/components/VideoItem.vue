@@ -1,6 +1,6 @@
 <template>
     <div v-if="showVideo" class="h-full flex flex-col flex-justify-between">
-        <router-link
+        <NuxtLink
             class="link inline-block w-full"
             :to="{
                 path: '/watch',
@@ -22,10 +22,10 @@
                     v-text="title"
                 />
             </div>
-        </router-link>
+        </NuxtLink>
 
         <div class="flex items-center">
-            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5 flex-shrink-0">
+            <NuxtLink :to="item.uploaderUrl" class="mr-0.5 mt-0.5 flex-shrink-0">
                 <div class="relative inline-block">
                     <img
                         v-if="item.uploaderAvatar"
@@ -43,18 +43,18 @@
                         <i class="i-fa6-solid:check text-[8px] text-white" />
                     </div>
                 </div>
-            </router-link>
+            </NuxtLink>
 
             <div class="flex-1 px-2 min-w-0">
                 <!-- Added min-w-0 to prevent flex item from overflowing -->
-                <router-link
+                <NuxtLink
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
                     class="link-secondary overflow-hidden text-sm leading-[1.65] no-underline hover:underline-dashed"
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
                     <span v-text="truncatedUploaderName" />
-                </router-link>
+                </NuxtLink>
 
                 <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
                     <span v-if="item.views >= 0">
@@ -72,7 +72,7 @@
             </div>
 
             <div v-if="!shouldHideVideoItemIcons" class="flex items-center gap-2.5">
-                <router-link
+                <NuxtLink
                     :to="{
                         path: '/watch',
                         query: {
@@ -86,7 +86,7 @@
                     :title="preferListen ? title : 'Listen to ' + title"
                 >
                     <i :class="preferListen ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'" />
-                </router-link>
+                </NuxtLink>
                 <button :title="$t('actions.add_to_playlist')" @click="showPlaylistModal = !showPlaylistModal">
                     <i class="i-fa6-solid:circle-plus" />
                 </button>

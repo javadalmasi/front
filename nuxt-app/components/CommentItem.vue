@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="comment-author">
-                    <router-link class="link font-bold" :to="comment.commentorUrl">{{ comment.author }}</router-link>
+                    <NuxtLink class="link font-bold" :to="comment.commentorUrl">{{ comment.author }}</NuxtLink>
                     <i v-if="comment.verified" class="i-fa6-solid:check mr-1.5" />
                 </div>
                 <div class="comment-meta mb-1.5 text-sm leading-[1.65]" v-text="comment.commentedTime" />

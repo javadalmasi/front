@@ -136,7 +136,7 @@ export default {
             try {
                 await navigator.clipboard.writeText(mytext);
                 alert(this.$t("info.copied"));
-            } catch ($e) {
+            } catch {
                 alert(this.$t("info.cannot_copy"));
             }
         },

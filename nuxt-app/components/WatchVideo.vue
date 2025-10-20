@@ -111,7 +111,7 @@
                     <div class="flex flex-wrap gap-1 px-2">
                         <!-- Channel Image & Info -->
                         <div class="flex items-center gap-3">
-                            <router-link :to="video.uploaderUrl" class="mr-1.5">
+                            <NuxtLink :to="video.uploaderUrl" class="mr-1.5">
                                 <div class="relative inline-block">
                                     <img
                                         loading="lazy"
@@ -131,10 +131,10 @@
                                         <i class="i-fa6-solid:check text-[10px] text-white" />
                                     </div>
                                 </div>
-                            </router-link>
-                            <router-link v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
+                            </NuxtLink>
+                            <NuxtLink v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
                                 video.uploader
-                            }}</router-link>
+                            }}</NuxtLink>
                         </div>
                         <PlaylistAddModal
                             v-if="showModal"
@@ -202,7 +202,7 @@
                                     platform="Odysee"
                                 />
                                 <!-- listen / watch toggle -->
-                                <router-link
+                                <NuxtLink
                                     :to="toggleListenUrl"
                                     :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                     :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
@@ -212,7 +212,7 @@
                                         :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
                                         class="mx-1.5"
                                     />
-                                </router-link>
+                                </NuxtLink>
                                 <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
                                     <i18n-t class="lt-lg:hidden" keypath="actions.add_to_playlist" tag="span"></i18n-t>
                                     <i class="i-fa6-solid:circle-plus mr-1" />
@@ -271,12 +271,12 @@
                         />
 
                         <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2 px-2">
-                            <router-link
+                            <NuxtLink
                                 v-for="tag in video.tags"
                                 :key="tag"
                                 class="btn btn-secondary line-clamp-1 rounded-2xl px-5 py-1"
                                 :to="`/results?search_query=${encodeURIComponent(tag)}`"
-                                >{{ tag }}</router-link
+                                >{{ tag }}</NuxtLink
                             >
                         </div>
                     </template>

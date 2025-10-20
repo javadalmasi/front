@@ -1,13 +1,13 @@
 <template>
     <div>
-        <router-link :to="{ path: '/playlist', query: { list: playlistId } }"
+        <NuxtLink :to="{ path: '/playlist', query: { list: playlistId } }"
             ><h1 class="font-bold leading-[1.7] !text-lg hover:underline" v-text="playlist.name"
-        /></router-link>
+        /></NuxtLink>
         <span class="text-sm leading-[1.65]">
             <template v-if="playlist.uploader">
-                <router-link class="link-secondary" :to="playlist.uploaderUrl" :title="playlist.uploader">
+                <NuxtLink class="link-secondary" :to="playlist.uploaderUrl" :title="playlist.uploader">
                     {{ playlist.uploader }}
-                </router-link>
+                </NuxtLink>
                 -
             </template>
             {{ selectedIndex }} / {{ playlist.videos }}
@@ -21,7 +21,7 @@
             :playlist-id="playlistId"
             :prefer-listen="preferListen"
         >
-            <router-link
+            <NuxtLink
                 class="flex rounded px-2 py-1 hover:bg-gray-50 dark:hover:bg-neutral-800"
                 :class="{ 'bg-gray-200 dark:bg-neutral-700': index === selectedIndex - 1 }"
                 :to="{
@@ -42,7 +42,7 @@
                 <div class="mr-2 flex flex-col">
                     <span class="link" :title="related.title" v-text="related.title" />
                     <div class="flex-1">
-                        <router-link
+                        <NuxtLink
                             v-if="related.uploaderUrl && related.uploaderName && !hideChannel"
                             class="link-secondary block overflow-hidden text-xs leading-[1.6] no-underline hover:underline-dashed"
                             :to="related.uploaderUrl"
@@ -50,10 +50,10 @@
                         >
                             <span v-text="getTruncatedUploaderName(related.uploaderName)" />
                             <i v-if="related.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
-                        </router-link>
+                        </NuxtLink>
                     </div>
                 </div>
-            </router-link>
+            </NuxtLink>
         </div>
     </div>
 </template>

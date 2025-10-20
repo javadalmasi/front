@@ -7,11 +7,11 @@
                 @mouseover="onMouseOver(i)"
                 @click="setSelected(i)"
             >
-                <router-link
+                <NuxtLink
                     class="suggestion"
                     :class="{ 'suggestion-selected': selected === i }"
                     :to="`/results?search_query=${encodeURIComponent(suggestion)}`"
-                    >{{ suggestion }}</router-link
+                    >{{ suggestion }}</NuxtLink
                 >
             </li>
         </ul>

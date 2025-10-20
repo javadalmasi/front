@@ -50,7 +50,7 @@
     <hr />
 
     <div class="flex flex-wrap justify-center gap-2 md:justify-start">
-        <router-link v-t="'titles.subscriptions'" class="btn btn-secondary min-w-[120px] flex-1" to="/subscriptions" />
+        <NuxtLink v-t="'titles.subscriptions'" class="btn btn-secondary min-w-[120px] flex-1" to="/subscriptions" />
         <a
             v-if="!isRssFeedDisabled"
             :href="getRssUrl"

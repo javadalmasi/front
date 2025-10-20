@@ -12,13 +12,13 @@
                 >
                     <div class="i-fa6-solid:bars text-lg leading-[1.7]" />
                 </button>
-                <router-link
+                <NuxtLink
                     class="ml-4 flex items-center text-3xl font-bold leading-[1.45] font-sans"
                     :to="homePagePath"
                 >
                     <img :src="logoSrc" alt="logo" height="32" width="32" class="bold w-10" />
                     <span class="hidden sm:inline">ویدیو</span>
-                </router-link>
+                </NuxtLink>
             </div>
 
             <!-- Search container - now responsive -->

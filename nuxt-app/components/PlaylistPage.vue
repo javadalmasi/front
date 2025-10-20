@@ -8,7 +8,7 @@
 
         <div class="mt-1 flex justify-between <md:flex-col md:items-center">
             <div>
-                <router-link class="link flex items-center gap-3" :to="playlist.uploaderUrl || '/'">
+                <NuxtLink class="link flex items-center gap-3" :to="playlist.uploaderUrl || '/'">
                     <div class="relative inline-block">
                         <img
                             loading="lazy"
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <strong v-text="playlist.uploader" />
-                </router-link>
+                </NuxtLink>
             </div>
             <div class="flex flex-wrap items-center gap-1">
                 <strong

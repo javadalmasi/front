@@ -500,7 +500,7 @@ export default {
             // Load Persian country map
             try {
                 this.CountryMap = await import(`../utils/CountryMaps/fa.json`).then(val => val.default);
-            } catch (e) {
+            } catch {
                 console.error("Countries not translated into fa");
             }
         }

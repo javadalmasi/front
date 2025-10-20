@@ -19,7 +19,7 @@
 
     <div class="video-grid">
         <div v-for="playlist in playlists" :key="playlist.id">
-            <router-link :to="`/playlist?list=${playlist.id}`">
+            <NuxtLink :to="`/playlist?list=${playlist.id}`">
                 <img class="w-full rounded-lg" :src="getOptimalThumbnailUrl(playlist.thumbnail)" alt="thumbnail" />
                 <div class="relative text-sm leading-[1.65]">
                     <span
@@ -33,7 +33,7 @@
                     :title="playlist.name"
                     v-text="playlist.name"
                 />
-            </router-link>
+            </NuxtLink>
             <button v-t="'actions.edit_playlist'" class="btn h-auto" @click="showPlaylistEditModal(playlist)" />
             <button v-t="'actions.delete_playlist'" class="btn mr-2 h-auto" @click="playlistToDelete = playlist.id" />
             <ModalComponent v-if="playlist.id == playlistToEdit" @close="playlistToEdit = null">
@@ -67,7 +67,7 @@
     <h2 v-t="'titles.bookmarks'" class="my-4 font-bold" />
 
     <div v-if="bookmarks" class="video-grid">
-        <router-link
+        <NuxtLink
             v-for="(playlist, index) in bookmarks"
             :key="playlist.playlistId"
             :to="`/playlist?list=${playlist.playlistId}`"
@@ -107,7 +107,7 @@
                 </div>
                 <span class="mr-3 hover:underline" v-text="playlist.uploader" />
             </a>
-        </router-link>
+        </NuxtLink>
     </div>
     <br />
     <CreatePlaylistModal

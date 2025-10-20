@@ -17,7 +17,7 @@
             </div>
         </form>
         <br />
-        <strong>Importing Subscriptions from YouTube</strong>
+        <strong v-t="'import.youtube'" />
         <br />
         <div>
             Open
@@ -32,7 +32,7 @@
             Select and import the file above.
         </div>
         <br />
-        <strong>Importing Subscriptions from Invidious</strong>
+        <strong v-t="'import.invidious'" />
         <br />
         <div>
             Open
@@ -43,7 +43,7 @@
             Select and import the file above.
         </div>
         <br />
-        <strong>Importing Subscriptions from NewPipe</strong>
+        <strong v-t="'import.newpipe'" />
         <br />
         <div>
             Go to the Feed tab.
@@ -167,7 +167,7 @@ export default {
             subscriptions.sort();
             try {
                 localStorage.setItem("localSubscriptions", JSON.stringify(subscriptions));
-            } catch (e) {
+            } catch {
                 alert(this.$t("info.local_storage"));
             }
         },

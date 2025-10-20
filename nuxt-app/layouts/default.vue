@@ -1,4 +1,5 @@
 <template>
+  <client-only>
     <div class="reset min-h-screen w-full flex flex-col antialiased" :class="[theme]">
         <div class="flex-1">
             <NavBar v-if="!isEmbedPage" :sidebar-state="sidebarState" :theme="theme" @toggle-sidebar="toggleSidebar" />
@@ -35,6 +36,7 @@
             }"
         />
     </div>
+  </client-only>
 </template>
 
 <script>

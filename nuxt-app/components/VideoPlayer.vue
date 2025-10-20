@@ -1092,7 +1092,7 @@ export default {
             try {
                 const newSpeed = Number(this.playbackSpeedInput);
                 this.adjustPlaybackSpeed(newSpeed);
-            } catch (err) {
+            } catch {
                 alert(this.$t("actions.invalid_input"));
             }
             this.showSpeedModal = false;

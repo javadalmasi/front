@@ -7,9 +7,9 @@
 
         <div v-if="results && results.corrected">
             <i18n-t keypath="search.did_you_mean" tag="div" class="text-lg leading-[1.7]">
-                <router-link :to="{ name: 'SearchResults', query: { search_query: results.suggestion } }">
+                <NuxtLink :to="{ name: 'SearchResults', query: { search_query: results.suggestion } }">
                     <em v-text="results.suggestion" />
-                </router-link>
+                </NuxtLink>
             </i18n-t>
         </div>
 

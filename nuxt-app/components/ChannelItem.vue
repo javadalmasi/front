@@ -1,6 +1,6 @@
 <template>
     <div class="h-full flex flex-col items-center justify-center text-center">
-        <router-link :to="item.url" class="link font-bold">
+        <NuxtLink :to="item.url" class="link font-bold">
             <div class="my-4 flex justify-center">
                 <div class="relative inline-block">
                     <img
@@ -23,19 +23,19 @@
                 <span v-text="item.name" />
                 <i v-if="item.verified" class="i-fa6-solid:check ml-1.5" />
             </p>
-        </router-link>
+        </NuxtLink>
         <p
             v-if="item.description"
             class="pt-1 text-sm leading-[1.65]"
             style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden"
             v-text="item.description"
         />
-        <router-link v-if="item.uploaderUrl" class="link" :to="item.uploaderUrl">
+        <NuxtLink v-if="item.uploaderUrl" class="link" :to="item.uploaderUrl">
             <p>
                 <span v-text="item.uploader" />
                 <i v-if="item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
-        </router-link>
+        </NuxtLink>
 
         <a v-if="item.uploaderName" class="link no-underline hover:underline-dashed" v-text="truncatedUploaderName" />
         <template v-if="item.videos >= 0">

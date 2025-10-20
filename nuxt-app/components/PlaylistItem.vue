@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col flex-justify-between">
-        <router-link :to="props.item.url" class="link inline-block">
+        <NuxtLink :to="props.item.url" class="link inline-block">
             <div class="relative">
                 <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
                 <div
@@ -11,10 +11,10 @@
                 </div>
             </div>
             <p :style="titleStyle" class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
-        </router-link>
+        </NuxtLink>
         <p v-if="props.item.description" v-text="props.item.description" />
 
-        <router-link
+        <NuxtLink
             v-if="props.item.uploaderUrl && props.item.uploaderName && !props.hideChannel"
             class="link-secondary text-sm leading-[1.65] no-underline hover:underline-dashed"
             :to="props.item.uploaderUrl"
@@ -23,7 +23,7 @@
                 <span ref="uploaderNameRef" v-text="truncatedUploaderName" />
                 <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
-        </router-link>
+        </NuxtLink>
         <a
             v-else-if="props.item.uploaderName && !props.hideChannel"
             ref="uploaderNameRef"
