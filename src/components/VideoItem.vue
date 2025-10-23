@@ -45,7 +45,7 @@
                 </div>
             </router-link>
 
-            <div class="flex-1 px-2 min-w-0">
+            <div class="min-w-0 flex-1 px-2">
                 <!-- Added min-w-0 to prevent flex item from overflowing -->
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
@@ -87,7 +87,11 @@
                 >
                     <i :class="preferListen ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'" />
                 </router-link>
-                <button :title="$t('actions.add_to_playlist')" @click="showPlaylistModal = !showPlaylistModal">
+                <button
+                    v-if="authenticated"
+                    :title="$t('actions.add_to_playlist')"
+                    @click="showPlaylistModal = !showPlaylistModal"
+                >
                     <i class="i-fa6-solid:circle-plus" />
                 </button>
                 <button :title="$t('actions.share')" @click="showShareModal = !showShareModal">

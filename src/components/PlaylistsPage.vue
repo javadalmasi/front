@@ -136,6 +136,12 @@ export default {
         };
     },
     mounted() {
+        // Redirect to login if not authenticated and trying to access protected functionality
+        if (!this.authenticated && this.getPreferenceBoolean("requireAuthForPlaylists", true)) {
+            this.$router.push("/login");
+            return;
+        }
+
         this.fetchPlaylists();
         this.loadPlaylistBookmarks();
     },

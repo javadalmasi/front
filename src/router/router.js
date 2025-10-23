@@ -52,14 +52,19 @@ const routes = [
         component: () => import("../components/ChannelPage.vue"),
     },
     {
+        path: "/auth",
+        name: "Authentication",
+        component: () => import("../components/AuthenticationPage.vue"),
+    },
+    {
         path: "/login",
         name: "Login",
-        component: () => import("../components/LoginPage.vue"),
+        redirect: "/auth",
     },
     {
         path: "/register",
         name: "Register",
-        component: () => import("../components/RegisterPage.vue"),
+        redirect: "/auth",
     },
     {
         path: "/feed",

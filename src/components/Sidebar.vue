@@ -29,6 +29,7 @@
                 <div
                     v-for="item in filteredPublicItems"
                     :key="item.name"
+                    v-show="!item.requiresAuth || authenticated"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
@@ -112,22 +113,12 @@
                 <div
                     v-if="!authenticated"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="navigateTo('/login')"
+                    @click="navigateTo('/auth')"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
                         <div class="i-fa6-solid:right-to-bracket" />
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ورود</span>
-                </div>
-                <div
-                    v-if="!authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="navigateTo('/register')"
-                >
-                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
-                        <div class="i-fa6-solid:user-plus" />
-                    </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ثبت نام</span>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ورود / ثبت نام</span>
                 </div>
                 <div
                     v-if="authenticated"
@@ -178,11 +169,11 @@ export default {
             showMoreCategories: false,
             publicItems: [
                 { name: "صفحه اصلی", route: "/", icon: "i-fa6-solid:house" },
-                { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss" },
-                { name: "اشتراک‌ها", route: "/subscriptions", icon: "i-fa6-solid:bell" },
                 { name: "پرطرفدار", route: "/trending", icon: "i-fa6-solid:fire" },
-                { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left" },
-                { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered" },
+                { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss", requiresAuth: true },
+                { name: "اشتراک‌ها", route: "/subscriptions", icon: "i-fa6-solid:bell", requiresAuth: true },
+                { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left", requiresAuth: true },
+                { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered", requiresAuth: true },
                 { name: "تنظیمات", route: "/preferences", icon: "i-fa6-solid:gear" },
             ],
             categories: [

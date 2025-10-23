@@ -161,6 +161,7 @@
                             </button>
 
                             <button
+                                v-if="authenticated"
                                 :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
                                 @click="subscribeHandler"
                             >
@@ -213,7 +214,11 @@
                                         class="mx-1.5"
                                     />
                                 </router-link>
-                                <button class="btn btn-secondary flex items-center" @click="showModal = !showModal">
+                                <button
+                                    v-if="authenticated"
+                                    class="btn btn-secondary flex items-center"
+                                    @click="showModal = !showModal"
+                                >
                                     <i18n-t class="lt-lg:hidden" keypath="actions.add_to_playlist" tag="span"></i18n-t>
                                     <i class="i-fa6-solid:circle-plus mr-1" />
                                 </button>
@@ -236,50 +241,81 @@
                     </div>
 
                     <div class="px-2">
-                        <button
-                            v-t="`actions.${showDesc ? 'minimize_description' : 'show_description'}`"
-                            class="btn btn-secondary mb-2"
-                            @click="showDesc = !showDesc"
-                        />
+                        <!-- Description, tags, category, and license section -->
+                        <div class="bg-gray-100 dark:bg-dark-800 rounded-lg p-4 mt-2">
+                            <!-- Show description if it exists -->
+                            <div v-if="hasDescription" class="mb-3">
+                                <CollapsableText
+                                    :text="processedDescription"
+                                    :visible-limit="150"
+                                    @expanded="onDescriptionExpanded"
+                                />
+                            </div>
 
-                        <span v-show="video?.chapters?.length > 0 && !chaptersDisabled" class="btn btn-secondary mr-2">
-                            <input id="showChapters" v-model="showChapters" type="checkbox" />
-                            <label v-t="'actions.show_chapters'" class="mr-2" for="showChapters" />
-                        </span>
-                    </div>
-
-                    <template v-if="showDesc">
-                        <!-- eslint-disable-next-line vue/no-v-html -->
-                        <div class="description break-words px-2" v-html="purifiedDescription" />
-                        <br />
-
-                        <div
-                            v-if="sponsors && sponsors.segments"
-                            class="px-2"
-                            v-text="`${$t('video.sponsor_segments')}: ${sponsors.segments.length}`"
-                        />
-                        <div v-if="video.category" class="px-2" v-text="`${$t('video.category')}: ${video.category}`" />
-                        <div
-                            v-if="!isLicenseInfoDisabled"
-                            class="px-2"
-                            v-text="`${$t('video.license')}: ${video.license}`"
-                        />
-                        <div
-                            v-if="!isLicenseInfoDisabled"
-                            class="px-2 capitalize"
-                            v-text="`${$t('video.visibility')}: ${video.visibility}`"
-                        />
-
-                        <div v-if="video.tags" class="mt-2 flex flex-wrap gap-2 px-2">
-                            <router-link
-                                v-for="tag in video.tags"
-                                :key="tag"
-                                class="btn btn-secondary line-clamp-1 rounded-2xl px-5 py-1"
-                                :to="`/results?search_query=${encodeURIComponent(tag)}`"
-                                >{{ tag }}</router-link
+                            <!-- Show additional info (category, license, tags) when description is expanded -->
+                            <div
+                                v-if="hasDescription && showAdditionalInfo"
+                                class="mt-3 pt-3 border-t border-gray-300 dark:border-gray-700"
                             >
+                                <div
+                                    v-if="video.category"
+                                    class="mb-2"
+                                    v-text="`${$t('video.category')}: ${video.category}`"
+                                />
+                                <div
+                                    v-if="!isLicenseInfoDisabled"
+                                    class="mb-2"
+                                    v-text="`${$t('video.license')}: ${video.license}`"
+                                />
+                                <div
+                                    v-if="!isLicenseInfoDisabled"
+                                    class="mb-2 capitalize"
+                                    v-text="`${$t('video.visibility')}: ${video.visibility}`"
+                                />
+
+                                <!-- Show tags if they exist (original + extracted) -->
+                                <div v-if="allTags.length > 0" class="mt-3 flex flex-wrap gap-2">
+                                    <router-link
+                                        v-for="tag in allTags"
+                                        :key="tag"
+                                        class="btn btn-secondary line-clamp-1 rounded-2xl px-4 py-1 text-sm"
+                                        :to="`/results?search_query=${encodeURIComponent(tag)}`"
+                                        >{{ tag }}</router-link
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Show other info when there's no description -->
+                            <div v-if="!hasDescription">
+                                <div
+                                    v-if="video.category"
+                                    class="mb-2"
+                                    v-text="`${$t('video.category')}: ${video.category}`"
+                                />
+                                <div
+                                    v-if="!isLicenseInfoDisabled"
+                                    class="mb-2"
+                                    v-text="`${$t('video.license')}: ${video.license}`"
+                                />
+                                <div
+                                    v-if="!isLicenseInfoDisabled"
+                                    class="mb-2 capitalize"
+                                    v-text="`${$t('video.visibility')}: ${video.visibility}`"
+                                />
+
+                                <!-- Show tags if they exist (original + extracted) -->
+                                <div v-if="allTags.length > 0" class="mt-3 flex flex-wrap gap-2">
+                                    <router-link
+                                        v-for="tag in allTags"
+                                        :key="tag"
+                                        class="btn btn-secondary line-clamp-1 rounded-2xl px-4 py-1 text-sm"
+                                        :to="`/results?search_query=${encodeURIComponent(tag)}`"
+                                        >{{ tag }}</router-link
+                                    >
+                                </div>
+                            </div>
                         </div>
-                    </template>
+                    </div>
                 </div>
 
                 <hr class="px-2" />
@@ -390,6 +426,7 @@ import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
 import PageNotFound from "./PageNotFound.vue";
+import CollapsableText from "./CollapsableText.vue";
 import { parseTimeParam } from "@/utils/Misc";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
 
@@ -410,6 +447,7 @@ export default {
         LoadingIndicatorPage,
         ToastComponent,
         PageNotFound,
+        CollapsableText,
     },
     data() {
         const smallViewQuery = window.matchMedia("(max-width: 640px)");
@@ -422,7 +460,7 @@ export default {
             selectedAutoLoop: false,
             selectedAutoPlay: null,
             showComments: true,
-            showDesc: false,
+            showDesc: true, // Now always enabled since we use CollapsableText
             showRecs: true,
             showChapters: true,
             comments: null,
@@ -439,6 +477,7 @@ export default {
             timeoutCounter: null,
             counter: 0,
             theaterMode: false,
+            showAdditionalInfo: false,
         };
     },
     computed: {
@@ -506,7 +545,79 @@ export default {
             return _this.getPreferenceNumber("autoPlayNextCountdown", 5);
         },
         purifiedDescription() {
-            return purifyHTML(this.video.description);
+            return purifyHTML(this.processedDescription);
+        },
+        extractedTags() {
+            // Extract hashtags from description and return unique tags only
+            if (!this.video?.description) return [];
+
+            // Find all /hashtag/ patterns in the description
+            const hashtagRegex = /\/hashtag\/([^'"?\s#&[\]]+)/g;
+            let match;
+            const newTags = [];
+            let description = this.video.description;
+
+            while ((match = hashtagRegex.exec(description)) !== null) {
+                let tag = match[1];
+                // Decode URL-encoded tags (like %D9%88%D8%A7%D9%84%DA%A9%D8%B3 -> والکس)
+                try {
+                    tag = decodeURIComponent(tag);
+                } catch (e) {
+                    // If decoding fails, use the original tag
+                    console.warn("Could not decode hashtag:", tag);
+                }
+
+                if (!this.video.tags?.includes(tag) && !newTags.includes(tag)) {
+                    newTags.push(tag);
+                }
+            }
+
+            return [...new Set(newTags)];
+        },
+        allTags() {
+            // Combine original tags and extracted tags, ensuring uniqueness
+            const all = [...(this.video?.tags || []), ...this.extractedTags];
+            return [...new Set(all)];
+        },
+        processedDescription() {
+            if (!this.video?.description) return "";
+
+            // Extract and remove hashtag links from description
+            const hashtagRegex = /\/hashtag\/([^'"?\s#&[\]]+)/g;
+            let processedDesc = this.video.description.replace(hashtagRegex, "");
+            // Clean up multiple newlines that may result from removal
+            processedDesc = processedDesc.replace(/\n\s*\n/g, "\n");
+
+            return processedDesc;
+        },
+        hasDescription() {
+            return this.processedDescription.trim().length > 0;
+        },
+        descriptionWithAdditionalInfo() {
+            let fullDescription = this.processedDescription;
+
+            // Add category, license, and visibility to the description
+            if (this.video?.category) {
+                fullDescription += `\n\n${this.$t("video.category")}: ${this.video.category}`;
+            }
+            if (!this.isLicenseInfoDisabled && this.video?.license) {
+                fullDescription += `\n${this.$t("video.license")}: ${this.video.license}`;
+            }
+            if (!this.isLicenseInfoDisabled && this.video?.visibility) {
+                fullDescription += `\n${this.$t("video.visibility")}: ${this.video.visibility}`;
+            }
+
+            // Add tags at the end
+            if (this.allTags.length > 0) {
+                const tagLinks = this.allTags
+                    .map(
+                        tag => `<a href="/results?search_query=${encodeURIComponent(tag)}" class="tag-link">${tag}</a>`,
+                    )
+                    .join(" ");
+                fullDescription += `\n\n${tagLinks}`;
+            }
+
+            return fullDescription;
         },
         youtubeVideoHref() {
             let link = `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}`;
@@ -569,7 +680,6 @@ export default {
         );
         this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
         this.showComments = !this.getPreferenceBoolean("minimizeComments", false);
-        this.showDesc = !this.getPreferenceBoolean("minimizeDescription", true);
         this.showRecs = this.isRecommendationsToggleDisabled
             ? true
             : !this.getPreferenceBoolean("minimizeRecommendations", false);
@@ -591,6 +701,9 @@ export default {
         this.dismiss();
     },
     methods: {
+        onDescriptionExpanded(isExpanded) {
+            this.showAdditionalInfo = isExpanded;
+        },
         checkIfLivestreamDisabled(video) {
             // Don't consider short videos as livestreams to be disabled
             if (video.isShort === true) {
@@ -923,5 +1036,31 @@ export default {
 .description a {
     text-decoration: underline;
     filter: brightness(0.75);
+}
+
+.description-box {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.description-box a {
+    text-decoration: none;
+    color: #039be5;
+}
+
+.description-box a:hover {
+    text-decoration: underline;
+}
+
+.tag-link {
+    display: inline-block;
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    padding: 4px 12px;
+    margin: 2px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
 }
 </style>

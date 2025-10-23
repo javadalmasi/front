@@ -309,7 +309,8 @@
         "username": "نام کاربری",
         "password": "رمز",
         "password_confirm": "تایید رمز عبور",
-        "passwords_incorrect": "رمزهای عبور یکسان نیستند!"
+        "passwords_incorrect": "رمزهای عبور یکسان نیستند!",
+        "please_fill_all_fields_correctly": "لطفاً تمام فیلدها را به درستی پر کنید"
     },
     "info": {
         "hours": "{amount} ساعت",

@@ -7,10 +7,10 @@
         <span v-if="text.length > visibleLimit && !showFullText">...</span>
         <button
             v-if="text.length > visibleLimit"
-            class="block whitespace-normal text-neutral-500 font-semibold hover:underline"
-            @click="showFullText = !showFullText"
+            class="block whitespace-normal text-neutral-500 font-semibold hover:underline ml-1"
+            @click="toggleFullText"
         >
-            [{{ showFullText ? $t("actions.show_less") : $t("actions.show_more") }}]
+            {{ showFullText ? "کمتر" : "بیشتر" }} ...
         </button>
     </div>
 </template>
@@ -29,6 +29,7 @@ export default {
             default: 100,
         },
     },
+    emits: ["expanded"],
     data() {
         return {
             showFullText: false,
@@ -40,6 +41,10 @@ export default {
         },
         collapsedText() {
             return purifyHTML(rewriteDescription(this.text.slice(0, this.visibleLimit)));
+        },
+        toggleFullText() {
+            this.showFullText = !this.showFullText;
+            this.$emit("expanded", this.showFullText);
         },
     },
 };

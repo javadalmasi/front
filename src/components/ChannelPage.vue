@@ -32,7 +32,11 @@
             </div>
 
             <div class="flex gap-2">
-                <button :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'" @click="subscribeHandler">
+                <button
+                    v-if="authenticated"
+                    :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
+                    @click="subscribeHandler"
+                >
                     <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
                     <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
                     {{
@@ -43,7 +47,7 @@
                 </button>
 
                 <button
-                    v-if="subscribed && !isAddToGroupDisabled"
+                    v-if="authenticated && subscribed && !isAddToGroupDisabled"
                     v-t="'actions.add_to_group'"
                     class="btn btn-secondary"
                     @click="showGroupModal = true"

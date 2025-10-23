@@ -44,7 +44,7 @@
         </template>
 
         <button
-            v-if="subscribed != null"
+            v-if="authenticated && subscribed != null"
             :class="[subscribed ? 'btn btn-unsubscribe mt-2 w-max' : 'btn btn-red mt-2 w-max']"
             class="mx-auto"
             @click="subscribeHandler"
