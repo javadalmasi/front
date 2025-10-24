@@ -45,10 +45,10 @@
                     <VideoThumbnail :item="related" :small="true" :in-playlist="true" />
                 </div>
 
-                <div class="mr-2 flex flex-col relative">
+                <div class="relative mr-2 flex flex-col">
                     <div class="min-h-[2.8em]">
                         <span
-                            class="link text-sm line-clamp-2 max-md:line-clamp-none"
+                            class="link line-clamp-2 text-sm max-md:line-clamp-none"
                             :title="related.title"
                             v-text="related.title"
                         />
@@ -56,7 +56,7 @@
                     <div class="flex-1">
                         <span
                             v-if="related.duration >= 0"
-                            class="text-xs leading-[1.6] text-gray-600 dark:text-gray-400"
+                            class="text-xs text-gray-600 leading-[1.6] dark:text-gray-400"
                         >
                             {{ toPersianDigits(timeFormat(related.duration)) }}
                         </span>
