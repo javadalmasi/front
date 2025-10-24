@@ -33,7 +33,7 @@
 
             <!-- duration indicator for non-shorts -->
             <div
-                v-if="!item.isShort && item.duration >= 0"
+                v-if="!item.isShort && item.duration >= 0 && !inPlaylist"
                 ref="durationIndicator"
                 :class="[
                     'duration-indicator absolute flex items-center gap-1 bottom-2 right-2 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs leading-[1.6] text-white',
@@ -100,6 +100,10 @@ export default {
             default: () => {
                 return false;
             },
+        },
+        inPlaylist: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {

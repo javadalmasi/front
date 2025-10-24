@@ -36,14 +36,20 @@
             >
                 <span class="min-w-5 flex-none text-xs leading-[1.6]" v-text="index + 1" />
                 <div class="w-24 flex-none">
-                    <VideoThumbnail :item="related" :small="true" />
+                    <VideoThumbnail :item="related" :small="true" :in-playlist="true" />
                 </div>
 
                 <div class="mr-2 flex flex-col">
                     <span class="link" :title="related.title" v-text="related.title" />
                     <div class="flex-1">
+                        <span
+                            v-if="related.duration >= 0"
+                            class="text-xs leading-[1.6] text-gray-600 dark:text-gray-400"
+                        >
+                            {{ timeFormat(related.duration) }}
+                        </span>
                         <router-link
-                            v-if="related.uploaderUrl && related.uploaderName && !hideChannel"
+                            v-else-if="related.uploaderUrl && related.uploaderName && !hideChannel"
                             class="link-secondary block overflow-hidden text-xs leading-[1.6] no-underline hover:underline-dashed"
                             :to="related.uploaderUrl"
                             :title="related.uploaderName"
@@ -61,7 +67,7 @@
 <script>
 import { nextTick } from "vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
-import { truncateStringByWidth } from "../utils/Misc";
+import { truncateStringByWidth, timeFormat } from "../utils/Misc";
 
 export default {
     components: { VideoThumbnail },
@@ -103,6 +109,7 @@ export default {
         this.updateWatched(this.playlist.relatedStreams);
     },
     methods: {
+        timeFormat,
         updateScroll() {
             const elems = Array.from(this.$refs.scrollable.children).filter(elm => elm.matches("div"));
             const index = this.selectedIndex - 1;
