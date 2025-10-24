@@ -314,6 +314,10 @@
         "selected_subscriptions": "Selected Subscriptions",
         "found_n_items": "Found {0} items",
         "livestreams_disabled": "Livestreams are not supported",
+        "password_weak": "Weak",
+        "password_fair": "Fair",
+        "password_good": "Good",
+        "password_strong": "Strong",
         "video_sections": "Video Sections"
     },
     "comment": {

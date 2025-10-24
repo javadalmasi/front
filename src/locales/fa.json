@@ -310,6 +310,9 @@
         "password": "رمز",
         "password_confirm": "تایید رمز عبور",
         "passwords_incorrect": "رمزهای عبور یکسان نیستند!",
+        "email_or_phone": "ایمیل یا شماره تلفن",
+        "first_name": "نام",
+        "last_name": "نام خانوادگی",
         "please_fill_all_fields_correctly": "لطفاً تمام فیلدها را به درستی پر کنید"
     },
     "info": {
@@ -332,6 +335,10 @@
         "selected_subscriptions": "اشتراک های انتخاب شده",
         "found_n_items": "تعداد {0} مورد پیدا شد",
         "livestreams_disabled": "پخش زنده پشتیبانی نمی شود",
+        "password_weak": "ضعیف",
+        "password_fair": "متوسط",
+        "password_good": "خوب",
+        "password_strong": "قوی",
         "video_sections": "بخش بندی ویدیو"
     },
     "subscriptions": {
