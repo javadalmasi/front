@@ -45,8 +45,14 @@
                     <VideoThumbnail :item="related" :small="true" :in-playlist="true" />
                 </div>
 
-                <div class="mr-2 flex flex-col">
-                    <span class="link text-sm" :title="related.title" v-text="related.title" />
+                <div class="mr-2 flex flex-col relative">
+                    <div class="min-h-[2.8em]">
+                        <span
+                            class="link text-sm line-clamp-2 max-md:line-clamp-none"
+                            :title="related.title"
+                            v-text="related.title"
+                        />
+                    </div>
                     <div class="flex-1">
                         <span
                             v-if="related.duration >= 0"
@@ -133,6 +139,12 @@ export default {
             str += pad(minutes, 2) + ":" + pad(seconds, 2);
 
             return str;
+        },
+        isTitleTruncated(title) {
+            // This is a simplified check - in a real implementation, you might
+            // want to check if the text actually overflows its container
+            // For now, we'll consider any title with more than 30 characters as potentially truncated
+            return title && title.length > 30;
         },
         updateScroll() {
             const elems = Array.from(this.$refs.scrollable.children).filter(elm => elm.matches("div"));
