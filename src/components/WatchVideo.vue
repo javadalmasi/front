@@ -242,7 +242,7 @@
 
                     <div class="px-2">
                         <!-- Description, tags, category, and license section -->
-                        <div class="bg-gray-100 dark:bg-dark-800 rounded-lg p-4 mt-2">
+                        <div class="mt-2 rounded-lg bg-gray-100 p-4 dark:bg-dark-800">
                             <!-- Show description if it exists -->
                             <div v-if="hasDescription" class="mb-3">
                                 <CollapsableText
@@ -255,7 +255,7 @@
                             <!-- Show additional info (category, license, tags) when description is expanded -->
                             <div
                                 v-if="hasDescription && showAdditionalInfo"
-                                class="mt-3 pt-3 border-t border-gray-300 dark:border-gray-700"
+                                class="mt-3 border-t border-gray-300 pt-3 dark:border-gray-700"
                             >
                                 <div
                                     v-if="video.category"
@@ -551,21 +551,30 @@ export default {
             // Extract hashtags from description and return unique tags only
             if (!this.video?.description) return [];
 
-            // Find all /hashtag/ patterns in the description
-            const hashtagRegex = /\/hashtag\/([^'"?\s#&[\]]+)/g;
+            // Find hashtag text that appears after hashtag links have been converted to text content
+            // This captures the hashtag text that remains after HTML processing (e.g., #hashtag_text)
+            const hashtagRegex = /#([^\s\n\r\t.,;:!?()[\]{}'"!@#$%^&*+=|\\<>`~]+)/g;
             let match;
             const newTags = [];
             let description = this.video.description;
 
             while ((match = hashtagRegex.exec(description)) !== null) {
                 let tag = match[1];
-                // Decode URL-encoded tags (like %D9%88%D8%A7%D9%84%DA%A9%D8%B3 -> والکس)
+                // Decode URL-encoded tags if they appear in the text content (like %D9%88%D8%A7%D9%84%DA%A9%D8%B3 -> والکس)
                 try {
                     tag = decodeURIComponent(tag);
                 } catch (e) {
                     // If decoding fails, use the original tag
                     console.warn("Could not decode hashtag:", tag);
                 }
+
+                // Clean up tag to remove any potential encoded characters or HTML artifacts that might have been processed incorrectly
+                tag = tag.replace(/<[^>]*>/g, "").trim(); // Remove any HTML tags that might have been included
+                tag = tag
+                    .replace(/&lt;br&gt;/gi, "")
+                    .replace(/&lt;br\/&gt;/gi, "")
+                    .replace(/&lt;.*?&gt;/g, "")
+                    .trim(); // Remove HTML entities that might be in the tag
 
                 if (!this.video.tags?.includes(tag) && !newTags.includes(tag)) {
                     newTags.push(tag);
@@ -582,11 +591,19 @@ export default {
         processedDescription() {
             if (!this.video?.description) return "";
 
-            // Extract and remove hashtag links from description
-            const hashtagRegex = /\/hashtag\/([^'"?\s#&[\]]+)/g;
-            let processedDesc = this.video.description.replace(hashtagRegex, "");
-            // Clean up multiple newlines that may result from removal
-            processedDesc = processedDesc.replace(/\n\s*\n/g, "\n");
+            // Remove hashtag text from description (that was extracted by extractedTags)
+            // This captures the hashtag text that remains after HTML processing (e.g., #hashtag_text)
+            let processedDesc = this.video.description;
+
+            // Remove hashtag text patterns like #hashtag_text from the description
+            const hashtagTextRegex = /#[^\s\n\r\t.,;:!?()[\]{}'"!@#$%^&*+=|\\<>`~]+/g;
+            processedDesc = processedDesc.replace(hashtagTextRegex, "");
+
+            // Clean up excessive whitespace that may result from hashtag removal
+            // Replace multiple consecutive whitespace characters with a single space or newline
+            processedDesc = processedDesc.replace(/\s+/g, " ").trim();
+            // Then normalize to proper newlines
+            processedDesc = processedDesc.replace(/\n\s*\n/g, "\n").trim();
 
             return processedDesc;
         },
@@ -794,8 +811,16 @@ export default {
                             const parser = new DOMParser();
                             const xmlDoc = parser.parseFromString(this.video.description, "text/html");
                             xmlDoc.querySelectorAll("a").forEach(elem => {
-                                if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/))
+                                const href = elem.getAttribute("href");
+                                // Skip hashtag links to preserve their text content for extraction
+                                if (href && href.includes("/hashtag/")) {
+                                    // Keep hashtag links as-is so their text content remains available for extraction
+                                    // Convert to text content without the link, preserving just the hashtag text
+                                    elem.outerHTML = elem.innerText || "";
+                                } else if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/)) {
+                                    // Convert other links to their href values (original behavior for non-hashtag links)
                                     elem.outerHTML = elem.getAttribute("href");
+                                }
                             });
                             xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
                             this.video.description = rewriteDescription(xmlDoc.querySelector("body").innerHTML);
@@ -811,8 +836,16 @@ export default {
                         const parser = new DOMParser();
                         const xmlDoc = parser.parseFromString(this.video.description, "text/html");
                         xmlDoc.querySelectorAll("a").forEach(elem => {
-                            if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/))
+                            const href = elem.getAttribute("href");
+                            // Skip hashtag links to preserve their text content for extraction
+                            if (href && href.includes("/hashtag/")) {
+                                // Keep hashtag links as-is so their text content remains available for extraction
+                                // Convert to text content without the link, preserving just the hashtag text
+                                elem.outerHTML = elem.innerText || "";
+                            } else if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/)) {
+                                // Convert other links to their href values (original behavior for non-hashtag links)
                                 elem.outerHTML = elem.getAttribute("href");
+                            }
                         });
                         xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
                         this.video.description = rewriteDescription(xmlDoc.querySelector("body").innerHTML);

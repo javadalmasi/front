@@ -119,7 +119,7 @@
 </template>
 
 <script>
-import { isEmail } from "../utils/Misc.js";
+import { isEmail, checkPasswordStrength } from "../utils/Misc.js";
 import ConfirmModal from "./ConfirmModal.vue";
 
 export default {
@@ -208,52 +208,14 @@ export default {
         
         checkPasswordStrength() {
             const password = this.password || '';
-            let strength = 0;
-            let text = '';
-            let textClass = '';
+            const result = checkPasswordStrength(password);
             
-            // Length check (0-40 points)
-            if (password.length >= 8) strength += 20;
-            if (password.length >= 12) strength += 10;
-            if (password.length >= 16) strength += 10;
+            this.passwordStrength = result.strength;
+            this.passwordStrengthText = result.text;
+            this.passwordStrengthClass = result.barClass;
+            this.passwordStrengthTextClass = result.textClass;
             
-            // Character variety checks (0-40 points)
-            const hasLowercase = /[a-z]/.test(password);
-            const hasUppercase = /[A-Z]/.test(password);
-            const hasNumbers = /[0-9]/.test(password);
-            const hasSymbols = /[^a-zA-Z0-9]/.test(password);
-            
-            if (hasLowercase) strength += 5;
-            if (hasUppercase) strength += 5;
-            if (hasNumbers) strength += 5;
-            if (hasSymbols) strength += 5;
-            
-            // Variety bonus (0-20 points)
-            const varietyCount = [hasLowercase, hasUppercase, hasNumbers, hasSymbols].filter(Boolean).length;
-            if (varietyCount >= 3) strength += 10;
-            if (varietyCount >= 4) strength += 10;
-            
-            // Update UI based on strength
-            if (strength < 40) {
-                text = this.$t('info.password_weak');
-                textClass = 'text-red-500';
-            } else if (strength < 75) {
-                text = this.$t('info.password_fair');
-                textClass = 'text-yellow-500';
-            } else if (strength < 90) {
-                text = this.$t('info.password_good');
-                textClass = 'text-blue-500';
-            } else {
-                text = this.$t('info.password_strong');
-                textClass = 'text-green-500';
-            }
-            
-            this.passwordStrength = strength;
-            this.passwordStrengthText = text;
-            this.passwordStrengthClass = strength < 40 ? 'bg-red-500' : strength < 75 ? 'bg-yellow-500' : strength < 90 ? 'bg-blue-500' : 'bg-green-500';
-            this.passwordStrengthTextClass = textClass;
-            
-            return strength;
+            return result.strength;
         },
         
         async loadTurnstile() {

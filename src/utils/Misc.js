@@ -7,6 +7,62 @@ export const isEmail = input => {
     return result;
 };
 
+export const checkPasswordStrength = password => {
+    let strength = 0;
+    let text = "";
+    let textClass = "";
+
+    // Length check (0-40 points)
+    if (password.length >= 8) strength += 20;
+    if (password.length >= 12) strength += 10;
+    if (password.length >= 16) strength += 10;
+
+    // Character variety checks (0-40 points)
+    const hasLowercase = /[a-z]/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    const hasSymbols = /[^a-zA-Z0-9]/.test(password);
+
+    if (hasLowercase) strength += 5;
+    if (hasUppercase) strength += 5;
+    if (hasNumbers) strength += 5;
+    if (hasSymbols) strength += 5;
+
+    // Variety bonus (0-20 points)
+    const varietyCount = [hasLowercase, hasUppercase, hasNumbers, hasSymbols].filter(Boolean).length;
+    if (varietyCount >= 3) strength += 10;
+    if (varietyCount >= 4) strength += 10;
+
+    // Update UI based on strength
+    if (strength < 40) {
+        text = "رمز عبور ضعیف است";
+        textClass = "text-red-500";
+    } else if (strength < 75) {
+        text = "رمز عبور متوسط است";
+        textClass = "text-yellow-500";
+    } else if (strength < 90) {
+        text = "رمز عبور خوب است";
+        textClass = "text-blue-500";
+    } else {
+        text = "رمز عبور قوی است";
+        textClass = "text-green-500";
+    }
+
+    return {
+        strength,
+        text,
+        textClass,
+        barClass:
+            strength < 40
+                ? "bg-red-500"
+                : strength < 75
+                  ? "bg-yellow-500"
+                  : strength < 90
+                    ? "bg-blue-500"
+                    : "bg-green-500",
+    };
+};
+
 export const parseTimeParam = time => {
     let start = 0;
     if (/^[\d]*$/g.test(time)) {
