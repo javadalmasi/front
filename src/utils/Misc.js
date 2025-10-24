@@ -97,6 +97,12 @@ export const measureTextWidth = (text, font = "14px system-ui") => {
     return ctx.measureText(text).width;
 };
 
+// Function to convert English digits to Persian digits
+export const toPersianDigits = num => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.toString().replace(/\d/g, x => persianDigits[x]);
+};
+
 // Function to truncate text based on available width in pixels
 export const truncateStringByWidth = (str, maxWidth, font = "14px system-ui") => {
     if (!str) return str;
