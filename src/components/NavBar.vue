@@ -4,117 +4,82 @@
     >
         <div class="mx-auto h-full flex items-center justify-between px-2 sm:px-4">
             <!-- Left side: Menu button and Logo -->
-            <div class="flex items-center">
+            <div class="flex items-center" :class="{ hidden: showSearchBox }">
                 <button
                     class="relative h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
                     aria-label="Toggle sidebar"
                     @click="toggleSidebar"
                 >
-                    <div class="i-fa6-solid:bars text-lg leading-[1.7]" />
+                    <div class="i-fa6-solid:bars text-lg" />
                 </button>
-                <router-link
-                    class="ml-4 flex items-center text-3xl font-bold leading-[1.45] font-sans"
-                    :to="homePagePath"
-                >
-                    <img :src="logoSrc" alt="logo" height="32" width="32" class="bold w-10" />
+                <router-link class="ml-4 flex items-center gap-2 text-3xl font-bold font-sans" :to="homePagePath">
+                    <img :src="logoSrc" alt="logo" class="bold w-10" height="32" width="32" />
                     <span class="hidden sm:inline">ویدیو</span>
                 </router-link>
             </div>
 
-            <!-- Search container - now responsive -->
-            <div
-                v-if="showSearchBox || isOnSearchResultsPage"
-                class="absolute inset-x-0 top-0 z-70 h-16 w-full flex items-center border-b border-gray-200 bg-gray-50 px-2 md:static md:h-auto dark:border-dark-100 md:border-none dark:bg-dark-800 md:bg-transparent sm:px-4"
-            >
-                <div class="relative max-w-3xl w-full flex flex-1 items-center gap-2">
-                    <!-- Cancel button for mobile -->
-                    <button
-                        class="h-10 w-10 flex items-center justify-center rounded-full md:hidden hover:bg-gray-200 dark:hover:bg-dark-100"
-                        aria-label="Cancel search"
-                        @click="cancelSearch"
-                    >
-                        <div class="i-fa6-solid:arrow-left text-lg leading-[1.7]" />
-                    </button>
-                    <!-- Search input and suggestions -->
-                    <div class="w-full flex-1 md:w-auto">
-                        <div class="search-container w-full flex items-center gap-2 md:flex-row">
-                            <div class="relative flex-1">
-                                <span
-                                    v-if="searchText"
-                                    class="delete-search absolute top-1/2 h-7 w-7 flex cursor-pointer items-center justify-center rounded-full bg-gray-200 text-center text-gray-500 opacity-70 ltr:left-4 rtl:left-4 rtl:right-auto -translate-y-1/2 dark:bg-dark-400 dark:text-gray-400 hover:opacity-100"
-                                    @click="clearSearchText()"
-                                >
-                                    ×
-                                </span>
-                                <input
-                                    ref="searchInput"
-                                    v-model="searchText"
-                                    class="input h-12 w-full border border-gray-300 rounded-md px-12 text-lg leading-[1.7] shadow-sm dark:border-dark-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    type="search"
-                                    role="search"
-                                    autocomplete="off"
-                                    :title="$t('actions.search')"
-                                    :placeholder="$t('actions.search')"
-                                    @blur="onInputBlur"
-                                    @focus="onInputFocus"
-                                    @keypress="onKeyPress"
-                                    @keyup="onKeyUp"
-                                />
-                            </div>
-                            <!-- Search Filters Dropdown (visible on desktop) -->
-                            <select
-                                v-model="selectedFilter"
-                                class="ddlSearchFilters hidden h-12 min-w-[100px] border border-gray-300 rounded-md bg-gray-100 px-2 text-base leading-[1.7] md:block dark:border-dark-200 dark:bg-dark-400"
-                                @change="updateFilter"
-                            >
-                                <option
-                                    v-for="filter in availableFilters"
-                                    :key="filter"
-                                    v-t="`search.${filter}`"
-                                    :value="filter"
-                                />
-                            </select>
-                        </div>
-                        <div class="absolute top-full mt-1 w-full ltr:left-0 ltr:right-auto rtl:left-auto rtl:right-0">
-                            <SearchSuggestions
-                                ref="searchSuggestions"
-                                :search-text="searchText"
-                                :is-visible="suggestionsVisible"
-                                @searchchange="onSearchTextChange"
-                            />
-                        </div>
-                    </div>
-                    <!-- Search button -->
-                    <button
-                        class="btn h-12 flex items-center justify-center rounded-lg bg-gray-100 px-5 dark:bg-dark-400 hover:bg-gray-200 dark:hover:bg-dark-300"
-                        @click="submitSearch"
-                    >
-                        <div class="i-fa6-solid:magnifying-glass text-base leading-[1.65]" />
-                    </button>
+            <!-- Center: Desktop Search Form -->
+            <div class="hidden flex-1 justify-center px-4 md:flex">
+                <div class="max-w-3xl w-full">
+                    <SearchForm
+                        ref="desktopSearch"
+                        :available-filters="availableFilters"
+                        :search-text-prop="searchText"
+                        :selected-filter-prop="selectedFilter"
+                        :suggestions-visible-prop="suggestionsVisible"
+                        @submit="submitSearch"
+                        @update:search-text="searchText = $event"
+                        @update:selected-filter="selectedFilter = $event"
+                        @update:suggestions-visible="suggestionsVisible = $event"
+                    />
                 </div>
             </div>
 
             <!-- Right side: User actions -->
-            <div v-if="!showSearchBox && !isOnSearchResultsPage" class="flex items-center">
+            <div class="flex items-center" :class="{ hidden: showSearchBox }">
                 <!-- Search button -->
                 <button
-                    class="ml-2 h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                    class="ml-2 h-10 w-10 flex items-center justify-center rounded-full md:hidden hover:bg-gray-200 dark:hover:bg-dark-100"
                     aria-label="Search"
                     @click="openSearchBox"
                 >
-                    <div class="i-fa6-solid:magnifying-glass text-lg leading-[1.7]" />
+                    <div class="i-fa6-solid:magnifying-glass text-lg" />
                 </button>
             </div>
+        </div>
+        <!-- Mobile search overlay -->
+        <div
+            v-if="showSearchBox"
+            class="absolute inset-0 z-70 h-16 w-full flex items-center border-b bg-gray-50 px-2 md:hidden dark:border-dark-100 dark:bg-dark-800 sm:px-4"
+        >
+            <button
+                class="h-10 w-10 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-dark-100"
+                aria-label="Cancel search"
+                @click="cancelSearch"
+            >
+                <div class="i-fa6-solid:arrow-left text-lg" />
+            </button>
+            <SearchForm
+                ref="mobileSearch"
+                :available-filters="availableFilters"
+                :search-text-prop="searchText"
+                :selected-filter-prop="selectedFilter"
+                :suggestions-visible-prop="suggestionsVisible"
+                @submit="submitSearch"
+                @update:search-text="searchText = $event"
+                @update:selected-filter="selectedFilter = $event"
+                @update:suggestions-visible="suggestionsVisible = $event"
+            />
         </div>
     </nav>
 </template>
 
 <script>
-import SearchSuggestions from "./SearchSuggestions.vue";
+import SearchForm from "./SearchForm.vue";
 import hotkeys from "hotkeys-js";
 export default {
     components: {
-        SearchSuggestions,
+        SearchForm,
     },
     props: {
         sidebarState: {
@@ -220,63 +185,22 @@ export default {
         focusOnSearchBar() {
             hotkeys("ctrl+k", event => {
                 event.preventDefault();
-                if (this.showSearchBox) {
-                    this.$refs.searchInput.focus();
+                if (this.$refs.desktopSearch) {
+                    this.$refs.desktopSearch.focusInput();
+                } else if (this.showSearchBox) {
+                    this.$refs.mobileSearch.focusInput();
                 } else {
                     this.showSearchBox = true;
                     this.$nextTick(() => {
-                        this.$refs.searchInput.focus();
+                        this.$refs.mobileSearch.focusInput();
                     });
                 }
             });
-        },
-        onKeyUp(e) {
-            if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-                e.preventDefault();
-                if (this.showSearchBox && this.$refs.searchSuggestions) {
-                    this.$refs.searchSuggestions.onKeyUp(e);
-                }
-            } else if (this.showSearchBox && this.$refs.searchSuggestions) {
-                this.$refs.searchSuggestions.onKeyUp(e);
-            }
-            this.suggestionsVisible = true;
-        },
-        onKeyPress(e) {
-            if (e.key === "Enter") {
-                this.submitSearch(e);
-            }
-        },
-        onInputFocus() {
-            if (this.showSearchBox && this.$refs.searchSuggestions) {
-                this.$refs.searchSuggestions.refreshSuggestions();
-                this.suggestionsVisible = true;
-            }
-        },
-        onInputBlur() {
-            // Only hide suggestions after a delay to allow click events to register
-            setTimeout(() => (this.suggestionsVisible = false), 200);
-        },
-        onSearchTextChange(searchText) {
-            if (searchText && searchText !== this.searchText) {
-                this.searchText = searchText;
-            }
-            this.suggestionsVisible = true;
         },
         async fetchAuthConfig() {
             this.fetchJson(this.authApiUrl() + "/config").then(config => {
                 this.registrationDisabled = config?.registrationDisabled === true;
             });
-        },
-        updateFilter() {
-            if (this.isOnSearchResultsPage && this.searchText && typeof this.searchText === "string") {
-                // Update the route with new filter while keeping the search query
-                this.$router.replace({
-                    query: {
-                        search_query: this.searchText,
-                        filter: this.selectedFilter,
-                    },
-                });
-            }
         },
         submitSearch() {
             if (this.searchText && typeof this.searchText === "string" && this.searchText.trim() !== "") {
@@ -297,55 +221,28 @@ export default {
             this.$emit("toggle-sidebar");
         },
         handleOutsideClick(event) {
-            // Check if the click is outside the search container and suggestions
-            const searchInput = this.$refs.searchInput;
-            const searchSuggestions = this.$refs.searchSuggestions;
+            const isClickInsideDesktopSearch =
+                this.$refs.desktopSearch && this.$refs.desktopSearch.$el.contains(event.target);
+            const isClickInsideMobileSearch =
+                this.$refs.mobileSearch && this.$refs.mobileSearch.$el.contains(event.target);
 
-            // Check if the clicked element is inside the search container or suggestions
-            let isClickInsideSearch = false;
-
-            if (searchInput && searchInput.contains && searchInput.contains(event.target)) {
-                isClickInsideSearch = true;
-            }
-
-            if (
-                searchSuggestions &&
-                searchSuggestions.$el &&
-                searchSuggestions.$el.contains &&
-                searchSuggestions.$el.contains(event.target)
-            ) {
-                isClickInsideSearch = true;
-            }
-
-            // If the click is outside both the search input and suggestions, hide suggestions
-            if (!isClickInsideSearch) {
+            if (!isClickInsideDesktopSearch && !isClickInsideMobileSearch) {
                 this.suggestionsVisible = false;
             }
         },
         openSearchBox() {
             this.showSearchBox = true;
             this.suggestionsVisible = false;
-            // Clear the search text and ensure the input is empty
             this.searchText = "";
-            // Wait for the component to update before focusing
             this.$nextTick(() => {
-                if (this.$refs.searchInput) {
-                    this.$refs.searchInput.focus();
-                    // Ensure the input is empty after focusing (in case browser tries to auto-fill)
-                    this.$refs.searchInput.value = "";
+                if (this.$refs.mobileSearch) {
+                    this.$refs.mobileSearch.focusInput();
                 }
             });
         },
         cancelSearch() {
             this.showSearchBox = false;
             this.suggestionsVisible = false;
-            this.searchText = "";
-            // Ensure the input field is also cleared in case of browser auto-fill
-            if (this.$refs.searchInput && this.$refs.searchInput.value) {
-                this.$refs.searchInput.value = "";
-            }
-        },
-        clearSearchText() {
             this.searchText = "";
         },
     },
