@@ -7,7 +7,7 @@
         <span v-if="text.length > visibleLimit && !showFullText">...</span>
         <button
             v-if="text.length > visibleLimit"
-            class="block whitespace-normal text-neutral-500 font-semibold hover:underline ml-1"
+            class="ml-1 block whitespace-normal text-neutral-500 font-semibold hover:underline"
             @click="toggleFullText"
         >
             {{ showFullText ? "کمتر" : "بیشتر" }} ...

@@ -28,8 +28,8 @@
                 </div>
                 <div
                     v-for="item in filteredPublicItems"
-                    :key="item.name"
                     v-show="!item.requiresAuth || authenticated"
+                    :key="item.name"
                     class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
