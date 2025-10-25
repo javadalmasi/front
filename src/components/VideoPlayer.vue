@@ -18,7 +18,7 @@
         <span
             id="preview-container"
             ref="previewContainer"
-            class="direction-ltr absolute bottom-0 z-[2000] mb-[3.5%] hidden flex-col items-center"
+            class="direction-ltr absolute bottom-12 z-[2000] mb-[3.5%] hidden flex-col items-center"
             dir="ltr"
         >
             <canvas id="preview" ref="preview" class="direction-ltr rounded-sm" dir="ltr" />
@@ -853,7 +853,9 @@ export default {
 
             const player = this.$ui.getControls().getPlayer();
 
-            this.setupSeekbarPreview();
+            this.$nextTick(() => {
+                this.setupSeekbarPreview();
+            });
 
             this.$player = player;
 
@@ -1154,6 +1156,7 @@ export default {
         },
         async showSeekbarPreview(position) {
             const frame = this.getFrame(position);
+            if (!frame) return;
             const originalImage = await this.loadImage(frame.url);
             if (!this.isHoveringTimebar) return;
 
@@ -1191,28 +1194,36 @@ export default {
             container.style.left = `max(${this.seekbarPadding}%, min(${left}%, ${maxLeft}%))`;
             container.style.display = "flex";
         },
-        // ineffective algorithm to find the thumbnail corresponding to the currently hovered position in the video
+        // algorithm to find the thumbnail corresponding to the currently hovered position in the video
         getFrame(position) {
-            let startPosition = 0;
-            const framePage = this.video.previewFrames.at(-1);
-            for (let i = 0; i < framePage.urls.length; i++) {
-                for (let positionY = 0; positionY < framePage.framesPerPageY; positionY++) {
-                    for (let positionX = 0; positionX < framePage.framesPerPageX; positionX++) {
-                        const endPosition = startPosition + framePage.durationPerFrame;
-                        if (position >= startPosition && position <= endPosition) {
-                            return {
-                                url: framePage.urls[i],
-                                positionX: positionX,
-                                positionY: positionY,
-                                frameWidth: framePage.frameWidth,
-                                frameHeight: framePage.frameHeight,
-                            };
-                        }
-                        startPosition = endPosition;
-                    }
-                }
+            const framePage = this.video.previewFrames?.at(-1);
+            if (!framePage) {
+                return null;
             }
-            return null;
+
+            const { durationPerFrame, framesPerPageX, framesPerPageY, urls, frameWidth, frameHeight } = framePage;
+
+            const framesPerUrl = framesPerPageX * framesPerPageY;
+
+            const frameIndex = Math.floor(position / durationPerFrame);
+
+            const urlIndex = Math.floor(frameIndex / framesPerUrl);
+            if (urlIndex >= urls.length) {
+                return null; // Position is out of bounds
+            }
+
+            const frameIndexInUrl = frameIndex % framesPerUrl;
+
+            const positionY = Math.floor(frameIndexInUrl / framesPerPageX);
+            const positionX = frameIndexInUrl % framesPerPageX;
+
+            return {
+                url: urls[urlIndex],
+                positionX,
+                positionY,
+                frameWidth,
+                frameHeight,
+            };
         },
         // creates a new image from an URL
         loadImage(url) {
