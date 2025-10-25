@@ -8,12 +8,12 @@
         "build": "vite build",
         "preview": "vite preview",
         "format": "prettier -w --ignore-path .gitignore **/**.{js,vue,json}",
-        "lint": "eslint --fix --color --ignore-pattern .gitignore --ext .js,.vue ."
+        "lint": "eslint --color src/**/*.js src/*.js *.config.js *.cjs",
+        "lint-check": "eslint --color src/**/*.js src/*.js *.config.js *.cjs"
     },
     "dependencies": {
         "dompurify": "3.2.6",
         "fast-xml-parser": "4.5.0",
-
         "hotkeys-js": "3.13.15",
         "jalali-moment": "^3.3.11",
         "javascript-time-ago": "2.5.11",
@@ -27,10 +27,12 @@
         "vue-router": "4.5.1"
     },
     "devDependencies": {
+        "@eslint/js": "^9.38.0",
         "@iconify-json/fa6-brands": "1.2.6",
         "@iconify-json/fa6-solid": "1.2.4",
         "@intlify/unplugin-vue-i18n": "6.0.8",
         "@unocss/eslint-config": "66.4.1",
+        "@unocss/eslint-plugin": "^66.5.4",
         "@unocss/preset-icons": "66.4.1",
         "@unocss/preset-uno": "66.4.1",
         "@unocss/preset-web-fonts": "66.4.1",
