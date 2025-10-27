@@ -1,5 +1,9 @@
 <template>
     <div>
+        <div class="flex gap-4 mb-4">
+            <button @click="sortBy = 'views'" :class="{ 'font-bold': sortBy === 'views' }">Most Viewed</button>
+            <button @click="sortBy = 'latest'" :class="{ 'font-bold': sortBy === 'latest' }">Latest</button>
+        </div>
         <div v-if="loading">Loading...</div>
         <div v-if="error">{{ error }}</div>
         <div v-if="!loading && !error">
@@ -7,25 +11,32 @@
             <div v-if="shorts.length > 0" class="shorts-container">
                 <h2>Shorts</h2>
                 <div class="shorts-grid">
-                    <div v-for="short in shorts" :key="short.url" class="short-item">
-                        <img :src="short.thumbnail" :alt="short.title" />
-                        <h3>{{ short.title }}</h3>
-                        <p>{{ short.uploaderName }}</p>
-                        <p>{{ short.views.toLocaleString() }} views</p>
-                    </div>
+                    <ContentItem v-for="short in shorts" :key="short.url" :item="short" class="short-item" />
                 </div>
             </div>
 
             <!-- Videos Section -->
             <div v-if="videos.length > 0" class="videos-container">
-                <h2>Videos</h2>
-                <div class="video-grid">
-                    <div v-for="video in videos" :key="video.url" class="video-item">
-                        <img :src="video.thumbnail" :alt="video.title" />
-                        <h3>{{ video.title }}</h3>
-                        <p>{{ video.uploaderName }}</p>
-                        <p>{{ video.views.toLocaleString() }} views</p>
-                    </div>
+                <div
+                    class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2"
+                    @dragover.prevent
+                    @drop="onDrop"
+                >
+                    <ContentItem
+                        v-for="(video, index) in sortedVideos"
+                        :key="video.url"
+                        :item="video"
+                        draggable="true"
+                        @dragstart="onDragStart(index)"
+                    />
+                </div>
+            </div>
+
+            <!-- Watched Items Section -->
+            <div v-if="watchedVideos.length > 0" class="watched-container">
+                <h2>Watched Items</h2>
+                <div class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2">
+                    <ContentItem v-for="video in watchedVideos" :key="video.url" :item="video" />
                 </div>
             </div>
         </div>
@@ -34,20 +45,54 @@
 
 <script>
 import { channelIds } from "../channels.js";
+import ContentItem from "./ContentItem.vue";
 
 export default {
+    components: {
+        ContentItem,
+    },
     data() {
         return {
             videos: [],
             shorts: [],
+            watchedVideos: [],
             loading: true,
             error: null,
+            sortBy: "views", // Default sort
+            draggedIndex: null,
         };
+    },
+    computed: {
+        sortedVideos() {
+            if (this.sortBy === "latest") {
+                return [...this.videos].sort((a, b) => b.uploaded - a.uploaded);
+            }
+            // Default sort by views
+            return [...this.videos].sort((a, b) => b.views - a.views);
+        },
     },
     async mounted() {
         await this.fetchFeed();
+        this.fetchWatchHistory();
     },
     methods: {
+        onDragStart(index) {
+            this.draggedIndex = index;
+        },
+        onDrop(event) {
+            event.preventDefault();
+            const targetElement = event.target.closest(".video-grid > *");
+            if (!targetElement) return;
+
+            const toIndex = Array.from(targetElement.parentNode.children).indexOf(targetElement);
+            const fromIndex = this.draggedIndex;
+
+            if (fromIndex === toIndex) return;
+
+            const itemToMove = this.videos.splice(fromIndex, 1)[0];
+            this.videos.splice(toIndex, 0, itemToMove);
+            this.draggedIndex = null;
+        },
         async fetchFeed() {
             this.loading = true;
             this.error = null;
@@ -61,16 +106,34 @@ export default {
                 }
                 const data = await response.json();
 
-                // Sort data by views in descending order
-                const sortedData = data.sort((a, b) => b.views - a.views);
-
                 // Separate videos and shorts
-                this.videos = sortedData.filter(item => !item.isShort);
-                this.shorts = sortedData.filter(item => item.isShort);
+                this.videos = data.filter(item => !item.isShort);
+                this.shorts = data.filter(item => item.isShort);
             } catch (err) {
                 this.error = err.message;
             } finally {
                 this.loading = false;
+            }
+        },
+        fetchWatchHistory() {
+            if (window.db) {
+                const tx = window.db.transaction("watch_history", "readonly");
+                const store = tx.objectStore("watch_history");
+                const request = store.openCursor(null, "prev");
+                const watched = [];
+                request.onsuccess = event => {
+                    const cursor = event.target.result;
+                    if (cursor && watched.length < 10) {
+                        // Limit to 10 items
+                        watched.push({
+                            url: "/watch?v=" + cursor.value.videoId,
+                            ...cursor.value,
+                        });
+                        cursor.continue();
+                    } else {
+                        this.watchedVideos = watched;
+                    }
+                };
             }
         },
     },
@@ -87,20 +150,9 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
 }
-.video-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-}
-.short-item img,
-.video-item img {
+.short-item {
+    aspect-ratio: 9 / 16;
     width: 100%;
-    border-radius: 8px;
-}
-.short-item h3,
-.video-item h3 {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0.5rem;
+    max-width: 200px;
 }
 </style>
