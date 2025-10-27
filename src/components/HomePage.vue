@@ -2,21 +2,21 @@
     <div class="homepage">
         <div v-if="loading" class="loading-indicator">Loading...</div>
         <div v-if="error" class="error-message">{{ error }}</div>
-        <div v-if="!loading && !error">
+        <div v-if="!loading && !error" class="space-y-8">
             <!-- Recommended Videos Section -->
-            <div v-if="videos.length > 0" class="carousel-section">
-                <div class="mb-2 flex items-center justify-between">
-                    <h2 class="text-base font-bold">{{ $t("titles.recommended") }}</h2>
+            <div v-if="videos.length > 0">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold">{{ $t("titles.recommended") }}</h2>
                     <div class="flex gap-2">
                         <button
-                            class="rounded-full px-3 py-1 text-sm"
+                            class="rounded-full px-4 py-2 text-sm font-medium"
                             :class="sortBy === 'views' ? 'bg-gray-700 text-white' : 'bg-gray-200 dark:bg-gray-800'"
                             @click="sortBy = 'views'"
                         >
                             {{ $t("sort.most_viewed") }}
                         </button>
                         <button
-                            class="rounded-full px-3 py-1 text-sm"
+                            class="rounded-full px-4 py-2 text-sm font-medium"
                             :class="sortBy === 'latest' ? 'bg-gray-700 text-white' : 'bg-gray-200 dark:bg-gray-800'"
                             @click="sortBy = 'latest'"
                         >
@@ -24,7 +24,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="carousel-container recommended-carousel">
+                <div class="carousel-container">
                     <div class="carousel-grid">
                         <ContentItem
                             v-for="video in sortedVideos"
@@ -37,9 +37,9 @@
             </div>
 
             <!-- Shorts Section -->
-            <div v-if="shorts.length > 0" class="carousel-section">
-                <h2 class="mb-2 text-base font-bold">{{ $t("titles.shorts") }}</h2>
-                <div class="carousel-container shorts-carousel">
+            <div v-if="shorts.length > 0">
+                <h2 class="mb-4 text-xl font-bold">{{ $t("titles.shorts") }}</h2>
+                <div class="carousel-container">
                     <ContentItem
                         v-for="short in shorts"
                         :key="short.url"
@@ -50,14 +50,14 @@
             </div>
 
             <!-- Watched Items Section -->
-            <div v-if="watchedVideos.length > 0" class="carousel-section">
-                <div class="mb-2 flex items-center justify-between">
-                    <h2 class="text-base font-bold">{{ $t("titles.watched_items") }}</h2>
+            <div v-if="watchedVideos.length > 0">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold">{{ $t("titles.watched_items") }}</h2>
                     <router-link to="/history" class="text-sm text-blue-500 hover:underline">
                         {{ $t("history.view_all") }}
                     </router-link>
                 </div>
-                <div class="carousel-container watched-carousel">
+                <div class="carousel-container">
                     <ContentItem v-for="video in watchedVideos" :key="video.url" :item="video" class="carousel-item" />
                 </div>
             </div>
@@ -144,9 +144,6 @@ export default {
 .homepage {
     @apply p-4;
 }
-.carousel-section {
-    @apply mb-4;
-}
 .carousel-container {
     @apply flex overflow-x-auto pb-4;
     -webkit-overflow-scrolling: touch;
@@ -168,18 +165,19 @@ export default {
     background: #555;
 }
 .carousel-item {
-    @apply mr-1 w-64 flex-shrink-0;
+    @apply mr-4 w-64 flex-shrink-0;
 }
 .short-item {
     @apply w-40;
+}
+.short-item :deep(.video-thumbnail) {
     aspect-ratio: 9 / 16;
 }
-/* Ensure the image within a short item is contained */
-.short-item :deep(img) {
-    @apply h-full w-full object-contain;
+.short-item :deep(.video-thumbnail img) {
+    @apply h-full w-full object-cover;
 }
-.recommended-carousel .carousel-grid {
-    @apply grid auto-cols-max grid-flow-col gap-1;
+.carousel-grid {
+    @apply grid auto-cols-max grid-flow-col gap-4;
     grid-template-rows: repeat(2, 1fr);
 }
 .loading-indicator,

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="showVideo" class="h-full flex flex-col flex-justify-between">
+    <div v-if="showVideo" class="video-item h-full flex flex-col">
         <router-link
             class="link inline-block w-full"
             :to="{
@@ -13,26 +13,17 @@
             }"
         >
             <VideoThumbnail :item="item" />
-
-            <div>
-                <p
-                    :style="lineClampStyle"
-                    class="link flex overflow-hidden pt-2 font-bold"
-                    :title="title"
-                    v-text="title"
-                />
-            </div>
         </router-link>
 
-        <div class="flex items-center">
-            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5 flex-shrink-0">
+        <div class="flex items-start pt-2">
+            <router-link v-if="!hideChannel" :to="item.uploaderUrl" class="mr-2 flex-shrink-0">
                 <div class="relative inline-block">
                     <img
                         v-if="item.uploaderAvatar"
                         loading="lazy"
                         :src="getOptimalThumbnailUrl(item.uploaderAvatar, { width: '68', height: '68', quality: 85 })"
                         :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
-                        class="h-32px w-32px"
+                        class="h-36px w-36px"
                         width="68"
                         height="68"
                     />
@@ -45,20 +36,25 @@
                 </div>
             </router-link>
 
-            <div class="min-w-0 flex-1 px-2">
-                <!-- Added min-w-0 to prevent flex item from overflowing -->
+            <div class="min-w-0 flex-1">
+                <p
+                    :style="lineClampStyle"
+                    class="link-secondary overflow-hidden text-sm font-medium leading-tight"
+                    :title="title"
+                    v-text="title"
+                />
+
                 <router-link
                     v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
-                    class="link-secondary overflow-hidden text-sm leading-[1.65] no-underline hover:underline-dashed"
+                    class="link-secondary mt-1 block truncate text-xs no-underline"
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
-                    <span v-text="truncatedUploaderName" />
+                    <span v-text="item.uploaderName" />
                 </router-link>
 
                 <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
                     <span v-if="item.views >= 0">
-                        <!-- <i class="i-fa6-solid:eye" /> -->
                         <span class="pr-1" v-text="`${numberFormat(item.views)} •`" />
                     </span>
                     <span
@@ -71,7 +67,7 @@
                 </div>
             </div>
 
-            <div v-if="!shouldHideVideoItemIcons" class="flex items-center gap-2.5">
+            <div v-if="!shouldHideVideoItemIcons" class="action-buttons flex items-center gap-2.5">
                 <router-link
                     :to="{
                         path: '/watch',
@@ -293,12 +289,15 @@ export default {
 };
 </script>
 
-<style>
-.video-info {
-    @apply mt-1 text-xs leading-[1.6] text-gray-600 font-normal;
+<style scoped>
+.video-item .action-buttons {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
-
-.dark .video-info {
-    @apply text-gray-400;
+.video-item:hover .action-buttons {
+    opacity: 1;
+}
+.video-info {
+    @apply mt-1 text-xs leading-tight text-gray-600 dark:text-gray-400;
 }
 </style>
