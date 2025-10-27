@@ -393,7 +393,7 @@ export default {
             minimizeChapters: false,
             showWatchOnYouTube: false,
             searchSuggestions: true,
-            watchHistory: false,
+            watchHistory: true,
             searchHistory: false,
             hideWatched: false,
             enabledCodecs: ["vp9", "avc"],
@@ -478,7 +478,7 @@ export default {
             this.minimizeChapters = this.getPreferenceBoolean("minimizeChapters", false);
             this.showWatchOnYouTube = this.getPreferenceBoolean("showWatchOnYouTube", false);
             this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
-            this.watchHistory = this.getPreferenceBoolean("watchHistory", false);
+            this.watchHistory = this.getPreferenceBoolean("watchHistory", true);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
             // Persian (fa) is the default language, no need to save in local storage
             this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");

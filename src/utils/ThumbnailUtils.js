@@ -3,52 +3,46 @@
  */
 
 /**
- * Transforms a YouTube thumbnail URL to the new CDN format
- * @param {string} originalThumbnailUrl - The original thumbnail URL (e.g., from YouTube)
- * @param {Object} options - Options for the transformation
- * @param {string} options.videoId - The video ID (if not extractable from URL)
- * @param {string} options.width - Width for resizing (default: 320)
- * @param {string} options.height - Height for resizing (default: 180)
- * @param {number} options.quality - Quality parameter as number between 1-100 (optional)
- * @returns {string} The transformed thumbnail URL using the CDN format
+ * Transforms a video ID into a CDN thumbnail URL.
+ * @param {string} videoId - The video ID.
+ * @param {Object} options - Options for the transformation.
+ * @param {boolean} options.isShort - Whether the video is a short (for 9:16 aspect ratio).
+ * @param {string} options.width - Width for resizing.
+ * @param {string} options.height - Height for resizing.
+ * @param {number} options.quality - Quality parameter (1-100).
+ * @returns {string} The transformed thumbnail URL.
  */
-export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
-    // Get the CDN base URL from environment variable
-    const cdnBaseUrl =
-        import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL ||
-        "https://impx.global.ssl.fastly.net/fragrant-fire-439a.laagaw.workers.dev/vi/";
-
-    // Extract video ID from the original URL if not provided
-    let videoId = options.videoId;
-    if (!videoId && originalThumbnailUrl) {
-        // Extract video ID from YouTube thumbnail URL patterns
-        // Common YouTube thumbnail URL patterns:
-        // - https://i.ytimg.com/vi/{videoId}/{style}.jpg
-        // - https://img.youtube.com/vi/{videoId}/{style}.jpg
-
-        const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
-        if (videoIdMatch && videoIdMatch[1]) {
-            videoId = videoIdMatch[1];
-        } else {
-            // If we can't extract from the URL, try to get it from options
-            // If still not available, return the original URL
-            if (!options.videoId) {
-                console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
-                return originalThumbnailUrl;
-            }
-        }
+export function transformThumbnailUrl(videoId, options = {}) {
+    if (!videoId) {
+        console.warn("transformThumbnailUrl called without a videoId.");
+        return ""; // Return empty string or a placeholder image URL
     }
 
-    // Determine dimensions (default 320x180)
-    const width = options.width || "320";
-    const height = options.height || "180";
+    const cdnBaseUrl = import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL;
+    if (!cdnBaseUrl) {
+        console.error("VITE_CDN_THUMBNAIL_BASE_URL is not configured.");
+        // Fallback to a default placeholder or the original ytimg URL if needed
+        return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    }
 
-    // Build the CDN URL
+    let { width, height, quality, isShort } = options;
+
+    // Default dimensions
+    const defaultWidth = 320;
+    const defaultHeight = 180;
+
+    if (isShort) {
+        width = width || defaultWidth; // Use default width if not provided
+        height = Math.round((width * 16) / 9); // Calculate height for 9:16
+    } else {
+        width = width || defaultWidth;
+        height = height || defaultHeight;
+    }
+
     let cdnUrl = `${cdnBaseUrl}${videoId}?resize=${width},${height}`;
 
-    // Add quality parameter if specified (as number between 1-100)
-    if (options.quality !== undefined) {
-        cdnUrl += `&quality=${options.quality}`;
+    if (quality !== undefined) {
+        cdnUrl += `&quality=${quality}`;
     }
 
     return cdnUrl;
@@ -140,13 +134,27 @@ function standardizeDimension(dimension) {
 }
 
 /**
- * Generates a thumbnail URL optimally sized for the current device
- * @param {string} originalThumbnailUrl - Original thumbnail URL
- * @param {Object} additionalOptions - Additional options to override
- * @returns {string} Optimally sized CDN thumbnail URL
+ * Generates a thumbnail URL optimally sized for the current device.
+ * It extracts the video ID from the original URL and passes it to transformThumbnailUrl.
+ * @param {string} originalThumbnailUrl - Original thumbnail URL from YouTube.
+ * @param {Object} additionalOptions - Additional options like 'isShort'.
+ * @returns {string} Optimally sized CDN thumbnail URL.
  */
 export function getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions = {}) {
+    if (!originalThumbnailUrl) return "";
+
+    // Extract video ID from the original URL
+    const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+    const videoId = videoIdMatch && videoIdMatch[1];
+
+    if (!videoId) {
+        console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
+        return originalThumbnailUrl; // Fallback to original if ID extraction fails
+    }
+
     const settings = getOptimalThumbnailSettings();
+    // Combine settings with any additional options (like isShort)
     const options = { ...settings, ...additionalOptions };
-    return transformThumbnailUrl(originalThumbnailUrl, options);
+
+    return transformThumbnailUrl(videoId, options);
 }
