@@ -14,6 +14,7 @@
             <option v-t="'actions.light'" value="light" />
         </select>
     </label>
+
     <h2 v-t="'titles.player'" class="text-center" />
     <label class="pref" for="chkAutoPlayVideo">
         <strong v-t="'actions.autoplay_video'" class="tooltip-hover" :title="$t('tooltips.autoplay_video')" />
@@ -393,7 +394,7 @@ export default {
             minimizeChapters: false,
             showWatchOnYouTube: false,
             searchSuggestions: true,
-            watchHistory: true,
+            watchHistory: false,
             searchHistory: false,
             hideWatched: false,
             enabledCodecs: ["vp9", "avc"],
@@ -478,7 +479,7 @@ export default {
             this.minimizeChapters = this.getPreferenceBoolean("minimizeChapters", false);
             this.showWatchOnYouTube = this.getPreferenceBoolean("showWatchOnYouTube", false);
             this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
-            this.watchHistory = this.getPreferenceBoolean("watchHistory", true);
+            this.watchHistory = this.getPreferenceBoolean("watchHistory", false);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
             // Persian (fa) is the default language, no need to save in local storage
             this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");

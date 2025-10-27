@@ -119,10 +119,25 @@ export default {
             return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
         },
         optimizedThumbnail() {
+            // Only transform video thumbnails, not channel avatars or other images
             if (this.thumbnail) {
-                return getOptimalThumbnailUrl(this.thumbnail, { isShort: this.item.isShort });
+                // Check if this is likely a video thumbnail by checking for common video ID patterns
+                if (this.thumbnail.includes("ytimg.com") || this.thumbnail.includes("youtube.com")) {
+                    // Extract video ID from the URL and use it for the CDN transformation
+                    const videoIdMatch = this.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+                    if (videoIdMatch && videoIdMatch[1]) {
+                        // Use transformThumbnailUrl with the extracted video ID for more reliable processing
+                        // getOptimalThumbnailUrl will automatically determine size based on device characteristics
+                        return getOptimalThumbnailUrl(this.thumbnail);
+                    } else {
+                        // If we can't extract the video ID, use the original URL
+                        return this.thumbnail;
+                    }
+                }
+                // For other images (like channel avatars), return the original URL
+                return this.thumbnail;
             }
-            return ""; // Return empty string if no thumbnail is available
+            return this.thumbnail;
         },
     },
     methods: {

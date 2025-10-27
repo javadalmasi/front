@@ -1,4 +1,4 @@
-export const channelIds = [
+export const channels = [
     "UC4niy1_9h1Q1vOmulX8WYmw",
     "UCDUfBV7CrrBPGLEf0E6u19Q",
     "UCEWpbFLzoYGPfuWUMFPSaoA",

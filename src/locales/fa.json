@@ -208,9 +208,6 @@
         "account": "حساب کاربری",
         "instance": "نمونه",
         "playlists": "فهرست‌های پخش",
-        "shorts": "ویدیوهای کوتاه",
-        "watched_items": "ویدیوهای تماشا شده",
-        "recommended": "پیشنهادی",
         "player": "پخش کننده",
         "bookmarks": "نشان‌دارها",
         "livestreams": "پخش زنده",
@@ -346,12 +343,5 @@
     },
     "subscriptions": {
         "subscribed_channels_count": "مشترک شده: {0}"
-    },
-    "history": {
-        "view_all": "مشاهده همه"
-    },
-    "sort": {
-        "most_viewed": "پربازدیدترین ها",
-        "latest": "جدیدترین ها"
     }
 }

@@ -2,10 +2,22 @@
 
 ## Changelog
 
-*   **Homepage Redesign:**
-    *   Replaced the horizontal carousel layout with a responsive, multi-column grid for "Recommended Videos," "Shorts," and "Watched Items."
-    *   Updated the styling of video items to match a more compact and modern design, improving visual consistency.
-    *   Added Persian translations for the new section headers to ensure full localization.
+*   **New Homepage:**
+    *   The default homepage has been replaced with a dynamic feed of videos from a curated list of channels, displayed in horizontally-scrolling carousels.
+    *   Added sections for "Shorts" and "Watched Items".
+    *   Added sorting tabs for "Most Viewed" and "Latest", with "Latest" as the default.
+    *   The list of channels is now configurable in `src/channels.js`.
+*   **Preferences:**
+    *   Removed the obsolete "Default Homepage" setting.
+    *   Enabled "Store Watch History" by default.
+*   **Localization:**
+    *   Translated new UI elements on the homepage to Persian.
+*   **UI/UX:**
+    *   Styled sorting tabs as rounded buttons.
+    *   Made video items on the homepage draggable for reordering.
+    *   Ensured the logo in the navbar links to the new homepage.
+*   **Technical:**
+    *   Implemented CDN support for video thumbnails.
 
 # Version 1.0.0
 
