@@ -3,13 +3,13 @@
         <div v-if="shorts.length > 0">
             <h2 class="my-4 text-2xl font-bold">Shorts</h2>
             <div class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-                <VideoItem v-for="video in shorts" :key="video.videoId" :video="video" />
+                <VideoItem v-for="video in shorts" :key="video.videoId" :item="video" />
             </div>
         </div>
         <div v-if="videos.length > 0">
             <h2 class="my-4 text-2xl font-bold">Videos</h2>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                <VideoItem v-for="video in videos" :key="video.videoId" :video="video" />
+                <VideoItem v-for="video in videos" :key="video.videoId" :item="video" />
             </div>
         </div>
     </div>
@@ -38,9 +38,10 @@ export default {
             const data = await response.json();
 
             const sortedVideos = data.sort((a, b) => b.viewCount - a.viewCount);
+            const validVideos = sortedVideos.filter(video => video.url);
 
-            this.videos = sortedVideos.filter(video => !video.isShort);
-            this.shorts = sortedVideos.filter(video => video.isShort);
+            this.videos = validVideos.filter(video => !video.isShort);
+            this.shorts = validVideos.filter(video => video.isShort);
         } catch (error) {
             console.error("Error fetching videos:", error);
         }

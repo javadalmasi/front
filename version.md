@@ -1,3 +1,10 @@
+# Version 1.0.2
+
+## Changelog
+
+*   **Bug Fix:**
+    *   Fixed a critical bug that caused the new homepage to crash and display a blank page. The issue was caused by an incorrect prop name being passed to the `VideoItem` component and a lack of data validation.
+
 # Version 1.0.1
 
 ## Changelog
