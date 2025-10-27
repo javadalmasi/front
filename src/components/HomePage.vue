@@ -5,36 +5,28 @@
         <div v-if="!loading && !error">
             <!-- Recommended Videos Section -->
             <div v-if="videos.length > 0" class="carousel-section">
-                <div class="flex items-center justify-between mb-4">
+                <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-xl font-bold">{{ $t("titles.recommended") }}</h2>
                     <div class="flex gap-2">
                         <button
+                            class="rounded-full px-3 py-1 text-sm"
+                            :class="sortBy === 'views' ? 'bg-gray-700 text-white' : 'bg-gray-200 dark:bg-gray-800'"
                             @click="sortBy = 'views'"
-                            class="px-3 py-1 rounded-full text-sm"
-                            :class="
-                                sortBy === 'views'
-                                    ? 'bg-gray-700 text-white'
-                                    : 'bg-gray-200 dark:bg-gray-800'
-                            "
                         >
                             {{ $t("sort.most_viewed") }}
                         </button>
                         <button
+                            class="rounded-full px-3 py-1 text-sm"
+                            :class="sortBy === 'latest' ? 'bg-gray-700 text-white' : 'bg-gray-200 dark:bg-gray-800'"
                             @click="sortBy = 'latest'"
-                            class="px-3 py-1 rounded-full text-sm"
-                            :class="
-                                sortBy === 'latest'
-                                    ? 'bg-gray-700 text-white'
-                                    : 'bg-gray-200 dark:bg-gray-800'
-                            "
                         >
                             {{ $t("sort.latest") }}
                         </button>
                     </div>
                 </div>
                 <div
-                    class="carousel-container recommended-carousel"
                     ref="recommendedCarousel"
+                    class="carousel-container recommended-carousel"
                     @mousedown="onMouseDown"
                     @mouseleave="onMouseLeave"
                     @mouseup="onMouseUp"
@@ -53,10 +45,10 @@
 
             <!-- Shorts Section -->
             <div v-if="shorts.length > 0" class="carousel-section">
-                <h2 class="text-xl font-bold mb-4">{{ $t("titles.shorts") }}</h2>
+                <h2 class="mb-4 text-xl font-bold">{{ $t("titles.shorts") }}</h2>
                 <div
-                    class="carousel-container shorts-carousel"
                     ref="shortsCarousel"
+                    class="carousel-container shorts-carousel"
                     @mousedown="onMouseDown"
                     @mouseleave="onMouseLeave"
                     @mouseup="onMouseUp"
@@ -73,26 +65,21 @@
 
             <!-- Watched Items Section -->
             <div v-if="watchedVideos.length > 0" class="carousel-section">
-                <div class="flex items-center justify-between mb-4">
+                <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-xl font-bold">{{ $t("titles.watched_items") }}</h2>
                     <router-link to="/history" class="text-sm text-blue-500 hover:underline">
                         {{ $t("history.view_all") }}
                     </router-link>
                 </div>
                 <div
-                    class="carousel-container watched-carousel"
                     ref="watchedCarousel"
+                    class="carousel-container watched-carousel"
                     @mousedown="onMouseDown"
                     @mouseleave="onMouseLeave"
                     @mouseup="onMouseUp"
                     @mousemove="onMouseMove"
                 >
-                    <ContentItem
-                        v-for="video in watchedVideos"
-                        :key="video.url"
-                        :item="video"
-                        class="carousel-item"
-                    />
+                    <ContentItem v-for="video in watchedVideos" :key="video.url" :item="video" class="carousel-item" />
                 </div>
             </div>
         </div>
@@ -215,7 +202,7 @@ export default {
     @apply mb-8;
 }
 .carousel-container {
-    @apply flex overflow-x-auto pb-4 cursor-grab;
+    @apply cursor-grab flex overflow-x-auto pb-4;
     -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
     scrollbar-width: none; /* for Firefox */
 }
@@ -226,16 +213,17 @@ export default {
     @apply cursor-grabbing;
 }
 .carousel-item {
-    @apply flex-shrink-0 w-64 mr-4;
+    @apply mr-4 w-64 flex-shrink-0;
 }
 .short-item {
     @apply w-40;
 }
 .recommended-carousel .carousel-grid {
-    @apply grid grid-flow-col auto-cols-max gap-4;
+    @apply grid auto-cols-max grid-flow-col gap-4;
     grid-template-rows: repeat(2, 1fr);
 }
-.loading-indicator, .error-message {
-    @apply text-center text-xl p-8;
+.loading-indicator,
+.error-message {
+    @apply p-8 text-center text-xl;
 }
 </style>

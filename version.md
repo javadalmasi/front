@@ -1,4 +1,4 @@
-# Version 1.0.1
+# Version 1.0.2
 
 ## Changelog
 
@@ -13,6 +13,19 @@
     *   The "Store Watch History" option is now enabled by default for new users.
 *   **Localization:**
     *   Added Persian translations for the new homepage sections and sorting options.
+
+# Version 1.0.1
+
+## Changelog
+
+*   Created a new dynamic homepage that fetches and displays a feed of videos and shorts.
+*   Removed the option to set a default homepage from the preferences.
+
+# Version 1.0.0
+
+## Changelog
+
+*   Fixed uneven spacing between menu items in the semi-open sidebar.
 
 ## Git Version
 
