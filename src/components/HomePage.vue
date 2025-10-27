@@ -5,8 +5,8 @@
         <div v-if="!loading && !error">
             <!-- Recommended Videos Section -->
             <div v-if="videos.length > 0" class="carousel-section">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-xl font-bold">{{ $t("titles.recommended") }}</h2>
+                <div class="mb-2 flex items-center justify-between">
+                    <h2 class="text-base font-bold">{{ $t("titles.recommended") }}</h2>
                     <div class="flex gap-2">
                         <button
                             class="rounded-full px-3 py-1 text-sm"
@@ -24,14 +24,7 @@
                         </button>
                     </div>
                 </div>
-                <div
-                    ref="recommendedCarousel"
-                    class="carousel-container recommended-carousel"
-                    @mousedown="onMouseDown"
-                    @mouseleave="onMouseLeave"
-                    @mouseup="onMouseUp"
-                    @mousemove="onMouseMove"
-                >
+                <div class="carousel-container recommended-carousel">
                     <div class="carousel-grid">
                         <ContentItem
                             v-for="video in sortedVideos"
@@ -45,15 +38,8 @@
 
             <!-- Shorts Section -->
             <div v-if="shorts.length > 0" class="carousel-section">
-                <h2 class="mb-4 text-xl font-bold">{{ $t("titles.shorts") }}</h2>
-                <div
-                    ref="shortsCarousel"
-                    class="carousel-container shorts-carousel"
-                    @mousedown="onMouseDown"
-                    @mouseleave="onMouseLeave"
-                    @mouseup="onMouseUp"
-                    @mousemove="onMouseMove"
-                >
+                <h2 class="mb-2 text-base font-bold">{{ $t("titles.shorts") }}</h2>
+                <div class="carousel-container shorts-carousel">
                     <ContentItem
                         v-for="short in shorts"
                         :key="short.url"
@@ -65,20 +51,13 @@
 
             <!-- Watched Items Section -->
             <div v-if="watchedVideos.length > 0" class="carousel-section">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-xl font-bold">{{ $t("titles.watched_items") }}</h2>
+                <div class="mb-2 flex items-center justify-between">
+                    <h2 class="text-base font-bold">{{ $t("titles.watched_items") }}</h2>
                     <router-link to="/history" class="text-sm text-blue-500 hover:underline">
                         {{ $t("history.view_all") }}
                     </router-link>
                 </div>
-                <div
-                    ref="watchedCarousel"
-                    class="carousel-container watched-carousel"
-                    @mousedown="onMouseDown"
-                    @mouseleave="onMouseLeave"
-                    @mouseup="onMouseUp"
-                    @mousemove="onMouseMove"
-                >
+                <div class="carousel-container watched-carousel">
                     <ContentItem v-for="video in watchedVideos" :key="video.url" :item="video" class="carousel-item" />
                 </div>
             </div>
@@ -102,10 +81,6 @@ export default {
             loading: true,
             error: null,
             sortBy: "latest",
-            isDown: false,
-            startX: null,
-            scrollLeft: null,
-            activeCarousel: null,
         };
     },
     computed: {
@@ -161,35 +136,6 @@ export default {
                 };
             }
         },
-        onMouseDown(e) {
-            this.activeCarousel = e.currentTarget;
-            this.isDown = true;
-            this.activeCarousel.classList.add("active");
-            this.startX = e.pageX - this.activeCarousel.offsetLeft;
-            this.scrollLeft = this.activeCarousel.scrollLeft;
-        },
-        onMouseLeave() {
-            if (!this.isDown) return;
-            this.isDown = false;
-            if (this.activeCarousel) {
-                this.activeCarousel.classList.remove("active");
-                this.activeCarousel = null;
-            }
-        },
-        onMouseUp() {
-            this.isDown = false;
-            if (this.activeCarousel) {
-                this.activeCarousel.classList.remove("active");
-                this.activeCarousel = null;
-            }
-        },
-        onMouseMove(e) {
-            if (!this.isDown || !this.activeCarousel) return;
-            e.preventDefault();
-            const x = e.pageX - this.activeCarousel.offsetLeft;
-            const walk = (x - this.startX) * 2; //scroll-fast
-            this.activeCarousel.scrollLeft = this.scrollLeft - walk;
-        },
     },
 };
 </script>
@@ -199,27 +145,41 @@ export default {
     @apply p-4;
 }
 .carousel-section {
-    @apply mb-8;
+    @apply mb-4;
 }
 .carousel-container {
-    @apply cursor-grab flex overflow-x-auto pb-4;
-    -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
-    scrollbar-width: none; /* for Firefox */
+    @apply flex overflow-x-auto pb-4;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 }
 .carousel-container::-webkit-scrollbar {
-    display: none; /* for Chrome, Safari, and Opera */
+    height: 8px;
 }
-.carousel-container.active {
-    @apply cursor-grabbing;
+.carousel-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.carousel-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.carousel-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 .carousel-item {
-    @apply mr-4 w-64 flex-shrink-0;
+    @apply mr-1 w-64 flex-shrink-0;
 }
 .short-item {
     @apply w-40;
+    aspect-ratio: 9 / 16;
+}
+/* Ensure the image within a short item is contained */
+.short-item :deep(img) {
+    @apply h-full w-full object-contain;
 }
 .recommended-carousel .carousel-grid {
-    @apply grid auto-cols-max grid-flow-col gap-4;
+    @apply grid auto-cols-max grid-flow-col gap-1;
     grid-template-rows: repeat(2, 1fr);
 }
 .loading-indicator,
