@@ -17,9 +17,9 @@
         :style="{ height: isMobile ? '100vh' : 'calc(100vh - 4rem)', direction: 'rtl' }"
     >
         <!-- Scrollable content area -->
-        <div class="h-full overflow-y-auto">
+        <div class="h-full overflow-y-auto pt-2">
             <!-- Public items section -->
-            <div class="mt-4">
+            <div>
                 <div
                     v-if="sidebarState === 'open'"
                     class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
@@ -30,7 +30,7 @@
                     v-for="item in filteredPublicItems"
                     v-show="!item.requiresAuth || authenticated"
                     :key="item.name"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -43,7 +43,7 @@
             </div>
 
             <!-- Categories section -->
-            <div v-if="sidebarState !== 'semi-open'" class="mt-4">
+            <div v-if="sidebarState !== 'semi-open'" class="">
                 <div
                     v-if="sidebarState === 'open'"
                     class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
@@ -53,7 +53,7 @@
                 <div
                     v-for="category in visibleCategories"
                     :key="category.name"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="searchCategory(category.name)"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -67,7 +67,7 @@
                 <!-- Show more button -->
                 <div
                     v-if="categories.length > 5 && sidebarState === 'open'"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="toggleShowMoreCategories"
                 >
                     <div
@@ -81,7 +81,7 @@
             </div>
 
             <!-- Theme toggle section -->
-            <div class="mt-4">
+            <div>
                 <div
                     v-if="sidebarState === 'open'"
                     class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
@@ -89,7 +89,7 @@
                     حالت پوسته
                 </div>
                 <div
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     data-testid="theme-toggle"
                     @click="emitToggleTheme"
                 >
@@ -103,7 +103,7 @@
             </div>
 
             <!-- Auth section -->
-            <div class="mt-4">
+            <div>
                 <div
                     v-if="!authenticated && sidebarState === 'open'"
                     class="px-4 py-2 text-sm text-gray-500 leading-[1.65]"
@@ -112,7 +112,7 @@
                 </div>
                 <div
                     v-if="!authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo('/auth')"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -122,7 +122,7 @@
                 </div>
                 <div
                     v-if="authenticated"
-                    class="mx-2 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="logout"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
