@@ -96,7 +96,7 @@ export default {
         return {
             searchText: this.$route.query?.search_query ?? "",
             suggestionsVisible: false,
-            homePagePath: import.meta.env.BASE_URL,
+            homePagePath: "/",
             registrationDisabled: false,
             showSearchBox: false,
             availableFilters: [
@@ -160,7 +160,6 @@ export default {
         this.fetchAuthConfig();
         this.updateSearchTextFromURLSearchParams();
         this.focusOnSearchBar();
-        this.homePagePath = this.getHomePage(this);
 
         // Add click event listener to detect clicks outside the search area
         document.addEventListener("click", this.handleOutsideClick);

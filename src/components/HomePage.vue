@@ -1,15 +1,27 @@
 <template>
     <div>
         <div class="flex gap-4 mb-4">
-            <button @click="sortBy = 'views'" :class="{ 'font-bold': sortBy === 'views' }">Most Viewed</button>
-            <button @click="sortBy = 'latest'" :class="{ 'font-bold': sortBy === 'latest' }">Latest</button>
+            <button
+                @click="sortBy = 'views'"
+                class="px-4 py-2 rounded-md"
+                :class="sortBy === 'views' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-gray-200 dark:bg-gray-800'"
+            >
+                پربازدیدترین ها
+            </button>
+            <button
+                @click="sortBy = 'latest'"
+                class="px-4 py-2 rounded-md"
+                :class="sortBy === 'latest' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-gray-200 dark:bg-gray-800'"
+            >
+                جدیدترین ها
+            </button>
         </div>
         <div v-if="loading">Loading...</div>
         <div v-if="error">{{ error }}</div>
         <div v-if="!loading && !error">
             <!-- Shorts Section -->
             <div v-if="shorts.length > 0" class="shorts-container">
-                <h2>Shorts</h2>
+                <h2>{{ $t("titles.shorts") }}</h2>
                 <div class="shorts-grid">
                     <ContentItem v-for="short in shorts" :key="short.url" :item="short" class="short-item" />
                 </div>
@@ -34,7 +46,7 @@
 
             <!-- Watched Items Section -->
             <div v-if="watchedVideos.length > 0" class="watched-container">
-                <h2>Watched Items</h2>
+                <h2>{{ $t("titles.watched_items") }}</h2>
                 <div class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2">
                     <ContentItem v-for="video in watchedVideos" :key="video.url" :item="video" />
                 </div>
@@ -58,7 +70,7 @@ export default {
             watchedVideos: [],
             loading: true,
             error: null,
-            sortBy: "views", // Default sort
+            sortBy: "latest", // Default sort
             draggedIndex: null,
         };
     },
