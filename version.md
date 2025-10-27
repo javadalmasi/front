@@ -1,9 +1,10 @@
-# Version 1.0.0
+# Version 1.0.1
 
 ## Changelog
 
-*   Fixed uneven spacing between menu items in the semi-open sidebar.
+*   Created a new dynamic homepage that fetches and displays a feed of videos and shorts.
+*   Removed the option to set a default homepage from the preferences.
 
 ## Git Version
 
-*   **Commit SHA:** `9dde192cf4bdc9953f5df989a27948d47e95d79a`
+*   **Commit SHA:** `(will be updated after commit)`

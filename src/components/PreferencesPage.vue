@@ -14,14 +14,6 @@
             <option v-t="'actions.light'" value="light" />
         </select>
     </label>
-    <label class="pref" for="ddlDefaultHomepage">
-        <strong v-t="'actions.default_homepage'" class="tooltip-hover" :title="$t('tooltips.default_homepage')" />
-        <select id="ddlDefaultHomepage" v-model="defaultHomepage" class="select w-auto" @change="onChange($event)">
-            <option v-t="'titles.trending'" value="trending" />
-            <option v-t="'titles.feed'" value="feed" />
-        </select>
-    </label>
-
     <h2 v-t="'titles.player'" class="text-center" />
     <label class="pref" for="chkAutoPlayVideo">
         <strong v-t="'actions.autoplay_video'" class="tooltip-hover" :title="$t('tooltips.autoplay_video')" />
@@ -395,7 +387,6 @@ export default {
             preferHls: false,
             defaultQuality: 0,
             bufferingGoal: import.meta.env.VITE_BUFFERING_GOAL || 10,
-            defaultHomepage: "trending",
             minimizeComments: false,
             minimizeDescription: true,
             minimizeRecommendations: false,
@@ -481,7 +472,6 @@ export default {
                 Number(localStorage.getItem("bufferGoal")),
                 import.meta.env.VITE_BUFFERING_GOAL || 10,
             );
-            this.defaultHomepage = this.getPreferenceString("homepage", "trending");
             this.minimizeComments = this.getPreferenceBoolean("minimizeComments", false);
             this.minimizeDescription = this.getPreferenceBoolean("minimizeDescription", true);
             this.minimizeRecommendations = this.getPreferenceBoolean("minimizeRecommendations", false);
@@ -536,7 +526,6 @@ export default {
                 localStorage.setItem("preferHls", this.preferHls);
                 localStorage.setItem("quality", this.defaultQuality);
                 localStorage.setItem("bufferGoal", this.bufferingGoal);
-                localStorage.setItem("homepage", this.defaultHomepage);
                 localStorage.setItem("minimizeComments", this.minimizeComments);
                 localStorage.setItem("minimizeDescription", this.minimizeDescription);
                 localStorage.setItem("minimizeRecommendations", this.minimizeRecommendations);

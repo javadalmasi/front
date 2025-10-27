@@ -4,7 +4,7 @@ const routes = [
     {
         path: "/",
         name: "Home",
-        component: () => import("../components/TrendingPage.vue"),
+        component: () => import("../components/HomePage.vue"),
     },
     {
         path: "/trending",

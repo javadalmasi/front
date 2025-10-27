@@ -1,0 +1,15 @@
+export const channelIds = [
+    "UC4niy1_9h1Q1vOmulX8WYmw",
+    "UCDUfBV7CrrBPGLEf0E6u19Q",
+    "UCEWpbFLzoYGPfuWUMFPSaoA",
+    "UCEdjL1kbZ0K8nFu519vE5LQ",
+    "UCHy8QSSJ1gXu-zbDlwwsE-w",
+    "UCNe_VAP5oEszkg-QCxowatg",
+    "UCON2DS646g1rw4g5NsgR5pA",
+    "UCXwQnL9H3B9fhX_G_DDz6Xw",
+    "UCgKePkWtPuF36bJy0n2cEMQ",
+    "UChWB95_-n9rUc3H9srsn9bQ",
+    "UCkQHRufVtt7tchYqo5_mwww",
+    "UCmRNXk6hpY7T8ct9gNIyMhQ",
+    "UCrn9HkH3trWYpxzlW9l8eSg",
+];
