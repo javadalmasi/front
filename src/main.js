@@ -173,7 +173,7 @@ const mixin = {
         },
         authApiUrl() {
             // Use dedicated IronVein-Users API for authentication if available, fallback to main API
-            return import.meta.env.VITE_IRONVEIN_USERS_API || import.meta.env.VITE_PIPED_API;
+            return "";
         },
         getAuthToken() {
             // Try to get the token from the new user API first, fallback to old API
