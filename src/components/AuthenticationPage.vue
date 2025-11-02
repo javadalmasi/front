@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import { checkPasswordStrength } from "@/utils/Misc.js";
+import { checkPasswordStrength, isEmail } from "@/utils/Misc.js";
 
 export default {
     components: {},
@@ -256,6 +256,11 @@ export default {
             );
         },
     },
+    watch: {
+        registerPassword() {
+            this.checkPasswordStrength();
+        },
+    },
     mounted() {
         //TODO: Add Server Side check
         if (this.getAuthToken()) {
@@ -279,7 +284,7 @@ export default {
             if (!this.loginUsername || !this.loginPassword) return;
 
             // Check if username is an email or phone number
-            const isEmailValue = this.isEmail(this.loginUsername);
+            const isEmailValue = isEmail(this.loginUsername);
             const loginData = isEmailValue
                 ? {
                       email: this.loginUsername,
@@ -367,14 +372,6 @@ export default {
             this.passwordStrengthText = result.text;
             this.passwordStrengthClass = result.barClass;
             this.passwordStrengthTextClass = result.textClass;
-        },
-        isEmail(input) {
-            // Taken from https://emailregex.com
-            const result = input.match(
-                //eslint-disable-next-line
-                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            );
-            return result !== null;
         },
     },
 };
