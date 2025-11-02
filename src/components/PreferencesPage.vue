@@ -573,6 +573,7 @@ export default {
             this.fetchJson(this.authApiUrl() + "/logout", null, {
                 method: "POST",
                 headers: {
+                    "Content-Type": "application/json",
                     Authorization: this.getAuthToken(),
                 },
             }).then(resp => {

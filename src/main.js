@@ -62,7 +62,21 @@ const mixin = {
                 url = new URL(url);
                 for (var param in params) url.searchParams.set(param, params[param]);
             }
-            return fetch(url, options).then(response => {
+
+            // Ensure we're properly handling the options parameter
+            const fetchOptions = options || {};
+
+            // Set default headers if not provided
+            if (!fetchOptions.headers) {
+                fetchOptions.headers = {};
+            }
+
+            // Set Content-Type to application/json if we have a body and no Content-Type is set
+            if (fetchOptions.body && !fetchOptions.headers["Content-Type"]) {
+                fetchOptions.headers["Content-Type"] = "application/json";
+            }
+
+            return fetch(url, fetchOptions).then(response => {
                 // Check if response status is 500 or greater (server error)
                 if (!response.ok) {
                     // Try to parse the JSON response to get the error message
@@ -148,18 +162,18 @@ const mixin = {
                 return JSON.parse(value);
             } else return defaultVal;
         },
+        userApiUrl() {
+            // Use the new IronVein-Users API
+            return import.meta.env.VITE_IRONVEIN_USERS_API || this.authApiUrl();
+        },
+
         apiUrl() {
             // Fixed to always use the custom instance
             return import.meta.env.VITE_PIPED_API;
         },
         authApiUrl() {
-            // Use dedicated user API for authentication if available, fallback to main API
-            return import.meta.env.VITE_USER_API || import.meta.env.VITE_PIPED_API;
-        },
-
-        userApiUrl() {
-            // Use the new Rust user management API
-            return import.meta.env.VITE_USERS_API || this.authApiUrl();
+            // Use dedicated IronVein-Users API for authentication if available, fallback to main API
+            return import.meta.env.VITE_IRONVEIN_USERS_API || import.meta.env.VITE_PIPED_API;
         },
         getAuthToken() {
             // Try to get the token from the new user API first, fallback to old API
@@ -223,7 +237,7 @@ const mixin = {
         },
         async fetchSubscriptions() {
             if (this.authenticated) {
-                return await this.fetchJson(this.userApiUrl() + "/subscriptions", null, {
+                return await this.fetchJson(this.userApiUrl() + "/api/user/subscriptions", null, {
                     headers: {
                         Authorization: "Bearer " + this.getAuthToken(),
                     },
@@ -234,6 +248,9 @@ const mixin = {
                 if (split.length > 100) {
                     return await this.fetchJson(this.authApiUrl() + "/subscriptions/unauthenticated", null, {
                         method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                         body: JSON.stringify(split),
                     });
                 } else {
@@ -256,6 +273,9 @@ const mixin = {
                 if (split.length > 100) {
                     return await this.fetchJson(this.authApiUrl() + "/feed/unauthenticated", null, {
                         method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                         body: JSON.stringify(split),
                     });
                 } else {
@@ -381,7 +401,7 @@ const mixin = {
                 });
             }
 
-            return await this.fetchJson(this.userApiUrl() + "/playlists", null, {
+            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
@@ -414,7 +434,7 @@ const mixin = {
                 return { playlistId: playlistId };
             }
 
-            return await this.fetchJson(this.userApiUrl() + "/playlists", null, {
+            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
                 method: "POST",
                 body: JSON.stringify({
                     name: name,
@@ -447,9 +467,10 @@ const mixin = {
             }
 
             // Make a direct fetch call for DELETE since our fetchJson method may not support it properly
-            const response = await fetch(this.userApiUrl() + "/playlists/" + playlistId, {
+            const response = await fetch(this.userApiUrl() + "/api/user/playlists/" + playlistId, {
                 method: "DELETE",
                 headers: {
+                    "Content-Type": "application/json",
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
             });
@@ -470,7 +491,7 @@ const mixin = {
                 return { message: "ok" };
             }
 
-            return await this.fetchJson(this.userApiUrl() + "/playlists/" + playlistId, null, {
+            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
                 method: "POST", // For now, using POST since we don't have a PUT endpoint
                 body: JSON.stringify({
                     name: newName,
@@ -489,7 +510,7 @@ const mixin = {
                 return { message: "ok" };
             }
 
-            return await this.fetchJson(this.userApiUrl() + "/playlists/" + playlistId, null, {
+            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
                 method: "POST", // For now, using POST since we don't have a PATCH endpoint
                 body: JSON.stringify({
                     description: newDescription,
@@ -521,16 +542,20 @@ const mixin = {
             // Add videos one by one since our API expects single video additions
             const results = [];
             for (const videoId of videoIds) {
-                const result = await this.fetchJson(this.userApiUrl() + "/playlists/" + playlistId + "/add", null, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        video_id: videoId,
-                    }),
-                    headers: {
-                        Authorization: "Bearer " + this.getAuthToken(),
-                        "Content-Type": "application/json",
+                const result = await this.fetchJson(
+                    this.userApiUrl() + "/api/user/playlists/" + playlistId + "/add",
+                    null,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            video_id: videoId,
+                        }),
+                        headers: {
+                            Authorization: "Bearer " + this.getAuthToken(),
+                            "Content-Type": "application/json",
+                        },
                     },
-                });
+                );
                 results.push(result);
             }
 
@@ -617,7 +642,7 @@ const mixin = {
                 return this.isSubscribedLocally(channelId);
             }
 
-            const response = await this.fetchJson(this.userApiUrl() + "/subscriptions", null, {
+            const response = await this.fetchJson(this.userApiUrl() + "/api/user/subscriptions", null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
@@ -629,19 +654,113 @@ const mixin = {
 
             return false;
         },
+
+        // API method to get admin user list
+        async fetchAdminUsers(page = 1, limit = 10, search = null) {
+            if (!this.authenticated) {
+                throw new Error("User is not authenticated");
+            }
+
+            let url = `${this.userApiUrl()}/admin/users`;
+            const params = new URLSearchParams({
+                page: page.toString(),
+                limit: limit.toString(),
+            });
+            if (search) {
+                params.append("search", search);
+            }
+            const fullUrl = `${url}?${params.toString()}`;
+
+            return await this.fetchJson(fullUrl, null, {
+                headers: {
+                    Authorization: "Bearer " + this.getAuthToken(),
+                },
+            });
+        },
+
+        // API method to get a specific user (admin)
+        async fetchAdminUser(userId) {
+            if (!this.authenticated) {
+                throw new Error("User is not authenticated");
+            }
+
+            return await this.fetchJson(`${this.userApiUrl()}/admin/users/${userId}`, null, {
+                headers: {
+                    Authorization: "Bearer " + this.getAuthToken(),
+                },
+            });
+        },
+
+        // API method to update a user (admin)
+        async updateAdminUser(userId, userData) {
+            if (!this.authenticated) {
+                throw new Error("User is not authenticated");
+            }
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users/${userId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.getAuthToken()}`,
+                },
+                body: JSON.stringify(userData),
+            });
+
+            return await response.json();
+        },
+
+        // API method to delete a user (admin)
+        async deleteAdminUser(userId) {
+            if (!this.authenticated) {
+                throw new Error("User is not authenticated");
+            }
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.getAuthToken()}`,
+                },
+            });
+
+            return await response.json();
+        },
+
+        // API method to create a new user (admin)
+        async createAdminUser(userData) {
+            if (!this.authenticated) {
+                throw new Error("User is not authenticated");
+            }
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.getAuthToken()}`,
+                },
+                body: JSON.stringify(userData),
+            });
+
+            return await response.json();
+        },
         async toggleSubscriptionState(channelId, subscribed) {
             if (!this.authenticated) return this.handleLocalSubscriptions(channelId);
 
-            const resp = await this.fetchJson(this.userApiUrl() + (subscribed ? "/unsubscribe" : "/subscribe"), null, {
-                method: "POST",
-                body: JSON.stringify({
-                    channel_id: channelId,
-                }),
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                    "Content-Type": "application/json",
+            const resp = await this.fetchJson(
+                this.userApiUrl() +
+                    (subscribed ? "/api/user/subscriptions/unsubscribe" : "/api/user/subscriptions/subscribe"),
+                null,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        channel_id: channelId,
+                    }),
+                    headers: {
+                        Authorization: "Bearer " + this.getAuthToken(),
+                        "Content-Type": "application/json",
+                    },
                 },
-            });
+            );
 
             return resp.success;
         },

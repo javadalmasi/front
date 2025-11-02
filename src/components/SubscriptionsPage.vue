@@ -187,16 +187,23 @@ export default {
         handleButton(subscription) {
             const channelId = subscription.url.split("/")[2];
             if (this.authenticated) {
-                this.fetchJson(this.authApiUrl() + (subscription.subscribed ? "/unsubscribe" : "/subscribe"), null, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        channelId: channelId,
-                    }),
-                    headers: {
-                        Authorization: this.getAuthToken(),
-                        "Content-Type": "application/json",
+                this.fetchJson(
+                    this.userApiUrl() +
+                        (subscription.subscribed
+                            ? "/api/user/subscriptions/unsubscribe"
+                            : "/api/user/subscriptions/subscribe"),
+                    null,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            channel_id: channelId,
+                        }),
+                        headers: {
+                            Authorization: "Bearer " + this.getAuthToken(),
+                            "Content-Type": "application/json",
+                        },
                     },
-                });
+                );
             } else {
                 this.handleLocalSubscriptions(channelId);
             }

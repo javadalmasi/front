@@ -60,9 +60,15 @@
                     <div class="flex-grow border-t border-gray-300 dark:border-dark-400"></div>
                 </div>
 
-                <div class="text-center">
-                    <router-link to="/register" class="text-blue-600 font-medium hover:text-blue-800">
+                <div class="flex flex-col gap-2">
+                    <router-link to="/register" class="text-center text-blue-600 font-medium hover:text-blue-800">
                         ایجاد حساب جدید
+                    </router-link>
+                    <router-link
+                        to="/forgot-password"
+                        class="text-center text-blue-600 font-medium hover:text-blue-800"
+                    >
+                        رمز عبور خود را فراموش کرده‌اید؟
                     </router-link>
                 </div>
             </div>
@@ -92,8 +98,7 @@ export default {
             this.$router.push(import.meta.env.BASE_URL);
         }
 
-        // Load Cloudflare Turnstile widget
-        this.loadTurnstile();
+        // Removed Turnstile widget loading as per requirement
     },
     activated() {
         document.title = this.$t("titles.login") + " - " + this.getSiteName();
@@ -107,16 +112,20 @@ export default {
                 ? {
                       email: this.username,
                       password: this.password,
-                      captcha_token: this.captchaToken,
                   }
                 : {
                       phone: this.username,
                       password: this.password,
-                      captcha_token: this.captchaToken,
                   };
 
-            this.fetchJson(this.userApiUrl() + "/login", null, {
+            // Remove captcha_token if it's null or empty (for development)
+            // Removed as per requirement to disable Turnstile
+
+            this.fetchJson(this.authApiUrl() + "/api/auth/login", null, {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(loginData),
             })
                 .then(resp => {

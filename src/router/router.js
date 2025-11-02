@@ -102,6 +102,60 @@ const routes = [
         name: "Page Not Found",
         component: () => import("../components/PageNotFound.vue"),
     },
+    // Password Reset routes
+    {
+        path: "/forgot-password",
+        name: "ForgotPassword",
+        component: () => import("../components/ForgotPasswordPage.vue"),
+    },
+    {
+        path: "/reset-password",
+        name: "ResetPassword",
+        component: () => import("../components/PasswordResetPage.vue"),
+    },
+    {
+        path: "/profile",
+        name: "Profile",
+        component: () => import("../components/ProfilePage.vue"),
+        meta: { requiresAuth: true },
+    },
+    // Admin routes
+    {
+        path: "/admin",
+        name: "AdminDashboard",
+        component: () => import("../components/AdminDashboard.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: "/admin/users",
+        name: "AdminUserManagement",
+        component: () => import("../components/AdminUserManagement.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: "/admin/email-settings",
+        name: "AdminEmailSettings",
+        component: () => import("../components/AdminEmailSettings.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: "/admin/sms-settings",
+        name: "AdminSmsSettings",
+        component: () => import("../components/AdminSmsSettings.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: "/admin/account-deletion",
+        name: "AdminAccountDeletion",
+        component: () => import("../components/AdminAccountDeletion.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+        path: "/admin/backups",
+        name: "AdminBackupManagement",
+        component: () => import("../components/AdminBackupManagement.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true },
+    },
 ];
 
 const router = createRouter({
@@ -110,6 +164,53 @@ const router = createRouter({
     scrollBehavior: function (_to, _from, savedPosition) {
         return savedPosition ? savedPosition : window.scrollTo(0, 0);
     },
+});
+
+// Navigation guard to protect routes
+router.beforeEach(async (to, from, next) => {
+    // Check if the route requires authentication
+    if (to.meta.requiresAuth) {
+        // Check if user is authenticated
+        const mixin = window.appMixin.methods;
+        const token = mixin.getAuthToken();
+
+        if (!token) {
+            // Redirect to login if not authenticated
+            next("/auth");
+            return;
+        }
+
+        // If the route also requires admin access, check the user's role
+        if (to.meta.requiresAdmin) {
+            try {
+                // Get the current user profile to verify admin status
+                const response = await mixin.fetchJson(mixin.userApiUrl() + "/user/profile", null, {
+                    headers: {
+                        Authorization: "Bearer " + token,
+                    },
+                });
+
+                if (response.success && response.data) {
+                    // Check if the user has admin role
+                    if (response.data.role !== "admin") {
+                        // Redirect to home if not admin
+                        next("/");
+                        return;
+                    }
+                } else {
+                    // If API call fails, redirect to login
+                    next("/auth");
+                    return;
+                }
+            } catch (error) {
+                console.error("Error checking admin access:", error);
+                next("/auth");
+                return;
+            }
+        }
+    }
+
+    next();
 });
 
 export default router;

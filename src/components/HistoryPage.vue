@@ -81,7 +81,7 @@ export default {
             try {
                 // If user is authenticated, fetch history from server
                 if (this.authenticated) {
-                    const response = await this.fetchJson(this.userApiUrl() + "/history", null, {
+                    const response = await this.fetchJson(this.userApiUrl() + "/api/user/history", null, {
                         headers: {
                             Authorization: "Bearer " + this.getAuthToken(),
                         },

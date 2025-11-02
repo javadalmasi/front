@@ -82,7 +82,7 @@
                         </button>
                     </div>
 
-                    <div class="text-center">
+                    <div class="flex flex-col gap-2">
                         <button
                             type="button"
                             class="text-blue-600 font-medium hover:text-blue-800"
@@ -90,6 +90,12 @@
                         >
                             حساب کاربری ندارید؟ ثبت نام کنید
                         </button>
+                        <router-link
+                            to="/forgot-password"
+                            class="text-center text-blue-600 font-medium hover:text-blue-800"
+                        >
+                            رمز عبور خود را فراموش کرده‌اید؟
+                        </router-link>
                     </div>
                 </form>
 
@@ -238,14 +244,21 @@ export default {
     },
     computed: {
         isRegisterFormValid() {
+            // In development, we might not have CAPTCHA set up properly
+            // For production, you should keep the captchaToken requirement
+            const isDevelopment = import.meta.env.MODE === "development" || !import.meta.env.PROD;
+
+            // For development, we'll allow weaker passwords
+            const minPasswordStrength = isDevelopment ? 40 : 75;
+
             return (
                 this.firstName &&
                 this.lastName &&
                 this.registerUsername &&
                 this.registerPassword &&
                 this.registerPassword === this.passwordConfirm &&
-                this.passwordStrength >= 75 && // Require strong password
-                this.captchaToken
+                this.passwordStrength >= minPasswordStrength && // Lower requirement in development
+                (isDevelopment || this.captchaToken) // Only require CAPTCHA in production
             );
         },
     },
@@ -288,8 +301,11 @@ export default {
                       captcha_token: this.captchaToken,
                   };
 
-            this.fetchJson(this.userApiUrl() + "/login", null, {
+            this.fetchJson(this.authApiUrl() + "/api/auth/login", null, {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(loginData),
             })
                 .then(resp => {
@@ -331,8 +347,11 @@ export default {
                       captcha_token: this.captchaToken,
                   };
 
-            this.fetchJson(this.userApiUrl() + "/register", null, {
+            this.fetchJson(this.authApiUrl() + "/api/auth/register", null, {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(registrationData),
             })
                 .then(resp => {

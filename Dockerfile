@@ -1,26 +1,39 @@
-FROM node:lts-alpine AS build
+# Use Node.js 22-alpine as base image for building
+FROM node:22-alpine AS builder
 
-WORKDIR /app/
+# Install pnpm globally
+RUN npm install -g pnpm
 
-RUN --mount=type=cache,target=/var/cache/apk \
-    apk add --no-cache \
-    curl
+# Set working directory
+WORKDIR /app
 
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code
 COPY . .
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Build the app
+RUN pnpm build
 
-RUN --mount=type=cache,target=/root/.local/share/pnpm \
-    --mount=type=cache,target=/app/node_modules \
-    pnpm install --prefer-offline && \
-    pnpm build && ./localizefonts.sh
+# Use nginx as runtime
+FROM nginx:alpine
 
-FROM nginxinc/nginx-unprivileged:alpine
+# Copy built files to nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-COPY --chown=101:101 --from=build /app/dist/ /usr/share/nginx/html/
+# Copy nginx configuration
+COPY --from=builder /app/docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --chown=101:101 docker/nginx.conf /etc/nginx/conf.d/default.conf
+# Copy entrypoint script
+COPY --from=builder /app/docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-COPY docker/entrypoint.sh /entrypoint.sh
+# Expose port 80
+EXPOSE 80
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+# Use custom entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

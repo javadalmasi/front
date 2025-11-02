@@ -123,6 +123,16 @@
                 <div
                     v-if="authenticated"
                     class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
+                    @click="navigateTo('/profile')"
+                >
+                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
+                        <div class="i-fa6-solid:user" />
+                    </div>
+                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">پروفایل کاربری</span>
+                </div>
+                <div
+                    v-if="authenticated"
+                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="logout"
                 >
                     <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
@@ -285,8 +295,12 @@ export default {
             return localStorage.getItem(key) || undefined;
         },
         authApiUrl() {
-            // Use dedicated user API for authentication if available, fallback to main API
-            return import.meta.env.VITE_USER_API || import.meta.env.VITE_PIPED_API || "https://pipedapi.kavin.rocks";
+            // Use dedicated IronVein-Users API for authentication if available, fallback to main API
+            return (
+                import.meta.env.VITE_IRONVEIN_USERS_API ||
+                import.meta.env.VITE_PIPED_API ||
+                "https://pipedapi.kavin.rocks"
+            );
         },
         hashCode(s) {
             return s.split("").reduce((a, b) => {

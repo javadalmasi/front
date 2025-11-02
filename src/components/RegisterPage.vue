@@ -185,10 +185,35 @@ export default {
                       captcha_token: this.captchaToken,
                   };
 
-            this.fetchJson(this.userApiUrl() + "/register", null, {
+            // Remove captcha_token if it's null or empty (for development)
+            if (!registrationData.captcha_token) {
+                delete registrationData.captcha_token;
+            }
+
+            fetch(this.authApiUrl() + "/api/auth/register", {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify(registrationData),
             })
+                .then(response => {
+                    if (!response.ok) {
+                        return response
+                            .json()
+                            .then(json => {
+                                if (json.message) {
+                                    alert(json.message);
+                                } else {
+                                    alert(json.error || "Registration failed");
+                                }
+                            })
+                            .catch(() => {
+                                alert(response.statusText || `HTTP ${response.status} Error`);
+                            });
+                    }
+                    return response.json();
+                })
                 .then(resp => {
                     if (resp.success && resp.data && resp.data.token) {
                         this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
@@ -209,7 +234,7 @@ export default {
             // Taken from https://emailregex.com
             const result = input.match(
                 //eslint-disable-next-line
-                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             );
             return result !== null;
         },

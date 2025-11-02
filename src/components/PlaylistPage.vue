@@ -188,6 +188,7 @@ export default {
             this.fetchJson(this.authApiUrl() + "/import/playlist", null, {
                 method: "POST",
                 headers: {
+                    "Content-Type": "application/json",
                     Authorization: this.getAuthToken(),
                 },
                 body: JSON.stringify({
