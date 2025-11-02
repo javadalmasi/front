@@ -69,9 +69,6 @@
                         </button>
                     </div>
 
-                    <!-- Cloudflare Turnstile Widget -->
-                    <div id="login-turnstile-widget" class="mb-4"></div>
-
                     <div class="mb-4">
                         <button
                             type="button"
@@ -182,9 +179,6 @@
                         <div class="mt-1 text-sm" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</div>
                     </div>
 
-                    <!-- Cloudflare Turnstile Widget -->
-                    <div id="register-turnstile-widget" class="mb-4"></div>
-
                     <div class="mb-4">
                         <button
                             type="button"
@@ -218,6 +212,8 @@
 </template>
 
 <script>
+import { checkPasswordStrength } from "@/utils/Misc.js";
+
 export default {
     components: {},
     data() {
@@ -239,7 +235,6 @@ export default {
             passwordStrengthTextClass: "",
             showUnsecureRegisterDialog: false,
             forceUnsecureRegister: false,
-            captchaToken: null,
         };
     },
     computed: {
@@ -257,8 +252,7 @@ export default {
                 this.registerUsername &&
                 this.registerPassword &&
                 this.registerPassword === this.passwordConfirm &&
-                this.passwordStrength >= minPasswordStrength && // Lower requirement in development
-                (isDevelopment || this.captchaToken) // Only require CAPTCHA in production
+                this.passwordStrength >= minPasswordStrength // Lower requirement in development
             );
         },
     },
@@ -267,9 +261,6 @@ export default {
         if (this.getAuthToken()) {
             this.$router.push(import.meta.env.BASE_URL);
         }
-
-        // Load Cloudflare Turnstile widgets
-        this.loadTurnstile();
     },
     activated() {
         document.title =
@@ -293,12 +284,10 @@ export default {
                 ? {
                       email: this.loginUsername,
                       password: this.loginPassword,
-                      captcha_token: this.captchaToken,
                   }
                 : {
                       phone: this.loginUsername,
                       password: this.loginPassword,
-                      captcha_token: this.captchaToken,
                   };
 
             this.fetchJson(this.authApiUrl() + "/api/auth/login", null, {
@@ -309,8 +298,8 @@ export default {
                 body: JSON.stringify(loginData),
             })
                 .then(resp => {
-                    if (resp.success && resp.data && resp.data.token) {
-                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
+                    if (resp.success && resp.data) {
+                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data);
                         window.location = import.meta.env.BASE_URL; // done to bypass cache
                     } else if (resp.message) {
                         alert(resp.message);
@@ -337,14 +326,12 @@ export default {
                       first_name: this.firstName,
                       last_name: this.lastName,
                       password: this.registerPassword,
-                      captcha_token: this.captchaToken,
                   }
                 : {
                       phone: this.registerUsername,
                       first_name: this.firstName,
                       last_name: this.lastName,
                       password: this.registerPassword,
-                      captcha_token: this.captchaToken,
                   };
 
             this.fetchJson(this.authApiUrl() + "/api/auth/register", null, {
@@ -355,8 +342,8 @@ export default {
                 body: JSON.stringify(registrationData),
             })
                 .then(resp => {
-                    if (resp.success && resp.data && resp.data.token) {
-                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
+                    if (resp.success && resp.data) {
+                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data);
                         window.location = import.meta.env.BASE_URL; // done to bypass cache
                     } else if (resp.message) {
                         alert(resp.message);
@@ -370,117 +357,16 @@ export default {
                 });
         },
         checkPasswordStrength() {
-            const password = this.registerPassword || "";
-            let strength = 0;
-            let text = "";
-            let textClass = "";
-
-            // Length check (0-40 points)
-            if (password.length >= 8) strength += 20;
-            if (password.length >= 12) strength += 10;
-            if (password.length >= 16) strength += 10;
-
-            // Character variety checks (0-40 points)
-            const hasLowercase = /[a-z]/.test(password);
-            const hasUppercase = /[A-Z]/.test(password);
-            const hasNumbers = /[0-9]/.test(password);
-            const hasSymbols = /[^a-zA-Z0-9]/.test(password);
-
-            if (hasLowercase) strength += 5;
-            if (hasUppercase) strength += 5;
-            if (hasNumbers) strength += 5;
-            if (hasSymbols) strength += 5;
-
-            // Variety bonus (0-20 points)
-            const varietyCount = [hasLowercase, hasUppercase, hasNumbers, hasSymbols].filter(Boolean).length;
-            if (varietyCount >= 3) strength += 10;
-            if (varietyCount >= 4) strength += 10;
-
-            // Update UI based on strength
-            if (strength < 40) {
-                text = this.$t("info.password_weak");
-                textClass = "text-red-500";
-            } else if (strength < 75) {
-                text = this.$t("info.password_fair");
-                textClass = "text-yellow-500";
-            } else if (strength < 90) {
-                text = this.$t("info.password_good");
-                textClass = "text-blue-500";
-            } else {
-                text = this.$t("info.password_strong");
-                textClass = "text-green-500";
+            if (!this.registerPassword) {
+                this.passwordStrength = null;
+                return;
             }
 
-            this.passwordStrength = strength;
-            this.passwordStrengthText = text;
-            this.passwordStrengthClass =
-                strength < 40
-                    ? "bg-red-500"
-                    : strength < 75
-                      ? "bg-yellow-500"
-                      : strength < 90
-                        ? "bg-blue-500"
-                        : "bg-green-500";
-            this.passwordStrengthTextClass = textClass;
-
-            return strength;
-        },
-        async loadTurnstile() {
-            // Check if Turnstile script is already loaded
-            if (!window.turnstile) {
-                // Load the Turnstile script dynamically
-                const script = document.createElement("script");
-                script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
-                script.async = true;
-                script.defer = true;
-                document.head.appendChild(script);
-
-                // Wait for the script to load
-                await new Promise(resolve => {
-                    script.onload = resolve;
-                });
-            }
-
-            // Initialize Turnstile widgets
-            // Note: You'll need to replace 'your-site-key' with your actual Cloudflare Turnstile site key
-            const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"; // Test key for development
-
-            if (window.turnstile) {
-                // Wait a bit for the DOM to update
-                setTimeout(() => {
-                    // Render login widget
-                    window.turnstile.render("#login-turnstile-widget", {
-                        sitekey: siteKey,
-                        callback: token => {
-                            this.captchaToken = token;
-                        },
-                        "error-callback": () => {
-                            console.error("Turnstile error occurred");
-                            this.captchaToken = null;
-                        },
-                        "expired-callback": () => {
-                            console.warn("Turnstile token expired");
-                            this.captchaToken = null;
-                        },
-                    });
-
-                    // Render register widget
-                    window.turnstile.render("#register-turnstile-widget", {
-                        sitekey: siteKey,
-                        callback: token => {
-                            this.captchaToken = token;
-                        },
-                        "error-callback": () => {
-                            console.error("Turnstile error occurred");
-                            this.captchaToken = null;
-                        },
-                        "expired-callback": () => {
-                            console.warn("Turnstile token expired");
-                            this.captchaToken = null;
-                        },
-                    });
-                }, 100);
-            }
+            const result = checkPasswordStrength(this.registerPassword, this.$i18n);
+            this.passwordStrength = result.strength;
+            this.passwordStrengthText = result.text;
+            this.passwordStrengthClass = result.barClass;
+            this.passwordStrengthTextClass = result.textClass;
         },
         isEmail(input) {
             // Taken from https://emailregex.com

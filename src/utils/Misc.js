@@ -7,7 +7,7 @@ export const isEmail = input => {
     return result;
 };
 
-export const checkPasswordStrength = password => {
+export const checkPasswordStrength = (password, i18n) => {
     let strength = 0;
     let text = "";
     let textClass = "";
@@ -35,16 +35,16 @@ export const checkPasswordStrength = password => {
 
     // Update UI based on strength
     if (strength < 40) {
-        text = "رمز عبور ضعیف است";
+        text = i18n.t("info.password_weak");
         textClass = "text-red-500";
     } else if (strength < 75) {
-        text = "رمز عبور متوسط است";
+        text = i18n.t("info.password_fair");
         textClass = "text-yellow-500";
     } else if (strength < 90) {
-        text = "رمز عبور خوب است";
+        text = i18n.t("info.password_good");
         textClass = "text-blue-500";
     } else {
-        text = "رمز عبور قوی است";
+        text = i18n.t("info.password_strong");
         textClass = "text-green-500";
     }
 
