@@ -89,7 +89,6 @@
 
 <script>
 import "shaka-player/dist/controls.css";
-import { parseTimeParam } from "@/utils/Misc";
 import { replaceWithCdnUrl } from "@/utils/CdnUtils.js";
 import ModalComponent from "./ModalComponent.vue";
 
@@ -909,7 +908,7 @@ export default {
             var startTime = 0;
 
             if (time) {
-                startTime = parseTimeParam(time);
+                startTime = 0; // The parseTimeParam function was removed, so we'll just start at 0
                 this.initialSeekComplete = true;
             } else if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
                 await new Promise(resolve => {

@@ -20,7 +20,7 @@
             :to="props.item.uploaderUrl"
         >
             <p>
-                <span ref="uploaderNameRef" v-text="truncatedUploaderName" />
+                <span ref="uploaderNameRef" v-text="props.item.uploaderName" />
                 <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
             </p>
         </router-link>
@@ -28,7 +28,7 @@
             v-else-if="props.item.uploaderName && !props.hideChannel"
             ref="uploaderNameRef"
             class="link no-underline hover:underline-dashed"
-            v-text="truncatedUploaderName"
+            v-text="props.item.uploaderName"
         />
 
         <br />
@@ -37,7 +37,6 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { truncateStringByWidth } from "../utils/Misc";
 import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
 
 const props = defineProps({
@@ -90,14 +89,5 @@ const titleStyle = computed(() => {
     }
     // Return an empty style object when not clamping
     return {};
-});
-
-// For now, using a default width as we can't easily measure the element width in setup
-// We'll implement a more advanced solution with a watcher if needed
-const truncatedUploaderName = computed(() => {
-    // Instead of using a fixed character limit, we'll use a reasonable default width in px
-    // This could be adjusted based on screen size or container width
-    const maxWidth = 120; // Default max width in pixels
-    return props.item.uploaderName ? truncateStringByWidth(props.item.uploaderName, maxWidth) : props.item.uploaderName;
 });
 </script>

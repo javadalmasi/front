@@ -160,14 +160,9 @@ export default {
     },
     methods: {
         async checkAdminAccess() {
-            // Verify that the user is authenticated and has admin role
-            if (!this.authenticated) {
-                this.$router.push("/login");
-                return;
-            }
-
+            // This is now handled by the global navigation guard in router.js
+            // However, we still need to fetch user data for the welcome message
             try {
-                // Get the current user profile to verify admin status
                 const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile", null, {
                     headers: {
                         Authorization: "Bearer " + this.getAuthToken(),
@@ -176,68 +171,39 @@ export default {
 
                 if (response.success && response.data) {
                     this.user = response.data;
-
-                    // Check if the user has admin role
-                    if (response.data.role !== "admin") {
-                        // Redirect to home if not admin
-                        this.$router.push("/");
-                        return;
-                    }
                 } else {
-                    // If API call fails, redirect to login
-                    this.$router.push("/login");
+                    this.$router.push("/auth");
                 }
             } catch (error) {
-                console.error("Error checking admin access:", error);
-                this.$router.push("/login");
+                console.error("Error fetching user profile:", error);
+                this.$router.push("/auth");
             }
         },
         async loadDashboardData() {
             try {
-                // Load stats
-                // For now, using mock data - in a real implementation, you would have an API endpoint
-                this.stats = {
-                    totalUsers: 125,
-                    activeUsers: 110,
-                    adminUsers: 5,
-                    todayRegistrations: 3,
-                };
+                const response = await this.fetchJson(this.userApiUrl() + "/api/admin/dashboard", null, {
+                    headers: {
+                        Authorization: "Bearer " + this.getAuthToken(),
+                    },
+                });
 
-                // Load recent activities
-                // For now, using mock data - in a real implementation, you would have an API endpoint
-                this.recentActivities = [
-                    {
-                        id: 1,
-                        user: "کاربر اول",
-                        action: "ثبت نام جدید",
-                        timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-                    },
-                    {
-                        id: 2,
-                        user: "کاربر دوم",
-                        action: "تغییر نام",
-                        timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-                    },
-                    {
-                        id: 3,
-                        user: "کاربر سوم",
-                        action: "حذف اکانت",
-                        timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-                    },
-                ];
+                if (response.success && response.data) {
+                    this.stats = response.data.stats;
+                    this.recentActivities = response.data.recent_activities;
+                } else {
+                    alert(response.message || "Failed to load dashboard data.");
+                }
             } catch (error) {
                 console.error("Error loading dashboard data:", error);
+                alert("An error occurred while loading dashboard data.");
             }
         },
         toggleSidebar() {
             this.isSidebarMinimized = !this.isSidebarMinimized;
         },
         logout() {
-            // Clear the authentication token
-            const key = "authToken" + this.hashCode(this.userApiUrl());
-            localStorage.removeItem(key);
-
-            // Redirect to home
+            const userApiUrl = this.userApiUrl();
+            this.removePreference("authToken" + this.hashCode(userApiUrl));
             this.$router.push("/");
         },
     },

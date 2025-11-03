@@ -10,7 +10,7 @@
                 </router-link>
                 -
             </template>
-            {{ toPersianDigits(selectedIndex) }} / {{ toPersianDigits(playlist.videos) }}
+            {{ selectedIndex }} / {{ playlist.videos }}
         </span>
     </div>
     <div ref="scrollable" class="mt-4 max-h-screen-sm overflow-y-auto">
@@ -40,7 +40,7 @@
                     },
                 }"
             >
-                <span class="min-w-5 flex-none text-xs leading-[1.6]" v-text="toPersianDigits(index + 1)" />
+                <span class="min-w-5 flex-none text-xs leading-[1.6]" v-text="index + 1" />
                 <div class="w-24 flex-none">
                     <VideoThumbnail :item="related" :small="true" :in-playlist="true" />
                 </div>
@@ -58,7 +58,7 @@
                             v-if="related.duration >= 0"
                             class="text-xs text-gray-600 leading-[1.6] dark:text-gray-400"
                         >
-                            {{ toPersianDigits(timeFormat(related.duration)) }}
+                            {{ timeFormat(related.duration) }}
                         </span>
                         <router-link
                             v-else-if="related.uploaderUrl && related.uploaderName && !hideChannel"
@@ -66,7 +66,7 @@
                             :to="related.uploaderUrl"
                             :title="related.uploaderName"
                         >
-                            <span v-text="getTruncatedUploaderName(related.uploaderName)" />
+                            <span v-text="related.uploaderName" />
                             <i v-if="related.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
                         </router-link>
                     </div>
@@ -79,7 +79,6 @@
 <script>
 import { nextTick } from "vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
-import { truncateStringByWidth, toPersianDigits } from "../utils/Misc";
 
 export default {
     components: { VideoThumbnail },
@@ -121,7 +120,6 @@ export default {
         this.updateWatched(this.playlist.relatedStreams);
     },
     methods: {
-        toPersianDigits,
         timeFormat: function (duration) {
             var pad = function (num, size) {
                 return ("000" + num).slice(size * -1);
@@ -152,17 +150,6 @@ export default {
             if (index < elems.length)
                 this.$refs.scrollable.scrollTop =
                     elems[this.selectedIndex - 1].offsetTop - this.$refs.scrollable.offsetTop;
-        },
-        getTruncatedUploaderName(uploaderName) {
-            // Calculate available width based on element's container
-            // Default to 80px if we can't determine the width
-            const maxWidth = this.calculateAvailableWidth();
-            return uploaderName ? truncateStringByWidth(uploaderName, maxWidth) : uploaderName;
-        },
-        calculateAvailableWidth() {
-            // For playlist videos, we use a default width since each item has limited space
-            // We can't easily measure the specific element width here, so we use an estimated value
-            return 80; // Reasonable width for the limited space in playlist items
         },
     },
 };

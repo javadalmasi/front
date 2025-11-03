@@ -23,30 +23,6 @@
                         @input="debouncedSearch"
                     />
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">وضعیت</label>
-                    <select
-                        v-model="statusFilter"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">همه</option>
-                        <option value="active">فعال</option>
-                        <option value="inactive">غیرفعال</option>
-                        <option value="verified">تایید شده</option>
-                        <option value="unverified">تایید نشده</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نقش</label>
-                    <select
-                        v-model="roleFilter"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">همه</option>
-                        <option value="user">کاربر</option>
-                        <option value="admin">ادمین</option>
-                    </select>
-                </div>
             </div>
         </div>
 
@@ -355,8 +331,6 @@ export default {
             currentPage: 1,
             totalPages: 1,
             searchQuery: "",
-            statusFilter: "",
-            roleFilter: "",
             showCreateUserModal: false,
             showEditUserModal: false,
             newUser: {
@@ -380,78 +354,28 @@ export default {
         };
     },
     async mounted() {
-        await this.checkAdminAccess();
         await this.loadUsers();
     },
     methods: {
-        async checkAdminAccess() {
-            // Verify that the user is authenticated and has admin role
-            if (!this.authenticated) {
-                this.$router.push("/login");
-                return;
-            }
-
-            try {
-                // Get the current user profile to verify admin status
-                const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile", null, {
-                    headers: {
-                        Authorization: "Bearer " + this.getAuthToken(),
-                    },
-                });
-
-                if (response.success && response.data) {
-                    // Check if the user has admin role
-                    if (response.data.role !== "admin") {
-                        // Redirect to home if not admin
-                        this.$router.push("/");
-                        return;
-                    }
-                } else {
-                    // If API call fails, redirect to login
-                    this.$router.push("/login");
-                }
-            } catch (error) {
-                console.error("Error checking admin access:", error);
-                this.$router.push("/login");
-            }
-        },
         async loadUsers() {
             try {
-                // Build query parameters
-                const params = {
-                    page: this.currentPage,
-                    limit: 10,
-                };
-
-                if (this.searchQuery) {
-                    params.search = this.searchQuery;
-                }
-
-                // We'll need to update the backend to support status and role filters
-                // For now, we'll filter on the frontend
-
                 const response = await this.fetchAdminUsers(this.currentPage, 10, this.searchQuery);
-
                 if (response.success && response.data) {
-                    this.users = response.data;
-                    // For now, setting total to 100 as a placeholder
-                    // Backend needs to return total count
-                    this.totalUsers = 100;
+                    this.users = response.data.users;
+                    this.totalUsers = response.data.total;
                     this.totalPages = Math.ceil(this.totalUsers / 10);
                 } else {
-                    console.error("Error loading users:", response.message || response.error);
+                    alert("Error loading users: " + response.message);
                 }
             } catch (error) {
                 console.error("Error loading users:", error);
+                alert("An error occurred while loading users.");
             }
         },
         debouncedSearch() {
-            // Clear any existing timer
             if (this.debouncedSearchTimer) {
                 clearTimeout(this.debouncedSearchTimer);
             }
-
-            // Set a new timer to call the search after 500ms
             this.debouncedSearchTimer = setTimeout(() => {
                 this.currentPage = 1;
                 this.loadUsers();
@@ -470,75 +394,45 @@ export default {
             }
         },
         editUser(user) {
-            // Copy user data to the edit form
-            this.editUserForm = {
-                id: user.id,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email,
-                phone: user.phone,
-                role: user.role || "user",
-                is_active: user.is_active,
-            };
+            this.editUserForm = { ...user };
             this.showEditUserModal = true;
         },
         async updateUser() {
             try {
-                const result = await this.updateAdminUser(this.editUserForm.id, {
-                    first_name: this.editUserForm.first_name,
-                    last_name: this.editUserForm.last_name,
-                    email: this.editUserForm.email,
-                    phone: this.editUserForm.phone,
-                    role: this.editUserForm.role,
-                    is_active: this.editUserForm.is_active,
-                });
-
+                const result = await this.updateAdminUser(this.editUserForm.id, this.editUserForm);
                 if (result.success) {
-                    // Close the modal and reload users
                     this.showEditUserModal = false;
                     await this.loadUsers();
                     alert("کاربر با موفقیت به‌روزرسانی شد");
                 } else {
-                    alert(result.message || "خطا در به‌روزرسانی کاربر");
+                    alert("Error updating user: " + result.message);
                 }
             } catch (error) {
                 console.error("Error updating user:", error);
-                alert("خطا در به‌روزرسانی کاربر: " + error.message);
+                alert("An error occurred while updating the user.");
             }
         },
         async deleteUser(userId) {
             if (!confirm("آیا از حذف این کاربر اطمینان دارید؟")) {
                 return;
             }
-
             try {
                 const result = await this.deleteAdminUser(userId);
-
                 if (result.success) {
-                    // Reload users after deletion
                     await this.loadUsers();
                     alert("کاربر با موفقیت حذف شد");
                 } else {
-                    alert(result.message || "خطا در حذف کاربر");
+                    alert("Error deleting user: " + result.message);
                 }
             } catch (error) {
                 console.error("Error deleting user:", error);
-                alert("خطا در حذف کاربر: " + error.message);
+                alert("An error occurred while deleting the user.");
             }
         },
         async createNewUser() {
             try {
-                const result = await this.createAdminUser({
-                    first_name: this.newUser.first_name,
-                    last_name: this.newUser.last_name,
-                    email: this.newUser.email,
-                    phone: this.newUser.phone,
-                    password: this.newUser.password,
-                    role: this.newUser.role,
-                });
-
+                const result = await this.createAdminUser(this.newUser);
                 if (result.success) {
-                    // Close the modal and reset the form
                     this.showCreateUserModal = false;
                     this.newUser = {
                         first_name: "",
@@ -548,16 +442,14 @@ export default {
                         password: "",
                         role: "user",
                     };
-
-                    // Reload users
                     await this.loadUsers();
                     alert("کاربر جدید با موفقیت ایجاد شد");
                 } else {
-                    alert(result.message || "خطا در ایجاد کاربر");
+                    alert("Error creating user: " + result.message);
                 }
             } catch (error) {
                 console.error("Error creating user:", error);
-                alert("خطا در ایجاد کاربر: " + error.message);
+                alert("An error occurred while creating the user.");
             }
         },
     },
@@ -568,7 +460,6 @@ export default {
 .admin-user-management {
     direction: rtl;
 }
-
 .modal {
     position: fixed;
     top: 0;
@@ -581,7 +472,6 @@ export default {
     align-items: center;
     z-index: 1000;
 }
-
 .modal-container {
     position: relative;
     max-height: 90vh;

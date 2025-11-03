@@ -37,7 +37,7 @@
             </p>
         </router-link>
 
-        <a v-if="item.uploaderName" class="link no-underline hover:underline-dashed" v-text="truncatedUploaderName" />
+        <a v-if="item.uploaderName" class="link no-underline hover:underline-dashed" v-text="item.uploaderName" />
         <template v-if="item.videos >= 0">
             <br v-if="item.uploaderName" />
             <strong v-text="`${item.videos} ${$t('video.videos')}`" />
@@ -58,8 +58,6 @@
     </div>
 </template>
 <script>
-import { truncateStringByWidth } from "../utils/Misc";
-
 export default {
     props: {
         item: {
@@ -93,14 +91,6 @@ export default {
         channelId(_this) {
             return _this.item.url.substr(-24);
         },
-        truncatedUploaderName(_this) {
-            // Calculate available width based on element's container
-            // Default to 120px if we can't determine the width
-            const maxWidth = this.calculateAvailableWidth();
-            return _this.item.uploaderName
-                ? truncateStringByWidth(_this.item.uploaderName, maxWidth)
-                : _this.item.uploaderName;
-        },
     },
     mounted() {
         this.updateSubscribedStatus();
@@ -114,18 +104,6 @@ export default {
             this.toggleSubscriptionState(this.channelId, this.subscribed).then(success => {
                 if (success) this.subscribed = !this.subscribed;
             });
-        },
-        calculateAvailableWidth() {
-            // Get the container element that displays the uploader name
-            if (this.$el && this.$el.querySelector) {
-                const nameElement = this.$el.querySelector("a");
-                if (nameElement) {
-                    // Calculate available width considering padding and margins
-                    return nameElement.clientWidth - 10; // 10px buffer
-                }
-            }
-            // Default fallback width (in pixels)
-            return 120;
         },
     },
 };
