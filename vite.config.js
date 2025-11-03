@@ -82,4 +82,13 @@ export default defineConfig({
         sourcemap: true,
         cssMinify: "lightningcss",
     },
+    server: {
+        proxy: {
+            "/users-api": {
+                target: "https://users.vidioo.ir/",
+                changeOrigin: true,
+                rewrite: path => path.replace(/^\/users-api/, ""),
+            },
+        },
+    },
 });

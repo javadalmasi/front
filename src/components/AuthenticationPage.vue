@@ -263,7 +263,7 @@ export default {
                 password: this.loginPassword,
             };
 
-            this.fetchJson(this.userApiUrl() + "/api/auth/login", null, {
+            this.fetchJson("/users-api/api/auth/login", null, {
                 method: "POST",
                 body: JSON.stringify(loginData),
             })
