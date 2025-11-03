@@ -2,19 +2,19 @@
     <div class="admin-backup-management p-6">
         <div class="mb-6">
             <h1 class="text-2xl font-bold">مدیریت پشتیبان‌گیری</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">مدیریت تنظیمات پشتیبان‌گیری و فایل‌های پشتیبان</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">مدیریت تنظیمات پشتیبان‌گیری و فایل‌های پشتیبان</p>
         </div>
 
         <!-- S3 Settings Section -->
-        <div class="bg-white dark:bg-dark-800 rounded-lg shadow p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">تنظیمات S3</h2>
+        <div class="mb-6 rounded-lg bg-white p-6 shadow dark:bg-dark-800">
+            <h2 class="mb-4 text-xl font-semibold">تنظیمات S3</h2>
 
             <div v-if="!s3Settings">
                 <p class="mb-4">هیچ تنظیمات S3 تعریف نشده است. لطفاً تنظیمات را وارد کنید:</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 mb-4 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"
                             >کلید دسترسی (Access Key)</label
                         >
                         <input
@@ -25,7 +25,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"
                             >کلید مخفی (Secret Key)</label
                         >
                         <input
@@ -36,7 +36,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نام باکت</label>
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">نام باکت</label>
                         <input
                             v-model="newS3Settings.bucket_name"
                             type="text"
@@ -45,7 +45,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">منطقه</label>
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">منطقه</label>
                         <input
                             v-model="newS3Settings.region"
                             type="text"
@@ -56,8 +56,8 @@
                 </div>
 
                 <button
+                    class="btn rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     @click="createS3Settings"
-                    class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
                 >
                     ذخیره تنظیمات
                 </button>
@@ -66,9 +66,9 @@
             <div v-else>
                 <p class="mb-4">تنظیمات S3 فعلی:</p>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 mb-4 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نام باکت</label>
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">نام باکت</label>
                         <input
                             v-model="s3Settings.bucket_name"
                             type="text"
@@ -77,7 +77,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">منطقه</label>
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">منطقه</label>
                         <input
                             v-model="s3Settings.region"
                             type="text"
@@ -88,15 +88,15 @@
                 </div>
 
                 <button
-                    @click="updateS3Settings"
-                    class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg mr-2"
+                    class="btn mr-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     :disabled="true"
+                    @click="updateS3Settings"
                 >
                     ویرایش تنظیمات (غیرفعال)
                 </button>
                 <button
+                    class="btn rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                     @click="deleteS3Settings"
-                    class="btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
                 >
                     حذف تنظیمات
                 </button>
@@ -104,26 +104,26 @@
         </div>
 
         <!-- Backup Operations Section -->
-        <div class="bg-white dark:bg-dark-800 rounded-lg shadow p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">عملیات پشتیبان‌گیری</h2>
+        <div class="mb-6 rounded-lg bg-white p-6 shadow dark:bg-dark-800">
+            <h2 class="mb-4 text-xl font-semibold">عملیات پشتیبان‌گیری</h2>
 
             <div class="flex flex-wrap gap-4">
                 <button
+                    class="btn rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                     @click="createBackup"
-                    class="btn bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
                 >
                     ایجاد پشتیبان جدید
                 </button>
 
-                <button @click="listBackups" class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg">
+                <button class="btn rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700" @click="listBackups">
                     لیست پشتیبان‌ها
                 </button>
             </div>
         </div>
 
         <!-- Backups List Section -->
-        <div v-if="backups.length > 0" class="bg-white dark:bg-dark-800 rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 bg-gray-50 dark:bg-dark-700">
+        <div v-if="backups.length > 0" class="overflow-hidden rounded-lg bg-white shadow dark:bg-dark-800">
+            <div class="bg-gray-50 px-6 py-4 dark:bg-dark-700">
                 <h2 class="text-lg font-semibold">فایل‌های پشتیبان</h2>
             </div>
 
@@ -132,51 +132,51 @@
                     <thead class="bg-gray-50 dark:bg-dark-700">
                         <tr>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 نام فایل
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 تاریخ ایجاد
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 اندازه
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 عملیات
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-100">
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-800 dark:divide-dark-100">
                         <tr v-for="backup in backups" :key="backup.id">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ backup.file_name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ timeAgo(backup.created_at) }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ formatFileSize(backup.size) }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
                                 <button
-                                    @click="downloadBackup(backup)"
-                                    class="text-blue-600 hover:text-blue-900 ml-4"
+                                    class="ml-4 text-blue-600 hover:text-blue-900"
                                     title="دانلود"
                                     :disabled="true"
+                                    @click="downloadBackup(backup)"
                                 >
                                     <i class="i-fa6-solid:download"></i>
                                 </button>
                                 <button
-                                    @click="deleteBackup(backup)"
                                     class="text-red-600 hover:text-red-900"
                                     title="حذف"
+                                    @click="deleteBackup(backup)"
                                 >
                                     <i class="i-fa6-solid:trash"></i>
                                 </button>
@@ -187,7 +187,7 @@
             </div>
         </div>
 
-        <div v-else-if="loadedBackups" class="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
+        <div v-else-if="loadedBackups" class="rounded-lg bg-white p-6 shadow dark:bg-dark-800">
             <p>هیچ فایل پشتیبانی وجود ندارد.</p>
         </div>
     </div>

@@ -11,7 +11,7 @@
                     <form @submit.prevent="updateProfile">
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"
                                     >نام</label
                                 >
                                 <input
@@ -22,7 +22,7 @@
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"
                                     >نام خانوادگی</label
                                 >
                                 <input
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ایمیل</label>
+                            <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">ایمیل</label>
                             <input
                                 v-model="profile.email"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
@@ -47,7 +47,7 @@
                         <div class="mt-6">
                             <button
                                 type="submit"
-                                class="rounded-lg bg-blue-600 py-2 px-4 text-white font-bold hover:bg-blue-700 transition duration-200"
+                                class="rounded-lg bg-blue-600 px-4 py-2 text-white font-bold transition duration-200 hover:bg-blue-700"
                             >
                                 به‌روزرسانی پروفایل
                             </button>
@@ -124,7 +124,7 @@
                         <div class="mt-6">
                             <button
                                 type="submit"
-                                class="rounded-lg bg-blue-600 py-2 px-4 text-white font-bold hover:bg-blue-700 transition duration-200"
+                                class="rounded-lg bg-blue-600 px-4 py-2 text-white font-bold transition duration-200 hover:bg-blue-700"
                                 :disabled="!isPasswordFormValid"
                             >
                                 تغییر رمز عبور
@@ -178,13 +178,13 @@
 
                     <div class="space-y-3">
                         <button
+                            class="w-full text-left text-red-600 font-medium hover:text-red-800"
                             @click="requestAccountDeletion"
-                            class="w-full text-left text-red-600 hover:text-red-800 font-medium"
                         >
                             درخواست حذف حساب
                         </button>
 
-                        <button @click="logout" class="w-full text-left text-red-600 hover:text-red-800 font-medium">
+                        <button class="w-full text-left text-red-600 font-medium hover:text-red-800" @click="logout">
                             خروج از حساب کاربری
                         </button>
                     </div>
