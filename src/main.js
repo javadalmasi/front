@@ -169,10 +169,7 @@ const mixin = {
             } else return defaultVal;
         },
         userApiUrl() {
-            if (import.meta.env.DEV) {
-                return "/users-api";
-            }
-            return import.meta.env.VITE_IRONVEIN_USERS_API;
+            return "https://users.vidioo.ir";
         },
         apiUrl() {
             return import.meta.env.VITE_PIPED_API;

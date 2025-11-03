@@ -263,7 +263,7 @@ export default {
                 password: this.loginPassword,
             };
 
-            this.fetchJson("/users-api/api/auth/login", null, {
+            this.fetchJson(this.userApiUrl() + "/api/auth/login", null, {
                 method: "POST",
                 body: JSON.stringify(loginData),
             })
@@ -287,11 +287,16 @@ export default {
             }
 
             const registrationData = {
-                email: this.registerIdentifier,
                 first_name: this.firstName,
                 last_name: this.lastName,
                 password: this.registerPassword,
             };
+
+            if (this.registerIdentifier.includes("@")) {
+                registrationData.email = this.registerIdentifier;
+            } else {
+                registrationData.phone = this.registerIdentifier;
+            }
 
             this.fetchJson(this.userApiUrl() + "/api/auth/register", null, {
                 method: "POST",
