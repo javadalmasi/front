@@ -53,7 +53,7 @@
                     :to="item.uploaderUrl"
                     :title="item.uploaderName"
                 >
-                    <span v-text="truncatedUploaderName" />
+                    <span v-text="item.uploaderName" />
                 </router-link>
 
                 <div v-if="item.views >= 0 || item.uploadedDate" class="video-info">
@@ -145,7 +145,6 @@ import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
-import { truncateStringByWidth } from "../utils/Misc";
 
 export default {
     components: { PlaylistAddModal, ConfirmModal, ShareModal, VideoThumbnail },
@@ -185,14 +184,6 @@ export default {
         },
         thumbnail() {
             return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
-        },
-        truncatedUploaderName() {
-            // Calculate available width based on element's container
-            // Default to 100px if we can't determine the width
-            const maxWidth = this.calculateUploaderNameWidth();
-            return this.item.uploaderName
-                ? truncateStringByWidth(this.item.uploaderName, maxWidth)
-                : this.item.uploaderName;
         },
         lineClampStyle() {
             // Apply line clamping only if the prop is true
@@ -266,28 +257,6 @@ export default {
                     instance.shouldShowVideo();
                 };
             }
-        },
-        calculateUploaderNameWidth() {
-            // Get the container element that displays the uploader name
-            if (this.$el && this.$el.querySelector) {
-                const nameElement = this.$el.querySelector(".link-secondary");
-                if (nameElement) {
-                    let availableWidth = nameElement.clientWidth - 10; // 10px buffer
-
-                    // If video item icons are hidden, we have more space available
-                    if (this.shouldHideVideoItemIcons) {
-                        // Add extra space that would have been taken by the icons container
-                        // The icons container has class "flex items-center gap-2.5" which adds extra space
-                        // This means when icons are hidden, the channel name can use that space
-                        const extraSpace = 100; // Approximate width of the icons container when present
-                        availableWidth += extraSpace;
-                    }
-
-                    return availableWidth;
-                }
-            }
-            // Default fallback width (in pixels)
-            return this.shouldHideVideoItemIcons ? 200 : 100; // More space when icons are hidden
         },
     },
 };

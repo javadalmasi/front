@@ -2,12 +2,12 @@
     <div class="admin-account-deletion p-6">
         <div class="mb-6">
             <h1 class="text-2xl font-bold">مدیریت درخواست‌های حذف حساب</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">مدیریت درخواست‌های حذف حساب کاربران</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">مدیریت درخواست‌های حذف حساب کاربران</p>
         </div>
 
         <!-- Pending Deletion Requests Table -->
-        <div class="bg-white dark:bg-dark-800 rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 bg-gray-50 dark:bg-dark-700 flex justify-between items-center">
+        <div class="overflow-hidden rounded-lg bg-white shadow dark:bg-dark-800">
+            <div class="flex items-center justify-between bg-gray-50 px-6 py-4 dark:bg-dark-700">
                 <h2 class="text-lg font-semibold">درخواست‌های حذف حساب در انتظار</h2>
             </div>
 
@@ -16,50 +16,50 @@
                     <thead class="bg-gray-50 dark:bg-dark-700">
                         <tr>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 نام کاربر
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 ایمیل
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 تاریخ درخواست
                             </th>
                             <th
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                class="px-6 py-3 text-right text-xs text-gray-500 font-medium tracking-wider uppercase dark:text-gray-300"
                             >
                                 عملیات
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-dark-800 divide-y divide-gray-200 dark:divide-dark-100">
+                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-800 dark:divide-dark-100">
                         <tr v-for="request in deletionRequests" :key="request.id">
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ request.first_name }} {{ request.last_name }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ request.email }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="whitespace-nowrap px-6 py-4">
                                 {{ timeAgo(request.requested_at) }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
                                 <button
-                                    @click="approveDeletion(request)"
-                                    class="text-green-600 hover:text-green-900 ml-4"
+                                    class="ml-4 text-green-600 hover:text-green-900"
                                     title="تایید"
+                                    @click="approveDeletion(request)"
                                 >
                                     <i class="i-fa6-solid:check"></i>
                                 </button>
                                 <button
-                                    @click="showRejectionModal(request)"
                                     class="text-red-600 hover:text-red-900"
                                     title="رد"
+                                    @click="showRejectionModal(request)"
                                 >
                                     <i class="i-fa6-solid:xmark"></i>
                                 </button>
@@ -72,8 +72,8 @@
 
         <!-- Rejection Modal -->
         <div v-if="showRejectionModalFlag" class="modal">
-            <div class="modal-container bg-white dark:bg-dark-800 p-6 rounded-lg shadow-xl max-w-md w-full">
-                <h3 class="text-lg font-semibold mb-4">رد درخواست حذف حساب</h3>
+            <div class="modal-container max-w-md w-full rounded-lg bg-white p-6 shadow-xl dark:bg-dark-800">
+                <h3 class="mb-4 text-lg font-semibold">رد درخواست حذف حساب</h3>
 
                 <p class="mb-4">
                     برای رد درخواست حذف حساب کاربر
@@ -92,14 +92,14 @@
 
                 <div class="flex justify-end space-x-3">
                     <button
+                        class="btn rounded-lg bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
                         @click="cancelRejection"
-                        class="btn bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg"
                     >
                         لغو
                     </button>
                     <button
+                        class="btn rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                         @click="rejectDeletion"
-                        class="btn bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg"
                     >
                         رد درخواست
                     </button>

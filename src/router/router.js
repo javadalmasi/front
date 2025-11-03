@@ -57,16 +57,6 @@ const routes = [
         component: () => import("../components/AuthenticationPage.vue"),
     },
     {
-        path: "/login",
-        name: "Login",
-        redirect: "/auth",
-    },
-    {
-        path: "/register",
-        name: "Register",
-        redirect: "/auth",
-    },
-    {
         path: "/feed",
         alias: ["/feed/subscriptions"],
         name: "Feed",
@@ -91,7 +81,6 @@ const routes = [
         name: "Watch History",
         component: () => import("../components/HistoryPage.vue"),
     },
-
     {
         path: "/playlists",
         name: "Playlists",
@@ -102,7 +91,6 @@ const routes = [
         name: "Page Not Found",
         component: () => import("../components/PageNotFound.vue"),
     },
-    // Password Reset routes
     {
         path: "/forgot-password",
         name: "ForgotPassword",
@@ -166,51 +154,39 @@ const router = createRouter({
     },
 });
 
-// Navigation guard to protect routes
 router.beforeEach(async (to, from, next) => {
-    // Check if the route requires authentication
     if (to.meta.requiresAuth) {
-        // Check if user is authenticated
         const mixin = window.appMixin.methods;
         const token = mixin.getAuthToken();
 
         if (!token) {
-            // Redirect to login if not authenticated
             next("/auth");
             return;
         }
 
-        // If the route also requires admin access, check the user's role
         if (to.meta.requiresAdmin) {
             try {
-                // Get the current user profile to verify admin status
-                const response = await mixin.fetchJson(mixin.userApiUrl() + "/user/profile", null, {
+                const response = await mixin.fetchJson(mixin.userApiUrl() + "/api/user/profile", null, {
                     headers: {
                         Authorization: "Bearer " + token,
                     },
                 });
 
-                if (response.success && response.data) {
-                    // Check if the user has admin role
-                    if (response.data.role !== "admin") {
-                        // Redirect to home if not admin
-                        next("/");
-                        return;
-                    }
+                if (response.success && response.data && response.data.role === "admin") {
+                    next();
                 } else {
-                    // If API call fails, redirect to login
-                    next("/auth");
-                    return;
+                    next("/");
                 }
             } catch (error) {
                 console.error("Error checking admin access:", error);
-                next("/auth");
-                return;
+                next("/");
             }
+        } else {
+            next();
         }
+    } else {
+        next();
     }
-
-    next();
 });
 
 export default router;

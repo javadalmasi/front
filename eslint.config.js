@@ -1,84 +1,29 @@
-import js from "@eslint/js";
+import globals from "globals";
+import pluginJs from "@eslint/js";
+import pluginVue from "eslint-plugin-vue";
+import eslintConfigPrettier from "eslint-config-prettier";
+import unocss from "@unocss/eslint-config/flat";
 
 export default [
-    js.configs.recommended,
-    {
-        languageOptions: {
-            ecmaVersion: 2022,
-            sourceType: "module",
-            globals: {
-                node: true,
-                window: true,
-                document: true,
-                console: true,
-                fetch: true,
-                localStorage: true,
-                URL: true,
-                URLSearchParams: true,
-                alert: true,
-                Blob: true,
-                Intl: true,
-                process: true,
-                __dirname: true,
-                setTimeout: true,
-                clearTimeout: true,
-                setInterval: true,
-                clearInterval: true,
-                requestAnimationFrame: true,
-                cancelAnimationFrame: true,
-                navigator: true,
-                screen: true,
-                crypto: true,
-                DOMException: true,
-                CustomEvent: true,
-                Event: true,
-                HTMLMediaElement: true,
-                HTMLVideoElement: true,
-                HTMLCanvasElement: true,
-                HTMLImageElement: true,
-                ResizeObserver: true,
-                MediaSource: true,
-                VTTCue: true,
-                TextEncoder: true,
-                TextDecoder: true,
-                btoa: true,
-                atob: true,
-                indexedDB: true,
-                IDBTransaction: true,
-                IDBDatabase: true,
-                IDBObjectStore: true,
-                caches: true,
-                Headers: true,
-                Response: true,
-                Request: true,
-                self: true,
-                importScripts: true,
-                define: true,
-                System: true,
-                shaka: true,
-                google: true,
-                chrome: true,
-                cast: true,
-                webapis: true,
-                Windows: true,
-                DeviceMotionEvent: true,
-                ManagedMediaSource: true,
-            },
-        },
-        files: ["**/*.js"],
-        ignores: ["node_modules/**", "dist/**", "public/**", ".nuxt/**", ".output/**"],
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
-    {
-        // Configuration files that run in Node.js environment
-        files: ["*.config.js", "*.cjs", "babel.config.js"],
-        languageOptions: {
-            globals: {
-                module: "readonly",
-                require: "readonly",
-                process: "readonly",
-                __dirname: "readonly",
-                exports: "readonly",
-            },
-        },
+  },
+  pluginJs.configs.recommended,
+  ...pluginVue.configs["flat/recommended"],
+  eslintConfigPrettier,
+  unocss,
+  {
+    files: ["**/*.vue"],
+    rules: {
+      "vue/multi-word-component-names": "off",
     },
+  },
+  {
+    ignores: ["dist", "node_modules", "public", ".nuxt", ".output"],
+  },
 ];

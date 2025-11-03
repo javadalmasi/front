@@ -2,17 +2,17 @@
     <div class="admin-email-settings p-6">
         <div class="mb-6">
             <h1 class="text-2xl font-bold">تنظیمات ایمیل</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">پیکربندی SMTP و قالب‌های ایمیل را در اینجا مدیریت کنید.</p>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">پیکربندی SMTP و قالب‌های ایمیل را در اینجا مدیریت کنید.</p>
         </div>
 
         <!-- SMTP Settings Section -->
-        <div class="bg-white dark:bg-dark-800 rounded-lg shadow p-6 mb-6">
-            <h2 class="text-xl font-semibold mb-4">تنظیمات SMTP</h2>
+        <div class="mb-6 rounded-lg bg-white p-6 shadow dark:bg-dark-800">
+            <h2 class="mb-4 text-xl font-semibold">تنظیمات SMTP</h2>
 
             <form @submit.prevent="saveSmtpSettings">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 mb-4 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                             SMTP Host
                         </label>
                         <input
@@ -23,7 +23,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                             SMTP Port
                         </label>
                         <input
@@ -35,9 +35,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-1 mb-4 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                             نام کاربری
                         </label>
                         <input
@@ -48,7 +48,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> گذرواژه </label>
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"> گذرواژه </label>
                         <input
                             v-model="smtpSettings.password"
                             type="password"
@@ -58,9 +58,9 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-1 mb-6 gap-4 md:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                             نام فرستنده
                         </label>
                         <input
@@ -71,7 +71,7 @@
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                             ایمیل فرستنده
                         </label>
                         <input
@@ -86,17 +86,17 @@
                 <div class="flex items-center justify-between">
                     <button
                         type="submit"
-                        class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+                        class="btn rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                         :disabled="isSavingSmtp"
                     >
                         {{ isSavingSmtp ? "در حال ذخیره..." : "ذخیره تنظیمات SMTP" }}
                     </button>
 
                     <button
-                        @click="testSmtpSettings"
                         type="button"
-                        class="btn bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+                        class="btn rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                         :disabled="isTestingSmtp"
+                        @click="testSmtpSettings"
                     >
                         {{ isTestingSmtp ? "در حال تست..." : "تست اتصال SMTP" }}
                     </button>
@@ -105,29 +105,29 @@
         </div>
 
         <!-- Email Templates Section -->
-        <div class="bg-white dark:bg-dark-800 rounded-lg shadow p-6">
-            <h2 class="text-xl font-semibold mb-4">قالب‌های ایمیل</h2>
+        <div class="rounded-lg bg-white p-6 shadow dark:bg-dark-800">
+            <h2 class="mb-4 text-xl font-semibold">قالب‌های ایمیل</h2>
 
-            <div class="mb-6 flex justify-between items-center">
+            <div class="mb-6 flex items-center justify-between">
                 <div class="flex space-x-2">
                     <button
                         v-for="template in emailTemplates"
                         :key="template.id"
-                        @click="selectTemplate(template)"
                         :class="{
                             'bg-blue-600 text-white': selectedTemplate?.id === template.id,
                             'bg-gray-200 dark:bg-dark-700': selectedTemplate?.id !== template.id,
                         }"
-                        class="px-4 py-2 rounded-lg transition-colors duration-200"
+                        class="rounded-lg px-4 py-2 transition-colors duration-200"
+                        @click="selectTemplate(template)"
                     >
                         {{ getTemplateName(template.name) }}
                     </button>
                 </div>
 
                 <button
-                    @click="saveTemplate"
-                    class="btn bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+                    class="btn rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     :disabled="!selectedTemplate || isSavingTemplate"
+                    @click="saveTemplate"
                 >
                     {{ isSavingTemplate ? "در حال ذخیره..." : "ذخیره قالب" }}
                 </button>
@@ -135,7 +135,7 @@
 
             <div v-if="selectedTemplate" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> عنوان </label>
+                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300"> عنوان </label>
                     <input
                         v-model="selectedTemplate.subject"
                         type="text"
@@ -145,7 +145,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label class="mb-1 block text-sm text-gray-700 font-medium dark:text-gray-300">
                         متن ایمیل
                         <span class="text-xs text-gray-500 dark:text-gray-400">
                             (از متغیرهایی مانند {{ user.first_name }}, {{ reset_link }}, {{ otp_code }} پشتیبانی می‌کند)
@@ -160,7 +160,7 @@
                 </div>
             </div>
 
-            <div v-else class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div v-else class="py-8 text-center text-gray-500 dark:text-gray-400">
                 یک قالب را انتخاب کنید تا ویرایش کنید
             </div>
         </div>

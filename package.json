@@ -8,8 +8,9 @@
         "build": "vite build",
         "preview": "vite preview",
         "format": "prettier -w --ignore-path .gitignore **/**.{js,vue,json}",
-        "lint": "eslint --color src/**/*.js src/*.js *.config.js *.cjs",
-        "lint-check": "eslint --color src/**/*.js src/*.js *.config.js *.cjs"
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix",
+        "lint-check": "eslint src"
     },
     "dependencies": {
         "dompurify": "3.2.6",
@@ -46,6 +47,7 @@
         "eslint-config-prettier": "10.1.8",
         "eslint-plugin-prettier": "5.5.3",
         "eslint-plugin-vue": "9.33.0",
+        "globals": "^16.5.0",
         "lightningcss": "1.30.1",
         "prettier": "3.5.3",
         "unocss": "66.4.1",
