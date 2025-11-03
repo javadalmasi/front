@@ -69,6 +69,9 @@
                         </button>
                     </div>
 
+                    <!-- Cloudflare Turnstile Widget -->
+                    <div id="login-turnstile-widget" class="mb-4"></div>
+
                     <div class="mb-4">
                         <button
                             type="button"
@@ -179,6 +182,9 @@
                         <div class="mt-1 text-sm" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</div>
                     </div>
 
+                    <!-- Cloudflare Turnstile Widget -->
+                    <div id="register-turnstile-widget" class="mb-4"></div>
+
                     <div class="mb-4">
                         <button
                             type="button"
@@ -233,6 +239,7 @@ export default {
             passwordStrengthTextClass: "",
             showUnsecureRegisterDialog: false,
             forceUnsecureRegister: false,
+            captchaToken: null,
         };
     },
     computed: {
@@ -250,7 +257,8 @@ export default {
                 this.registerUsername &&
                 this.registerPassword &&
                 this.registerPassword === this.passwordConfirm &&
-                this.passwordStrength >= minPasswordStrength
+                this.passwordStrength >= minPasswordStrength && // Lower requirement in development
+                (isDevelopment || this.captchaToken) // Only require CAPTCHA in production
             );
         },
     },
@@ -259,6 +267,9 @@ export default {
         if (this.getAuthToken()) {
             this.$router.push(import.meta.env.BASE_URL);
         }
+
+        // Load Cloudflare Turnstile widgets
+        this.loadTurnstile();
     },
     activated() {
         document.title =
@@ -282,10 +293,12 @@ export default {
                 ? {
                       email: this.loginUsername,
                       password: this.loginPassword,
+                      captcha_token: this.captchaToken,
                   }
                 : {
                       phone: this.loginUsername,
                       password: this.loginPassword,
+                      captcha_token: this.captchaToken,
                   };
 
             this.fetchJson(this.authApiUrl() + "/api/auth/login", null, {
@@ -296,8 +309,8 @@ export default {
                 body: JSON.stringify(loginData),
             })
                 .then(resp => {
-                    if (resp.success && resp.data) {
-                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data);
+                    if (resp.success && resp.data && resp.data.token) {
+                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
                         window.location = import.meta.env.BASE_URL; // done to bypass cache
                     } else if (resp.message) {
                         alert(resp.message);
@@ -324,12 +337,14 @@ export default {
                       first_name: this.firstName,
                       last_name: this.lastName,
                       password: this.registerPassword,
+                      captcha_token: this.captchaToken,
                   }
                 : {
                       phone: this.registerUsername,
                       first_name: this.firstName,
                       last_name: this.lastName,
                       password: this.registerPassword,
+                      captcha_token: this.captchaToken,
                   };
 
             this.fetchJson(this.authApiUrl() + "/api/auth/register", null, {
@@ -340,8 +355,8 @@ export default {
                 body: JSON.stringify(registrationData),
             })
                 .then(resp => {
-                    if (resp.success && resp.data) {
-                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data);
+                    if (resp.success && resp.data && resp.data.token) {
+                        this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
                         window.location = import.meta.env.BASE_URL; // done to bypass cache
                     } else if (resp.message) {
                         alert(resp.message);
@@ -409,6 +424,63 @@ export default {
             this.passwordStrengthTextClass = textClass;
 
             return strength;
+        },
+        async loadTurnstile() {
+            // Check if Turnstile script is already loaded
+            if (!window.turnstile) {
+                // Load the Turnstile script dynamically
+                const script = document.createElement("script");
+                script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+
+                // Wait for the script to load
+                await new Promise(resolve => {
+                    script.onload = resolve;
+                });
+            }
+
+            // Initialize Turnstile widgets
+            // Note: You'll need to replace 'your-site-key' with your actual Cloudflare Turnstile site key
+            const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"; // Test key for development
+
+            if (window.turnstile) {
+                // Wait a bit for the DOM to update
+                setTimeout(() => {
+                    // Render login widget
+                    window.turnstile.render("#login-turnstile-widget", {
+                        sitekey: siteKey,
+                        callback: token => {
+                            this.captchaToken = token;
+                        },
+                        "error-callback": () => {
+                            console.error("Turnstile error occurred");
+                            this.captchaToken = null;
+                        },
+                        "expired-callback": () => {
+                            console.warn("Turnstile token expired");
+                            this.captchaToken = null;
+                        },
+                    });
+
+                    // Render register widget
+                    window.turnstile.render("#register-turnstile-widget", {
+                        sitekey: siteKey,
+                        callback: token => {
+                            this.captchaToken = token;
+                        },
+                        "error-callback": () => {
+                            console.error("Turnstile error occurred");
+                            this.captchaToken = null;
+                        },
+                        "expired-callback": () => {
+                            console.warn("Turnstile token expired");
+                            this.captchaToken = null;
+                        },
+                    });
+                }, 100);
+            }
         },
         isEmail(input) {
             // Taken from https://emailregex.com

@@ -11,9 +11,40 @@
 
             <!-- Password Reset Form -->
             <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-dark-800">
+                <!-- Request Password Reset Form -->
+                <form v-if="isRequestMode">
+                    <div class="mb-4">
+                        <input
+                            v-model="email"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="ایمیل"
+                            :aria-label="$t('password_reset.email')"
+                            @keyup.enter="requestPasswordReset"
+                        />
+                    </div>
+
+                    <div class="mb-4">
+                        <button
+                            type="button"
+                            class="w-full rounded-lg bg-blue-600 py-3 text-white font-bold transition duration-200 hover:bg-blue-700"
+                            @click="requestPasswordReset"
+                        >
+                            ارسال لینک بازنشانی
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <router-link to="/auth" class="text-blue-600 font-medium hover:text-blue-800">
+                            به ورود بازگردید
+                        </router-link>
+                    </div>
+                </form>
+
                 <!-- Reset Password Form (with token) -->
-                <form>
-                    <div class="relative mb-4">
+                <form v-else>
+                    <div class="mb-4">
                         <input
                             v-model="newPassword"
                             class="w-full border border-gray-300 rounded-lg px-4 py-3 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
@@ -95,6 +126,7 @@ import { checkPasswordStrength } from "@/utils/Misc.js";
 export default {
     data() {
         return {
+            isRequestMode: true, // true for requesting reset, false for resetting with token
             email: null,
             newPassword: null,
             confirmNewPassword: null,
@@ -124,10 +156,39 @@ export default {
 
         if (token) {
             this.token = token;
+            this.isRequestMode = false; // Switch to reset mode
             document.title = this.$t("titles.password_reset") + " - " + this.getSiteName();
         }
     },
     methods: {
+        async requestPasswordReset() {
+            if (!this.email) {
+                alert("لطفاً ایمیل خود را وارد کنید");
+                return;
+            }
+
+            try {
+                const response = await this.fetchJson(this.authApiUrl() + "/api/auth/request-password-reset", null, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: this.email,
+                    }),
+                });
+
+                if (response.success) {
+                    alert("لینک بازنشانی رمز عبور به ایمیل شما ارسال شد");
+                    this.$router.push("/auth");
+                } else {
+                    alert(response.message || "خطا در ارسال ایمیل بازنشانی");
+                }
+            } catch (error) {
+                console.error("Password reset request error:", error);
+                alert("خطا در ارسال درخواست: " + error.message);
+            }
+        },
         async resetPassword() {
             if (!this.isResetFormValid) {
                 alert("لطفاً فیلدها را به درستی پر کنید");
@@ -168,7 +229,7 @@ export default {
                 return;
             }
 
-            const result = checkPasswordStrength(this.newPassword, this.$i18n);
+            const result = checkPasswordStrength(this.newPassword);
             this.passwordStrength = result.strength;
             this.passwordStrengthText = result.text;
             this.passwordStrengthClass = result.barClass;

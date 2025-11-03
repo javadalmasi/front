@@ -52,19 +52,19 @@ const routes = [
         component: () => import("../components/ChannelPage.vue"),
     },
     {
-        path: "/auth",
+        path: "/authentication",
         name: "Authentication",
         component: () => import("../components/AuthenticationPage.vue"),
     },
     {
         path: "/login",
         name: "Login",
-        redirect: "/auth",
+        redirect: "/authentication",
     },
     {
         path: "/register",
         name: "Register",
-        redirect: "/auth",
+        redirect: "/authentication",
     },
     {
         path: "/feed",
@@ -176,7 +176,7 @@ router.beforeEach(async (to, from, next) => {
 
         if (!token) {
             // Redirect to login if not authenticated
-            next("/auth");
+            next("/authentication");
             return;
         }
 

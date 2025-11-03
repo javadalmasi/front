@@ -80,13 +80,4 @@ export default defineConfig({
         sourcemap: true,
         cssMinify: "lightningcss",
     },
-    server: {
-        proxy: {
-            "/api": {
-                target: process.env.VITE_IRONVEIN_USERS_API,
-                changeOrigin: true,
-                rewrite: path => path.replace(/^\/api/, ""),
-            },
-        },
-    },
 });
