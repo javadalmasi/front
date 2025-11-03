@@ -20,6 +20,7 @@
         "javascript-time-ago": "2.5.11",
         "linkify-html": "4.3.2",
         "linkifyjs": "4.3.2",
+        "primevue": "^4.4.1",
         "qrcode": "^1.5.3",
         "shaka-player": "4.15.9",
         "vazirmatn": "^33.0.3",

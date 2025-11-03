@@ -17,6 +17,8 @@ import "uno.css";
 
 const timeAgo = new TimeAgo("en-US");
 
+import("./registerServiceWorker");
+
 const mixin = {
     methods: {
         timeFormat: function (duration) {
@@ -38,8 +40,7 @@ const mixin = {
             return str;
         },
         numberFormat(num) {
-            // var loc = `fa-${import.meta.env.VITE_COUNTRY_REGION || "US"}`;
-            var loc = "fa";
+            var loc = `fa-${import.meta.env.VITE_COUNTRY_REGION || "US"}`;
 
             try {
                 Intl.getCanonicalLocales(loc);
@@ -116,13 +117,6 @@ const mixin = {
                 if (!disableAlert) alert(this.$t("info.local_storage"));
             }
         },
-        removePreference(key, disableAlert = false) {
-            try {
-                localStorage.removeItem(key);
-            } catch {
-                if (!disableAlert) alert(this.$t("info.local_storage"));
-            }
-        },
         getPreferenceBoolean(key, defaultVal) {
             var value;
             if (
@@ -169,16 +163,22 @@ const mixin = {
             } else return defaultVal;
         },
         userApiUrl() {
-            if (import.meta.env.DEV) {
-                return "/users-api";
-            }
-            return import.meta.env.VITE_IRONVEIN_USERS_API;
+            // Use the new IronVein-Users API
+            return import.meta.env.VITE_IRONVEIN_USERS_API || this.authApiUrl();
         },
+
         apiUrl() {
+            // Fixed to always use the custom instance
             return import.meta.env.VITE_PIPED_API;
         },
+        authApiUrl() {
+            // Use dedicated IronVein-Users API for authentication if available, fallback to main API
+            return import.meta.env.VITE_IRONVEIN_USERS_API || import.meta.env.VITE_PIPED_API;
+        },
         getAuthToken() {
-            return this.getPreferenceString("authToken" + this.hashCode(this.userApiUrl()));
+            // Try to get the token from the new user API first, fallback to old API
+            const token = this.getPreferenceString("authToken" + this.hashCode(this.userApiUrl()));
+            return token || this.getPreferenceString("authToken" + this.hashCode(this.authApiUrl()));
         },
         hashCode(s) {
             return s.split("").reduce(function (a, b) {
@@ -221,6 +221,7 @@ const mixin = {
             if (localSubscriptions.includes(channelId))
                 localSubscriptions.splice(localSubscriptions.indexOf(channelId), 1);
             else localSubscriptions.push(channelId);
+            // Sort for better cache hits
             localSubscriptions.sort();
             try {
                 localStorage.setItem("localSubscriptions", JSON.stringify(localSubscriptions));
@@ -245,7 +246,7 @@ const mixin = {
                 const channels = this.getUnauthenticatedChannels();
                 const split = channels.split(",");
                 if (split.length > 100) {
-                    return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", null, {
+                    return await this.fetchJson(this.authApiUrl() + "/subscriptions/unauthenticated", null, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -253,7 +254,7 @@ const mixin = {
                         body: JSON.stringify(split),
                     });
                 } else {
-                    return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", {
+                    return await this.fetchJson(this.authApiUrl() + "/subscriptions/unauthenticated", {
                         channels: this.getUnauthenticatedChannels(),
                     });
                 }
@@ -261,14 +262,16 @@ const mixin = {
         },
         async fetchFeed() {
             if (this.authenticated) {
-                return await this.fetchJson(this.apiUrl() + "/feed", {
+                // Note: The feed endpoint may still be on the main API, not the user API
+                // We'll need to verify if there's a user-specific feed endpoint on the new backend
+                return await this.fetchJson(this.authApiUrl() + "/feed", {
                     authToken: this.getAuthToken(),
                 });
             } else {
                 const channels = this.getUnauthenticatedChannels();
                 const split = channels.split(",");
                 if (split.length > 100) {
-                    return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", null, {
+                    return await this.fetchJson(this.authApiUrl() + "/feed/unauthenticated", null, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -276,15 +279,18 @@ const mixin = {
                         body: JSON.stringify(split),
                     });
                 } else {
-                    return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", {
+                    return await this.fetchJson(this.authApiUrl() + "/feed/unauthenticated", {
                         channels: channels,
                     });
                 }
             }
         },
+        /* generate a temporary file and ask the user to download it */
         download(text, filename, mimeType) {
             var file = new Blob([text], { type: mimeType });
+
             const elem = document.createElement("a");
+
             elem.href = URL.createObjectURL(file);
             elem.download = filename;
             elem.click();
@@ -325,7 +331,7 @@ const mixin = {
             store.delete(groupName);
         },
         async getLocalPlaylist(playlistId) {
-            return new Promise(resolve => {
+            return await new Promise(resolve => {
                 var tx = window.db.transaction("playlists", "readonly");
                 var store = tx.objectStore("playlists");
                 const req = store.openCursor(playlistId);
@@ -342,8 +348,10 @@ const mixin = {
             var store = tx.objectStore("playlists");
             store.put(playlist);
         },
+        // needs to handle both, streamInfo items and streams items
         createLocalPlaylistVideo(videoId, videoInfo) {
             if (videoInfo === undefined || videoId === null || videoInfo?.error) return;
+
             var tx = window.db.transaction("playlist_videos", "readwrite");
             var store = tx.objectStore("playlist_videos");
             const video = {
@@ -362,7 +370,7 @@ const mixin = {
             store.put(video);
         },
         async getLocalPlaylistVideo(videoId) {
-            return new Promise(resolve => {
+            return await new Promise(resolve => {
                 var tx = window.db.transaction("playlist_videos", "readonly");
                 var store = tx.objectStore("playlist_videos");
                 const req = store.openCursor(videoId);
@@ -374,7 +382,7 @@ const mixin = {
         async getPlaylists() {
             if (!this.authenticated) {
                 if (!window.db) return [];
-                return new Promise(resolve => {
+                return await new Promise(resolve => {
                     let playlists = [];
                     var tx = window.db.transaction("playlists", "readonly");
                     var store = tx.objectStore("playlists");
@@ -392,6 +400,7 @@ const mixin = {
                     };
                 });
             }
+
             return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
@@ -406,7 +415,8 @@ const mixin = {
                 playlist.relatedStreams = (await Promise.all(videosFuture)).filter(video => video !== undefined);
                 return playlist;
             }
-            return await this.fetchJson(this.apiUrl() + "/playlists/" + playlistId);
+
+            return await this.fetchJson(this.authApiUrl() + "/playlists/" + playlistId);
         },
         async createPlaylist(name) {
             if (!this.authenticated) {
@@ -414,14 +424,16 @@ const mixin = {
                 const playlistId = `local-${uuid}`;
                 this.createOrUpdateLocalPlaylist({
                     playlistId: playlistId,
+                    // remapping needed for the playlists page
                     id: playlistId,
                     name: name,
                     description: "",
                     thumbnail: import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com",
-                    videoIds: "[]",
+                    videoIds: "[]", // empty list
                 });
                 return { playlistId: playlistId };
             }
+
             return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
                 method: "POST",
                 body: JSON.stringify({
@@ -439,6 +451,7 @@ const mixin = {
                 var tx = window.db.transaction("playlists", "readwrite");
                 var store = tx.objectStore("playlists");
                 store.delete(playlistId);
+                // delete videos that don't need to be store anymore
                 const playlists = await this.getPlaylists();
                 const usedVideoIds = playlists
                     .filter(playlist => playlist.id != playlistId)
@@ -452,6 +465,8 @@ const mixin = {
                 }
                 return { message: "ok" };
             }
+
+            // Make a direct fetch call for DELETE since our fetchJson method may not support it properly
             const response = await fetch(this.userApiUrl() + "/api/user/playlists/" + playlistId, {
                 method: "DELETE",
                 headers: {
@@ -459,11 +474,13 @@ const mixin = {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
             });
+
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("Delete playlist error:", errorText);
                 throw new Error(errorText || "Failed to delete playlist");
             }
+
             return await response.json();
         },
         async renamePlaylist(playlistId, newName) {
@@ -473,8 +490,9 @@ const mixin = {
                 this.createOrUpdateLocalPlaylist(playlist);
                 return { message: "ok" };
             }
+
             return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
-                method: "POST",
+                method: "POST", // For now, using POST since we don't have a PUT endpoint
                 body: JSON.stringify({
                     name: newName,
                 }),
@@ -491,8 +509,9 @@ const mixin = {
                 this.createOrUpdateLocalPlaylist(playlist);
                 return { message: "ok" };
             }
+
             return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
-                method: "POST",
+                method: "POST", // For now, using POST since we don't have a PATCH endpoint
                 body: JSON.stringify({
                     description: newDescription,
                 }),
@@ -519,6 +538,8 @@ const mixin = {
                 }
                 return { message: "ok" };
             }
+
+            // Add videos one by one since our API expects single video additions
             const results = [];
             for (const videoId of videoIds) {
                 const result = await this.fetchJson(
@@ -537,6 +558,8 @@ const mixin = {
                 );
                 results.push(result);
             }
+
+            // Return success if all videos were added successfully
             return results.every(r => r.success) ? { message: "ok" } : { error: "Some videos failed to add" };
         },
         async removeVideoFromPlaylist(playlistId, index) {
@@ -549,6 +572,10 @@ const mixin = {
                 this.createOrUpdateLocalPlaylist(playlist);
                 return { message: "ok" };
             }
+
+            // Note: Our current API removes by video_id, not by index
+            // This requires getting the playlist first to identify the video at that index
+            // For now, we'll just return an error since the API doesn't support index-based removal
             console.error("Index-based removal not supported by current API. Use video_id instead.");
             return { error: "Not supported" };
         },
@@ -571,10 +598,13 @@ const mixin = {
         filterLivestreams(items) {
             if (this.isLiveStreamDisabled()) {
                 return items.filter(item => {
+                    // Check if it's a stream item and is a livestream
                     if (item.type === "stream") {
+                        // Don't filter out short videos, only livestreams
                         if (item.isShort === true) {
-                            return true;
+                            return true; // Keep short videos
                         }
+                        // Check various properties that might indicate a livestream
                         return !(
                             item.livestream === true ||
                             (item.duration !== undefined && item.duration <= 0) ||
@@ -583,18 +613,21 @@ const mixin = {
                             item.uploadedDate === null
                         );
                     }
-                    return true;
+                    return true; // Keep non-stream items
                 });
             }
             return items;
         },
         fetchDeArrowContent(content) {
             if (!this.getPreferenceBoolean("dearrow", false)) return;
+
             const videoIds = content
                 .filter(item => item.type === "stream")
                 .map(item => item.url.substr(-11))
                 .sort();
+
             if (videoIds.length === 0) return;
+
             this.fetchJson(this.apiUrl() + "/dearrow", {
                 videoIds: videoIds.join(","),
             }).then(json => {
@@ -608,21 +641,27 @@ const mixin = {
             if (!this.authenticated) {
                 return this.isSubscribedLocally(channelId);
             }
+
             const response = await this.fetchJson(this.userApiUrl() + "/api/user/subscriptions", null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
             });
+
             if (response.success && response.data) {
                 return response.data.includes(channelId);
             }
+
             return false;
         },
+
+        // API method to get admin user list
         async fetchAdminUsers(page = 1, limit = 10, search = null) {
             if (!this.authenticated) {
                 throw new Error("User is not authenticated");
             }
-            let url = `${this.userApiUrl()}/api/admin/users`;
+
+            let url = `${this.userApiUrl()}/admin/users`;
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: limit.toString(),
@@ -631,27 +670,34 @@ const mixin = {
                 params.append("search", search);
             }
             const fullUrl = `${url}?${params.toString()}`;
+
             return await this.fetchJson(fullUrl, null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
             });
         },
+
+        // API method to get a specific user (admin)
         async fetchAdminUser(userId) {
             if (!this.authenticated) {
                 throw new Error("User is not authenticated");
             }
-            return await this.fetchJson(`${this.userApiUrl()}/api/admin/users/${userId}`, null, {
+
+            return await this.fetchJson(`${this.userApiUrl()}/admin/users/${userId}`, null, {
                 headers: {
                     Authorization: "Bearer " + this.getAuthToken(),
                 },
             });
         },
+
+        // API method to update a user (admin)
         async updateAdminUser(userId, userData) {
             if (!this.authenticated) {
                 throw new Error("User is not authenticated");
             }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users/${userId}`, {
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users/${userId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -659,26 +705,34 @@ const mixin = {
                 },
                 body: JSON.stringify(userData),
             });
+
             return await response.json();
         },
+
+        // API method to delete a user (admin)
         async deleteAdminUser(userId) {
             if (!this.authenticated) {
                 throw new Error("User is not authenticated");
             }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users/${userId}`, {
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users/${userId}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${this.getAuthToken()}`,
                 },
             });
+
             return await response.json();
         },
+
+        // API method to create a new user (admin)
         async createAdminUser(userData) {
             if (!this.authenticated) {
                 throw new Error("User is not authenticated");
             }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users`, {
+
+            const response = await fetch(`${this.userApiUrl()}/admin/users`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -686,10 +740,12 @@ const mixin = {
                 },
                 body: JSON.stringify(userData),
             });
+
             return await response.json();
         },
         async toggleSubscriptionState(channelId, subscribed) {
             if (!this.authenticated) return this.handleLocalSubscriptions(channelId);
+
             const resp = await this.fetchJson(
                 this.userApiUrl() +
                     (subscribed ? "/api/user/subscriptions/unsubscribe" : "/api/user/subscriptions/subscribe"),
@@ -705,6 +761,7 @@ const mixin = {
                     },
                 },
             );
+
             return resp.success;
         },
         getCustomInstances() {
@@ -749,15 +806,18 @@ const mixin = {
                     }
                 }
             }
+            // Check for VITE_DEFAULT_LANGUAGE environment variable
             if (import.meta.env.VITE_DEFAULT_LANGUAGE) {
                 try {
                     await import(`./locales/${import.meta.env.VITE_DEFAULT_LANGUAGE}.json`);
                     return import.meta.env.VITE_DEFAULT_LANGUAGE;
                 } catch {
+                    // If the env variable language doesn't exist, fall back to fa
                     try {
                         await import(`./locales/fa.json`);
                         return "fa";
                     } catch {
+                        // If fa doesn't exist, fall back to en
                         return "en";
                     }
                 }
@@ -790,6 +850,7 @@ const i18n = createI18n({
 
 window.i18n = i18n;
 
+// Make the mixin globally available
 window.appMixin = mixin;
 
 const app = createApp(App);

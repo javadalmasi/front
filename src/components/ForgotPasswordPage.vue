@@ -9,22 +9,24 @@
 
             <!-- Forgot Password Form -->
             <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-dark-800">
-                <form @submit.prevent="sendResetLink">
+                <form>
                     <div class="mb-4">
                         <input
-                            v-model="identifier"
+                            v-model="email"
                             class="w-full border border-gray-300 rounded-lg px-4 py-3 dark:border-dark-400 focus:border-blue-500 dark:bg-dark-700 dark:text-white focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            autocomplete="username"
-                            :placeholder="$t('login.email_or_phone')"
-                            :aria-label="$t('login.email_or_phone')"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="آدرس ایمیل"
+                            :aria-label="$t('forgot_password.email')"
+                            @keyup.enter="sendResetLink"
                         />
                     </div>
 
                     <div class="mb-4">
                         <button
-                            type="submit"
+                            type="button"
                             class="w-full rounded-lg bg-blue-600 py-3 text-white font-bold transition duration-200 hover:bg-blue-700"
+                            @click="sendResetLink"
                         >
                             ارسال لینک بازنشانی
                         </button>
@@ -51,33 +53,36 @@
 export default {
     data() {
         return {
-            identifier: null,
+            email: null,
         };
     },
     methods: {
         async sendResetLink() {
-            if (!this.identifier) {
-                alert(this.$t("forgot_password.please_enter_email_or_phone"));
+            if (!this.email) {
+                alert("لطفاً آدرس ایمیل خود را وارد کنید");
                 return;
             }
 
             try {
-                const response = await this.fetchJson(this.userApiUrl() + "/api/auth/request-password-reset", null, {
+                const response = await this.fetchJson(this.authApiUrl() + "/api/auth/request-password-reset", null, {
                     method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                     body: JSON.stringify({
-                        email: this.identifier,
+                        email: this.email,
                     }),
                 });
 
                 if (response.success) {
-                    alert(this.$t("forgot_password.reset_link_sent"));
+                    alert("لینک بازنشانی رمز عبور به ایمیل شما ارسال شده است");
                     this.$router.push("/auth");
                 } else {
-                    alert(response.message || this.$t("forgot_password.error_sending_email"));
+                    alert(response.message || "خطا در ارسال ایمیل بازنشانی");
                 }
             } catch (error) {
                 console.error("Forgot password error:", error);
-                alert(this.$t("forgot_password.request_error") + ": " + error.message);
+                alert("خطا در ارسال درخواست: " + error.message);
             }
         },
     },
