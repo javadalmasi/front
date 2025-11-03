@@ -233,7 +233,7 @@ export default {
                 this.registerIdentifier &&
                 this.registerPassword &&
                 this.registerPassword === this.passwordConfirm &&
-                this.passwordStrength >= 40
+                this.passwordStrength >= 60
             );
         },
     },
@@ -273,17 +273,17 @@ export default {
                         this.setPreference("user" + this.hashCode(this.userApiUrl()), JSON.stringify(resp.data.user));
                         window.location = import.meta.env.BASE_URL;
                     } else {
-                        alert(resp.message || "Login failed");
+                        this.showToast(resp.message || "Login failed", "error");
                     }
                 })
                 .catch(error => {
                     console.error("Login error:", error);
-                    alert("Login failed: " + (error.message || "Unknown error"));
+                    this.showToast("Login failed: " + (error.message || "Unknown error"), "error");
                 });
         },
         register() {
             if (!this.isRegisterFormValid) {
-                alert(this.$t("login.please_fill_all_fields_correctly"));
+                this.showToast(this.$t("login.please_fill_all_fields_correctly"), "error");
                 return;
             }
 
@@ -303,12 +303,12 @@ export default {
                         this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
                         window.location = import.meta.env.BASE_URL;
                     } else {
-                        alert(resp.message || "Registration failed");
+                        this.showToast(resp.message || "Registration failed", "error");
                     }
                 })
                 .catch(error => {
                     console.error("Registration error:", error);
-                    alert("Registration failed: " + (error.message || "Unknown error"));
+                    this.showToast("Registration failed: " + (error.message || "Unknown error"), "error");
                 });
         },
         checkPasswordStrength() {

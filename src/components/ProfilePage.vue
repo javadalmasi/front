@@ -2,7 +2,15 @@
     <div class="container mx-auto px-4 py-6">
         <h1 class="mb-6 text-2xl font-bold">پروفایل کاربری</h1>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div v-if="loading" class="text-center">
+            <p>در حال بارگذاری اطلاعات...</p>
+        </div>
+
+        <div v-if="error" class="rounded-lg bg-red-100 p-4 text-red-700">
+            <p>{{ error }}</p>
+        </div>
+
+        <div v-if="!loading && !error" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <!-- Profile Info Section -->
             <div class="lg:col-span-2">
                 <div class="rounded-lg bg-white p-6 shadow-lg dark:bg-dark-800">
@@ -200,6 +208,8 @@ import { checkPasswordStrength } from "@/utils/Misc.js";
 export default {
     data() {
         return {
+            loading: true,
+            error: null,
             profile: {
                 firstName: "",
                 lastName: "",
@@ -238,6 +248,8 @@ export default {
     },
     methods: {
         async loadUserProfile() {
+            this.loading = true;
+            this.error = null;
             try {
                 const token = this.getAuthToken();
                 if (!token) {
@@ -245,11 +257,7 @@ export default {
                     return;
                 }
 
-                const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile", null, {
-                    headers: {
-                        Authorization: "Bearer " + token,
-                    },
-                });
+                const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile");
 
                 if (response.success && response.data) {
                     this.profile = {
@@ -262,11 +270,13 @@ export default {
                         isVerified: response.data.is_verified,
                     };
                 } else {
-                    alert(response.message || "خطا در بارگذاری اطلاعات پروفایل");
+                    this.error = response.message || "خطا در بارگذاری اطلاعات پروفایل";
                 }
             } catch (error) {
                 console.error("Error loading profile:", error);
-                alert("خطا در بارگذاری اطلاعات پروفایل: " + error.message);
+                this.error = "خطا در بارگذاری اطلاعات پروفایل: " + error.message;
+            } finally {
+                this.loading = false;
             }
         },
         async updateProfile() {
@@ -287,18 +297,18 @@ export default {
                 });
 
                 if (response.success) {
-                    alert("پروفایل با موفقیت به‌روزرسانی شد");
+                    this.showToast("پروفایل با موفقیت به‌روزرسانی شد", "success");
                 } else {
-                    alert(response.message || "خطا در به‌روزرسانی پروفایل");
+                    this.showToast(response.message || "خطا در به‌روزرسانی پروفایل", "error");
                 }
             } catch (error) {
                 console.error("Update profile error:", error);
-                alert("خطا در به‌روزرسانی پروفایل: " + error.message);
+                this.showToast("خطا در به‌روزرسانی پروفایل: " + error.message, "error");
             }
         },
         async changePassword() {
             if (!this.isPasswordFormValid) {
-                alert("لطفاً فیلدها را به درستی پر کنید");
+                this.showToast("لطفاً فیلدها را به درستی پر کنید", "error");
                 return;
             }
 
@@ -318,7 +328,7 @@ export default {
                 });
 
                 if (response.success) {
-                    alert("رمز عبور با موفقیت تغییر یافت");
+                    this.showToast("رمز عبور با موفقیت تغییر یافت", "success");
                     this.passwordForm = {
                         currentPassword: "",
                         newPassword: "",
@@ -326,11 +336,11 @@ export default {
                     };
                     this.passwordStrength = null;
                 } else {
-                    alert(response.message || "خطا در تغییر رمز عبور");
+                    this.showToast(response.message || "خطا در تغییر رمز عبور", "error");
                 }
             } catch (error) {
                 console.error("Change password error:", error);
-                alert("خطا در تغییر رمز عبور: " + error.message);
+                this.showToast("خطا در تغییر رمز عبور: " + error.message, "error");
             }
         },
         async requestAccountDeletion() {
@@ -353,13 +363,13 @@ export default {
                 });
 
                 if (response.success) {
-                    alert("درخواست حذف حساب با موفقیت ثبت شد");
+                    this.showToast("درخواست حذف حساب با موفقیت ثبت شد", "success");
                 } else {
-                    alert(response.message || "خطا در درخواست حذف حساب");
+                    this.showToast(response.message || "خطا در درخواست حذف حساب", "error");
                 }
             } catch (error) {
                 console.error("Account deletion error:", error);
-                alert("خطا در درخواست حذف حساب: " + error.message);
+                this.showToast("خطا در درخواست حذف حساب: " + error.message, "error");
             }
         },
         logout() {

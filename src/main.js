@@ -70,6 +70,11 @@ const mixin = {
                 fetchOptions.headers = {};
             }
 
+            const token = this.getAuthToken();
+            if (token) {
+                fetchOptions.headers["Authorization"] = "Bearer " + token;
+            }
+
             // Set Content-Type to application/json if we have a body and no Content-Type is set
             if (fetchOptions.body && !fetchOptions.headers["Content-Type"]) {
                 fetchOptions.headers["Content-Type"] = "application/json";
@@ -173,15 +178,9 @@ const mixin = {
             } else return defaultVal;
         },
         userApiUrl() {
-            if (import.meta.env.DEV) {
-                return "/users-api";
-            }
             return import.meta.env.VITE_IRONVEIN_USERS_API;
         },
         apiUrl() {
-            if (import.meta.env.DEV) {
-                return "/users-api";
-            }
             return import.meta.env.VITE_PIPED_API;
         },
         getAuthToken() {

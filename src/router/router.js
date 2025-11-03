@@ -157,11 +157,9 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const mixin = window.appMixin.methods;
     const token = mixin.getAuthToken();
-    const user = mixin.getPreferenceJSON("user" + mixin.hashCode(mixin.userApiUrl()));
-    console.log("user", user);
+    const user = mixin.getPreference("user" + mixin.hashCode(mixin.userApiUrl()));
 
     if (to.name === "Authentication" && token && user) {
-        console.log("user.role", user.role);
         if (user.role === "admin") {
             next({ name: "AdminDashboard" });
         } else {
