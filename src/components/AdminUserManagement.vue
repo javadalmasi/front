@@ -359,7 +359,22 @@ export default {
     methods: {
         async loadUsers() {
             try {
-                const response = await this.fetchAdminUsers(this.currentPage, 10, this.searchQuery);
+                const token = this.getAuthToken();
+                if (!token) {
+                    this.$router.push("/auth");
+                    return;
+                }
+                const response = await this.fetchJson(
+                    `${this.userApiUrl()}/api/admin/users?page=${this.currentPage}&limit=10&query=${
+                        this.searchQuery
+                    }`,
+                    null,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
                 if (response.success && response.data) {
                     this.users = response.data.users;
                     this.totalUsers = response.data.total;
@@ -399,7 +414,22 @@ export default {
         },
         async updateUser() {
             try {
-                const result = await this.updateAdminUser(this.editUserForm.id, this.editUserForm);
+                const token = this.getAuthToken();
+                if (!token) {
+                    this.$router.push("/auth");
+                    return;
+                }
+                const result = await this.fetchJson(
+                    `${this.userApiUrl()}/api/admin/users/${this.editUserForm.id}`,
+                    null,
+                    {
+                        method: "POST",
+                        body: JSON.stringify(this.editUserForm),
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
                 if (result.success) {
                     this.showEditUserModal = false;
                     await this.loadUsers();
@@ -417,7 +447,17 @@ export default {
                 return;
             }
             try {
-                const result = await this.deleteAdminUser(userId);
+                const token = this.getAuthToken();
+                if (!token) {
+                    this.$router.push("/auth");
+                    return;
+                }
+                const result = await this.fetchJson(`${this.userApiUrl()}/api/admin/users/${userId}`, null, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (result.success) {
                     await this.loadUsers();
                     alert("کاربر با موفقیت حذف شد");
@@ -431,7 +471,18 @@ export default {
         },
         async createNewUser() {
             try {
-                const result = await this.createAdminUser(this.newUser);
+                const token = this.getAuthToken();
+                if (!token) {
+                    this.$router.push("/auth");
+                    return;
+                }
+                const result = await this.fetchJson(`${this.userApiUrl()}/api/admin/users`, null, {
+                    method: "POST",
+                    body: JSON.stringify(this.newUser),
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 if (result.success) {
                     this.showCreateUserModal = false;
                     this.newUser = {

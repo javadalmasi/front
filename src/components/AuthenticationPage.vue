@@ -287,7 +287,7 @@ export default {
             }
 
             const registrationData = {
-                identifier: this.registerIdentifier,
+                email: this.registerIdentifier,
                 first_name: this.firstName,
                 last_name: this.lastName,
                 password: this.registerPassword,

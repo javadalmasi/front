@@ -309,11 +309,11 @@ export default {
                     return;
                 }
 
-                const response = await this.fetchJson(this.userApiUrl() + "/api/user/change-password", null, {
+                const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile", null, {
                     method: "POST",
                     body: JSON.stringify({
                         current_password: this.passwordForm.currentPassword,
-                        new_password: this.passwordForm.newPassword,
+                        password: this.passwordForm.newPassword,
                     }),
                 });
 

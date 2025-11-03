@@ -17,8 +17,6 @@ import "uno.css";
 
 const timeAgo = new TimeAgo("en-US");
 
-import("./registerServiceWorker");
-
 const mixin = {
     methods: {
         timeFormat: function (duration) {
@@ -40,7 +38,8 @@ const mixin = {
             return str;
         },
         numberFormat(num) {
-            var loc = `fa-${import.meta.env.VITE_COUNTRY_REGION || "US"}`;
+            // var loc = `fa-${import.meta.env.VITE_COUNTRY_REGION || "US"}`;
+            var loc = "fa";
 
             try {
                 Intl.getCanonicalLocales(loc);
