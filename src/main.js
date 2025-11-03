@@ -169,7 +169,10 @@ const mixin = {
             } else return defaultVal;
         },
         userApiUrl() {
-            return "https://users.vidioo.ir";
+            if (import.meta.env.DEV) {
+                return "/users-api";
+            }
+            return import.meta.env.VITE_IRONVEIN_USERS_API;
         },
         apiUrl() {
             return import.meta.env.VITE_PIPED_API;
@@ -720,6 +723,16 @@ const mixin = {
         },
         getSiteName() {
             return import.meta.env.VITE_SITE_NAME || "Piped";
+        },
+        showToast(message, type = "info") {
+            window.dispatchEvent(
+                new CustomEvent("show-toast", {
+                    detail: {
+                        message,
+                        type,
+                    },
+                }),
+            );
         },
     },
     computed: {

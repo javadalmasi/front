@@ -38,6 +38,9 @@
                 'pr-0': sidebarState === 'closed' || isWatchPage,
             }"
         />
+        <ToastComponent v-if="toast.message" @dismissed="dismissToast">
+            {{ toast.message }}
+        </ToastComponent>
     </div>
 </template>
 
@@ -45,6 +48,7 @@
 import NavBar from "./components/NavBar.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import AppSidebar from "./components/Sidebar.vue";
+import ToastComponent from "./components/ToastComponent.vue";
 
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -53,6 +57,7 @@ export default {
         NavBar,
         FooterComponent,
         AppSidebar,
+        ToastComponent,
     },
     data() {
         return {
@@ -62,6 +67,10 @@ export default {
             isMobile: false,
             routeChangeTimeout: null,
             previousSidebarState: "semi-open", // Track previous state when leaving non-watch pages
+            toast: {
+                message: null,
+                type: "info",
+            },
         };
     },
     computed: {
@@ -97,6 +106,7 @@ export default {
         },
     },
     mounted() {
+        window.addEventListener("show-toast", this.showToast);
         window.addEventListener("sidebarStateChanged", this.updateSidebarState);
         this.setTheme();
         darkModePreference.addEventListener("change", this.setTheme);
@@ -185,6 +195,7 @@ export default {
         })();
     },
     beforeUnmount() {
+        window.removeEventListener("show-toast", this.showToast);
         window.removeEventListener("sidebarStateChanged", this.updateSidebarState);
         darkModePreference.removeEventListener("change", this.setTheme);
         window.removeEventListener("resize", this.checkIsMobile);
@@ -193,6 +204,13 @@ export default {
         }
     },
     methods: {
+        showToast(event) {
+            this.toast.message = event.detail.message;
+            this.toast.type = event.detail.type;
+        },
+        dismissToast() {
+            this.toast.message = null;
+        },
         checkIsMobile() {
             this.isMobile = window.innerWidth < 768;
             if (this.isMobile) {
