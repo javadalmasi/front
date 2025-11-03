@@ -80,13 +80,4 @@ export default defineConfig({
         sourcemap: true,
         cssMinify: "lightningcss",
     },
-    server: {
-        proxy: {
-            "/users-api": {
-                target: "http://localhost:8082",
-                changeOrigin: true,
-                rewrite: path => path.replace(/^\/users-api/, ""),
-            },
-        },
-    },
 });

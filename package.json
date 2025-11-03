@@ -8,8 +8,9 @@
         "build": "vite build",
         "preview": "vite preview",
         "format": "prettier -w --ignore-path .gitignore **/**.{js,vue,json}",
-        "lint": "eslint --color src/**/*.js src/*.js *.config.js *.cjs",
-        "lint-check": "eslint --color src/**/*.js src/*.js *.config.js *.cjs"
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "lint-check": "eslint ."
     },
     "dependencies": {
         "dompurify": "3.2.6",

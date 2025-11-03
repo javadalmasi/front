@@ -43,7 +43,14 @@ export function checkPasswordStrength(password, i18n) {
     return {
         strength: strength,
         text: text,
-        class: strength < 40 ? "bg-red-500" : strength < 75 ? "bg-yellow-500" : strength < 90 ? "bg-blue-500" : "bg-green-500",
+        class:
+            strength < 40
+                ? "bg-red-500"
+                : strength < 75
+                  ? "bg-yellow-500"
+                  : strength < 90
+                    ? "bg-blue-500"
+                    : "bg-green-500",
         textClass: textClass,
     };
 }

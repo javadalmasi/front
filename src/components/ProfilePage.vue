@@ -118,7 +118,9 @@
                                     :style="{ width: passwordStrength + '%' }"
                                 ></div>
                             </div>
-                            <div class="mt-1 text-sm" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</div>
+                            <div class="mt-1 text-sm" :class="passwordStrengthTextClass">
+                                {{ passwordStrengthText }}
+                            </div>
                         </div>
 
                         <div class="mt-6">
