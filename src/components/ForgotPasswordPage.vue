@@ -57,29 +57,27 @@ export default {
     methods: {
         async sendResetLink() {
             if (!this.identifier) {
-                this.showToast(this.$t("forgot_password.please_enter_email_or_phone"), "error");
+                alert(this.$t("forgot_password.please_enter_email_or_phone"));
                 return;
             }
 
             try {
                 const response = await this.fetchJson(this.userApiUrl() + "/api/auth/request-password-reset", null, {
                     method: "POST",
-                    body: JSON.stringify(
-                        this.identifier.includes("@")
-                            ? { email: this.identifier }
-                            : { phone: this.identifier, email: "" },
-                    ),
+                    body: JSON.stringify({
+                        email: this.identifier,
+                    }),
                 });
 
                 if (response.success) {
-                    this.showToast(this.$t("forgot_password.reset_link_sent"), "success");
+                    alert(this.$t("forgot_password.reset_link_sent"));
                     this.$router.push("/auth");
                 } else {
-                    this.showToast(response.message || this.$t("forgot_password.error_sending_email"), "error");
+                    alert(response.message || this.$t("forgot_password.error_sending_email"));
                 }
             } catch (error) {
                 console.error("Forgot password error:", error);
-                this.showToast(this.$t("forgot_password.request_error") + ": " + error.message, "error");
+                alert(this.$t("forgot_password.request_error") + ": " + error.message);
             }
         },
     },

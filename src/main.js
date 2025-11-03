@@ -165,7 +165,11 @@ const mixin = {
                 (value = new URLSearchParams(window.location.search).get(key)) !== null ||
                 (this.testLocalStorage && (value = localStorage.getItem(key)) !== null)
             ) {
-                return JSON.parse(value);
+                try {
+                    return JSON.parse(value);
+                } catch (e) {
+                    return defaultVal;
+                }
             } else return defaultVal;
         },
         userApiUrl() {
@@ -175,6 +179,9 @@ const mixin = {
             return import.meta.env.VITE_IRONVEIN_USERS_API;
         },
         apiUrl() {
+            if (import.meta.env.DEV) {
+                return "/users-api";
+            }
             return import.meta.env.VITE_PIPED_API;
         },
         getAuthToken() {
@@ -723,16 +730,6 @@ const mixin = {
         },
         getSiteName() {
             return import.meta.env.VITE_SITE_NAME || "Piped";
-        },
-        showToast(message, type = "info") {
-            window.dispatchEvent(
-                new CustomEvent("show-toast", {
-                    detail: {
-                        message,
-                        type,
-                    },
-                }),
-            );
         },
     },
     computed: {

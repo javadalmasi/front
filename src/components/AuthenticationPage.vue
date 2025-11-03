@@ -233,7 +233,7 @@ export default {
                 this.registerIdentifier &&
                 this.registerPassword &&
                 this.registerPassword === this.passwordConfirm &&
-                this.passwordStrength >= 60
+                this.passwordStrength >= 40
             );
         },
     },
@@ -270,33 +270,29 @@ export default {
                 .then(resp => {
                     if (resp.success && resp.data && resp.data.token) {
                         this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
+                        this.setPreference("user" + this.hashCode(this.userApiUrl()), JSON.stringify(resp.data.user));
                         window.location = import.meta.env.BASE_URL;
                     } else {
-                        this.showToast(resp.message || "Login failed", "error");
+                        alert(resp.message || "Login failed");
                     }
                 })
                 .catch(error => {
                     console.error("Login error:", error);
-                    this.showToast("Login failed: " + (error.message || "Unknown error"), "error");
+                    alert("Login failed: " + (error.message || "Unknown error"));
                 });
         },
         register() {
             if (!this.isRegisterFormValid) {
-                this.showToast(this.$t("login.please_fill_all_fields_correctly"), "error");
+                alert(this.$t("login.please_fill_all_fields_correctly"));
                 return;
             }
 
             const registrationData = {
+                email: this.registerIdentifier,
                 first_name: this.firstName,
                 last_name: this.lastName,
                 password: this.registerPassword,
             };
-
-            if (this.registerIdentifier.includes("@")) {
-                registrationData.email = this.registerIdentifier;
-            } else {
-                registrationData.phone = this.registerIdentifier;
-            }
 
             this.fetchJson(this.userApiUrl() + "/api/auth/register", null, {
                 method: "POST",
@@ -307,12 +303,12 @@ export default {
                         this.setPreference("authToken" + this.hashCode(this.userApiUrl()), resp.data.token);
                         window.location = import.meta.env.BASE_URL;
                     } else {
-                        this.showToast(resp.message || "Registration failed", "error");
+                        alert(resp.message || "Registration failed");
                     }
                 })
                 .catch(error => {
                     console.error("Registration error:", error);
-                    this.showToast("Registration failed: " + (error.message || "Unknown error"), "error");
+                    alert("Registration failed: " + (error.message || "Unknown error"));
                 });
         },
         checkPasswordStrength() {

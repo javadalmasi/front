@@ -155,10 +155,22 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    if (to.meta.requiresAuth) {
-        const mixin = window.appMixin.methods;
-        const token = mixin.getAuthToken();
+    const mixin = window.appMixin.methods;
+    const token = mixin.getAuthToken();
+    const user = mixin.getPreferenceJSON("user" + mixin.hashCode(mixin.userApiUrl()));
+    console.log("user", user);
 
+    if (to.name === "Authentication" && token && user) {
+        console.log("user.role", user.role);
+        if (user.role === "admin") {
+            next({ name: "AdminDashboard" });
+        } else {
+            next({ name: "Profile" });
+        }
+        return;
+    }
+
+    if (to.meta.requiresAuth) {
         if (!token) {
             next("/auth");
             return;
