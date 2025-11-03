@@ -64,9 +64,6 @@ export default {
             try {
                 const response = await this.fetchJson(this.userApiUrl() + "/api/auth/request-password-reset", null, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
                     body: JSON.stringify({
                         identifier: this.identifier,
                     }),

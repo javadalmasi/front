@@ -118,9 +118,7 @@
                                     :style="{ width: passwordStrength + '%' }"
                                 ></div>
                             </div>
-                            <div class="mt-1 text-sm" :class="passwordStrengthTextClass">
-                                {{ passwordStrengthText }}
-                            </div>
+                            <div class="mt-1 text-sm" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</div>
                         </div>
 
                         <div class="mt-6">
@@ -281,10 +279,6 @@ export default {
 
                 const response = await this.fetchJson(this.userApiUrl() + "/api/user/profile", null, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + token,
-                    },
                     body: JSON.stringify({
                         first_name: this.profile.firstName,
                         last_name: this.profile.lastName,
@@ -317,10 +311,6 @@ export default {
 
                 const response = await this.fetchJson(this.userApiUrl() + "/api/user/change-password", null, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + token,
-                    },
                     body: JSON.stringify({
                         current_password: this.passwordForm.currentPassword,
                         new_password: this.passwordForm.newPassword,
@@ -357,10 +347,6 @@ export default {
 
                 const response = await this.fetchJson(this.userApiUrl() + "/api/user/account-deletion/request", null, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + token,
-                    },
                     body: JSON.stringify({
                         password: prompt("برای تأیید، لطفاً رمز عبور خود را وارد کنید:"),
                     }),

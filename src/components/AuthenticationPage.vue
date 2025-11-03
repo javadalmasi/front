@@ -265,9 +265,6 @@ export default {
 
             this.fetchJson(this.userApiUrl() + "/api/auth/login", null, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 body: JSON.stringify(loginData),
             })
                 .then(resp => {
@@ -298,9 +295,6 @@ export default {
 
             this.fetchJson(this.userApiUrl() + "/api/auth/register", null, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 body: JSON.stringify(registrationData),
             })
                 .then(resp => {

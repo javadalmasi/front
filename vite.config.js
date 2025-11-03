@@ -69,7 +69,9 @@ export default defineConfig({
                 ],
             },
         }),
-        eslintPlugin(),
+        eslintPlugin({
+          exclude: ['/node_modules/**', 'dist/**'],
+        }),
     ],
     resolve: {
         alias: {
