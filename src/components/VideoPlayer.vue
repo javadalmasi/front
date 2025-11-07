@@ -788,7 +788,7 @@ export default {
                         this.parent.appendChild(this.button);
 
                         this.eventManager.listen(this.button, "click", () => {
-                            this.video.dispatchEvent(new Event("toggle-theater"));
+                            this.controls.getVideo().dispatchEvent(new Event("toggle-theater"));
                         });
                     }
                 };
@@ -826,7 +826,7 @@ export default {
                         this.parent.appendChild(this.button);
 
                         this.eventManager.listen(this.button, "click", () => {
-                            this.video.dispatchEvent(new Event("toggle-loop"));
+                            this.controls.getVideo().dispatchEvent(new Event("toggle-loop"));
                         });
                     }
                 };
@@ -864,7 +864,7 @@ export default {
                         this.parent.appendChild(this.button);
 
                         this.eventManager.listen(this.button, "click", () => {
-                            this.video.dispatchEvent(new Event("cycle-autoplay"));
+                            this.controls.getVideo().dispatchEvent(new Event("cycle-autoplay"));
                         });
                     }
                 };
