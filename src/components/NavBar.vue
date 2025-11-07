@@ -198,9 +198,7 @@ export default {
             });
         },
         async fetchAuthConfig() {
-            this.fetchJson(this.authApiUrl() + "/config").then(config => {
-                this.registrationDisabled = config?.registrationDisabled === true;
-            });
+
         },
         submitSearch() {
             if (this.searchText && typeof this.searchText === "string" && this.searchText.trim() !== "") {

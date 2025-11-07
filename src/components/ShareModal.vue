@@ -96,7 +96,7 @@ export default {
     },
     computed: {
         generatedLink() {
-            const baseUrl = window.location.origin + "/watch?v=" + this.videoId;
+            const baseUrl = window.location.origin + "/v/" + this.videoId;
             const url = new URL(baseUrl);
 
             if (this.withTimeCode && this.timeStamp)

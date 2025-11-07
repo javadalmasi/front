@@ -115,7 +115,7 @@
                     <input
                         type="checkbox"
                         class="checkbox"
-                        :checked="selectedGroup.channels.includes(subscription.url.substr(-24))"
+                        :checked="selectedGroup.channels.includes(subscription.id)"
                         @change="checkedChange(subscription)"
                     />
                 </div>
@@ -151,7 +151,7 @@ export default {
         filteredSubscriptions(_this) {
             return _this.selectedGroup.groupName == ""
                 ? _this.subscriptions
-                : _this.subscriptions.filter(channel => _this.selectedGroup.channels.includes(channel.url.substr(-24)));
+                : _this.subscriptions.filter(channel => _this.selectedGroup.channels.includes(channel.id));
         },
     },
     mounted() {
@@ -263,7 +263,7 @@ export default {
             this.groupToDelete = null;
         },
         checkedChange(subscription) {
-            const channelId = subscription.url.substr(-24);
+            const channelId = subscription.id;
             this.selectedGroup.channels = this.selectedGroup.channels.includes(channelId)
                 ? this.selectedGroup.channels.filter(channel => channel != channelId)
                 : this.selectedGroup.channels.concat(channelId);

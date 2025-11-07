@@ -48,7 +48,6 @@ export default {
                 this.videos = videos;
             }
             this.updateWatched(this.videos);
-            this.fetchDeArrowContent(this.videos);
         });
     },
     activated() {

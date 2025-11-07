@@ -16,7 +16,7 @@
     <div ref="scrollable" class="mt-4 max-h-screen-sm overflow-y-auto">
         <div
             v-for="(related, index) in playlist.relatedStreams"
-            :key="related.url"
+            :key="related.id"
             :index="index"
             :playlist-id="playlistId"
             :prefer-listen="preferListen"
@@ -31,9 +31,8 @@
                           : 'bg-gray-100 dark:bg-gray-800'
                 "
                 :to="{
-                    path: '/watch',
+                    path: `/v/${related.id}`,
                     query: {
-                        v: related.url.substr(-11),
                         ...(playlistId && { list: playlistId }),
                         ...(index >= 0 && { index: index + 1 }),
                         ...(preferListen && { listen: 1 }),

@@ -259,7 +259,7 @@ export default {
         },
         async createPlaylistWithVideos(playlist) {
             let newPlaylist = await this.createPlaylist(playlist.name);
-            let videoIds = playlist.videos.map(url => url.substr(-11));
+            let videoIds = playlist.videos.map(video => typeof video === 'string' ? video.substr(-11) : video.id);
             await this.addVideosToPlaylist(newPlaylist.playlistId, videoIds);
         },
         async loadPlaylistBookmarks() {

@@ -27,9 +27,23 @@ const routes = [
         component: () => import("../components/PlaylistPage.vue"),
     },
     {
+        path: "/v/:v",
+        name: "WatchVideoNew",
+        component: () => import("../components/WatchVideo.vue"),
+    },
+    {
         path: "/:path(v|w|embed|live|shorts|watch)/:v?",
         name: "WatchVideo",
         component: () => import("../components/WatchVideo.vue"),
+    },
+    {
+        path: "/watch",
+        redirect: (to) => {
+            if (to.query.v) {
+                return { path: `/v/${to.query.v}` };
+            }
+            return { path: "/" };
+        }
     },
     {
         path: "/watch_videos",

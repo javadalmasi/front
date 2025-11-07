@@ -170,7 +170,6 @@ export default {
             if (!this.videosStore) return;
             this.currentVideoCount = Math.min(this.currentVideoCount + this.videoStep, this.videosStore.length);
             if (this.videos.length != this.videosStore.length) {
-                this.fetchDeArrowContent(this.videosStore.slice(this.videos.length, this.currentVideoCount));
                 this.videos = this.videosStore.slice(0, this.currentVideoCount);
             }
         },

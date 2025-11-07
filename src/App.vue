@@ -79,7 +79,7 @@ export default {
             this.routeChangeTimeout = setTimeout(() => {
                 const wasWatchPage = this.isWatchPage;
                 const previousState = this.sidebarState; // Preserve current state before changing isWatchPage
-                this.isWatchPage = to.name === "WatchVideo" || to.name === "SearchResults";
+                this.isWatchPage = to.name === "WatchVideo" || to.name === "WatchVideoNew" || to.name === "SearchResults";
 
                 if (this.isWatchPage) {
                     // On watch pages, always close the sidebar, but remember previous state
@@ -104,7 +104,7 @@ export default {
         this.checkIsMobile();
         window.addEventListener("resize", this.checkIsMobile);
 
-        this.isWatchPage = this.$route.name === "WatchVideo" || this.$route.name === "SearchResults";
+        this.isWatchPage = this.$route.name === "WatchVideo" || this.$route.name === "WatchVideoNew" || this.$route.name === "SearchResults";
         if (this.isWatchPage) {
             this.previousSidebarState = this.sidebarState; // Remember the state before switching to watch
             this.sidebarState = "closed";
@@ -148,9 +148,9 @@ export default {
                             for (let i = 0; i < group.channels.length; i++) {
                                 const tooShortChannelId = group.channels[i];
                                 const foundChannel = subscriptions.find(
-                                    channel => channel.url.substr(-11) == tooShortChannelId,
+                                    channel => channel.id == tooShortChannelId,
                                 );
-                                if (foundChannel) group.channels[i] = foundChannel.url.substr(-24);
+                                if (foundChannel) group.channels[i] = foundChannel.id;
                             }
                             this.createOrUpdateChannelGroup(group);
                         }

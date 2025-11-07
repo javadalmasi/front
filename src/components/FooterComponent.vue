@@ -43,11 +43,7 @@ export default {
     },
     methods: {
         async fetchConfig() {
-            this.fetchJson(this.apiUrl() + "/config").then(config => {
-                this.donationHref = config?.donationUrl;
-                this.statusPageHref = config?.statusPageUrl;
-                this.privacyPolicyHref = config?.privacyPolicyUrl;
-            });
+
         },
     },
 };

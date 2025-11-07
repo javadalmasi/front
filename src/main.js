@@ -194,7 +194,7 @@ const mixin = {
                 var tx = window.db.transaction("watch_history", "readonly");
                 var store = tx.objectStore("watch_history");
                 videos.map(async video => {
-                    var request = store.get(video.url.substr(-11));
+                    var request = store.get(video.id);
                     request.onsuccess = function (event) {
                         if (event.target.result) {
                             video.watched = event.target.result.currentTime != 0;
@@ -351,7 +351,7 @@ const mixin = {
                 title: videoInfo.title,
                 type: "stream",
                 shortDescription: videoInfo.shortDescription ?? videoInfo.description,
-                url: `/watch?v=${videoId}`,
+                url: `/v/${videoId}`,
                 thumbnail: videoInfo.thumbnail ?? videoInfo.thumbnailUrl,
                 uploaderVerified: videoInfo.uploaderVerified,
                 duration: videoInfo.duration,
@@ -510,7 +510,7 @@ const mixin = {
                 playlist.videoIds = JSON.stringify(currentVideoIds);
                 let streamInfos =
                     videoInfos ??
-                    (await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/streams/" + videoId))));
+                    (await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/api/video/" + videoId))));
                 playlist.thumbnail = streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl;
                 this.createOrUpdateLocalPlaylist(playlist);
                 for (let i in videoIds) {
@@ -570,40 +570,41 @@ const mixin = {
         },
         filterLivestreams(items) {
             if (this.isLiveStreamDisabled()) {
+                // Check if items is an array before filtering
+                if (!Array.isArray(items)) {
+                    console.warn('filterLivestreams: items is not an array', items);
+                    return items;
+                }
                 return items.filter(item => {
-                    if (item.type === "stream") {
+                    // Determine if item is a stream based on properties if type is undefined
+                    const isStream = item?.type === "stream" || 
+                        (item && item.id && (item.duration !== undefined || item.uploader !== undefined || item.views !== undefined));
+                        
+                    if (isStream) {
+                        // Check if it's a short video (these should never be considered livestreams)
                         if (item.isShort === true) {
                             return true;
                         }
-                        return !(
-                            item.livestream === true ||
-                            (item.duration !== undefined && item.duration <= 0) ||
-                            (item.duration === undefined && item.isLive === true) ||
-                            (item.duration !== undefined && item.duration === -1) ||
-                            item.uploadedDate === null
+                        
+                        // More specific livestream detection - only filter if it's definitely a livestream
+                        // A livestream should have properties that clearly indicate it's live
+                        const isDefinitelyLivestream = (
+                            item.livestream === true ||  // Explicitly marked as livestream
+                            (item.isLive === true && item.duration === undefined) ||  // Live flag with no duration
+                            (item.duration !== undefined && item.duration === -1) ||  // Explicitly marked with -1 duration
+                            (item.duration !== undefined && item.duration <= 0 && item.uploadedDate === null)  // Negative duration with null upload date
                         );
+                        
+                        // Only filter OUT the item if it's definitely a livestream
+                        // Otherwise keep the item
+                        return !isDefinitelyLivestream;
                     }
                     return true;
                 });
             }
             return items;
         },
-        fetchDeArrowContent(content) {
-            if (!this.getPreferenceBoolean("dearrow", false)) return;
-            const videoIds = content
-                .filter(item => item.type === "stream")
-                .map(item => item.url.substr(-11))
-                .sort();
-            if (videoIds.length === 0) return;
-            this.fetchJson(this.apiUrl() + "/dearrow", {
-                videoIds: videoIds.join(","),
-            }).then(json => {
-                Object.keys(json).forEach(videoId => {
-                    const item = content.find(item => item.url.endsWith(videoId));
-                    if (item) item.dearrow = json[videoId];
-                });
-            });
-        },
+
         async fetchSubscriptionStatus(channelId) {
             if (!this.authenticated) {
                 return this.isSubscribedLocally(channelId);

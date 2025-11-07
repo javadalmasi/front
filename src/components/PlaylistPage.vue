@@ -143,7 +143,6 @@ export default {
                         this.playlist.relatedStreams = this.filterLivestreams(this.playlist.relatedStreams);
                     }
                     this.updateWatched(this.playlist.relatedStreams);
-                    this.fetchDeArrowContent(this.playlist.relatedStreams);
                 });
         },
         async updateTitle() {
@@ -174,7 +173,6 @@ export default {
                     }
 
                     this.updateTotalDuration();
-                    this.fetchDeArrowContent(json.relatedStreams);
                 });
             }
         },

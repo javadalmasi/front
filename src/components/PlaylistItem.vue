@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col flex-justify-between">
-        <router-link :to="props.item.url" class="link inline-block">
+        <router-link :to="{path: '/playlist', query: { list: props.item.id }}" class="link inline-block">
             <div class="relative">
                 <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
                 <div

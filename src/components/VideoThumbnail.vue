@@ -113,10 +113,10 @@ export default {
     },
     computed: {
         title() {
-            return this.item.dearrow?.titles[0]?.title ?? this.item.title;
+            return this.item.title;
         },
         thumbnail() {
-            return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
+            return this.item.thumbnail;
         },
         optimizedThumbnail() {
             // Only transform video thumbnails, not channel avatars or other images
@@ -137,6 +137,12 @@ export default {
                 // For other images (like channel avatars), return the original URL
                 return this.thumbnail;
             }
+            // If no thumbnail field exists, use the video ID to construct the thumbnail URL
+            else if (this.item.id) {
+                // Use getOptimalThumbnailUrl with an empty string and the video ID in options
+                return getOptimalThumbnailUrl('', { videoId: this.item.id });
+            }
+            // Fallback to the thumbnail (which would be undefined/empty)
             return this.thumbnail;
         },
     },

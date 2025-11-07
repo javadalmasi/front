@@ -3,9 +3,8 @@
         <router-link
             class="link inline-block w-full"
             :to="{
-                path: '/watch',
+                path: `/v/${item.id}`,
                 query: {
-                    v: item.url.substr(-11),
                     ...(playlistId && { list: playlistId }),
                     ...(index >= 0 && { index: index + 1 }),
                     ...(preferListen && { listen: 1 }),
@@ -74,9 +73,8 @@
             <div v-if="!shouldHideVideoItemIcons" class="flex items-center gap-2.5">
                 <router-link
                     :to="{
-                        path: '/watch',
+                        path: `/v/${item.id}`,
                         query: {
-                            v: item.url.substr(-11),
                             ...(playlistId && { list: playlistId }),
                             ...(index >= 0 && { index: index + 1 }),
                             ...(!preferListen && { listen: 1 }),
@@ -108,7 +106,7 @@
                 <button
                     v-if="showMarkOnWatched && isFeed"
                     ref="watchButton"
-                    @click="toggleWatched(item.url.substr(-11))"
+                    @click="toggleWatched(item.id)"
                 >
                     <i
                         v-if="item.watched && item.currentTime > item.duration * 0.9"
@@ -121,17 +119,17 @@
                     v-if="showConfirmRemove"
                     :message="$t('actions.delete_playlist_video_confirm')"
                     @close="showConfirmRemove = false"
-                    @confirm="removeVideo(item.url.substr(-11))"
+                    @confirm="removeVideo(item.id)"
                 />
                 <PlaylistAddModal
                     v-if="showPlaylistModal"
-                    :video-id="item.url.substr(-11)"
+                    :video-id="item.id"
                     :video-info="item"
                     @close="showPlaylistModal = false"
                 />
                 <ShareModal
                     v-if="showShareModal"
-                    :video-id="item.url.substr(-11)"
+                    :video-id="item.id"
                     :current-time="0"
                     @close="showShareModal = false"
                 />
@@ -180,10 +178,10 @@ export default {
     },
     computed: {
         title() {
-            return this.item.dearrow?.titles[0]?.title ?? this.item.title;
+            return this.item.title;
         },
         thumbnail() {
-            return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
+            return this.item.thumbnail;
         },
         lineClampStyle() {
             // Apply line clamping only if the prop is true
@@ -217,7 +215,7 @@ export default {
             if (!this.isFeed || !this.getPreferenceBoolean("hideWatched", false)) return;
 
             const objectStore = window.db.transaction("watch_history", "readonly").objectStore("watch_history");
-            const request = objectStore.get(this.item.url.substr(-11));
+            const request = objectStore.get(this.item.id);
             request.onsuccess = event => {
                 const video = event.target.result;
                 if (video && (video.currentTime ?? 0) > video.duration * 0.9) {
@@ -253,7 +251,7 @@ export default {
                     video.currentTime =
                         instance.item.currentTime < instance.item.duration * 0.9 ? instance.item.duration : 0;
                     store.put(video);
-                    instance.$emit("update:watched", [instance.item.url]);
+                    instance.$emit("update:watched", [instance.item.id]);
                     instance.shouldShowVideo();
                 };
             }

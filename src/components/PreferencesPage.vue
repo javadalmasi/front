@@ -303,14 +303,7 @@
         </label>
     </div>
 
-    <h2 v-if="!isDeArrowIntegrationDisabled" v-t="'titles.dearrow'" class="text-center" />
-    <p v-if="!isDeArrowIntegrationDisabled" class="text-center">
-        <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
-    </p>
-    <label v-if="!isDeArrowIntegrationDisabled" class="pref" for="chkDeArrow">
-        <strong v-t="'actions.enable_dearrow'" class="tooltip-hover" :title="$t('tooltips.enable_dearrow')" />
-        <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
-    </label>
+
 
     <!-- options that are visible only when logged in -->
     <div v-if="authenticated">
@@ -385,7 +378,6 @@ export default {
             ]),
             showMarkers: true,
             minSegmentLength: 0,
-            dearrow: false,
             selectedTheme: "dark",
             autoPlayVideo: true,
             autoDisplayCaptions: false,
@@ -439,9 +431,7 @@ export default {
         isPrefetchLimitDisabled() {
             return import.meta.env.VITE_DISABLE_PREFETCH_LIMIT === "true";
         },
-        isDeArrowIntegrationDisabled() {
-            return import.meta.env.VITE_DISABLE_DEARROW_INTEGRATION === "true";
-        },
+
     },
     activated() {
         document.title = this.$t("titles.preferences") + " - " + this.getSiteName();
@@ -470,7 +460,6 @@ export default {
 
             this.showMarkers = this.getPreferenceBoolean("showMarkers", true);
             this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
-            this.dearrow = this.getPreferenceBoolean("dearrow", false);
             this.selectedTheme = this.getPreferenceString("theme", "dark");
             this.autoPlayVideo = this.getPreferenceBoolean("playerAutoPlay", true);
             this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
@@ -525,8 +514,6 @@ export default {
 
                 localStorage.setItem("showMarkers", this.showMarkers);
                 localStorage.setItem("minSegmentLength", this.minSegmentLength);
-
-                localStorage.setItem("dearrow", this.dearrow);
 
                 localStorage.setItem("theme", this.selectedTheme);
                 localStorage.setItem("playerAutoPlay", this.autoPlayVideo);

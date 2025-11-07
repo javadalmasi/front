@@ -1,6 +1,6 @@
 <template>
     <div class="h-full flex flex-col items-center justify-center text-center">
-        <router-link :to="item.url" class="link font-bold">
+        <router-link :to="{path: '/channel', query: { c: item.id }}" class="link font-bold">
             <div class="my-4 flex justify-center">
                 <div class="relative inline-block">
                     <img
@@ -89,7 +89,7 @@ export default {
             return {};
         },
         channelId(_this) {
-            return _this.item.url.substr(-24);
+            return _this.item.id;
         },
     },
     mounted() {

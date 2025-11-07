@@ -184,7 +184,6 @@ export default {
                         this.contentItems = this.channel.relatedStreams;
                         this.fetchSubscribedStatus();
                         this.updateWatched(this.channel.relatedStreams);
-                        this.fetchDeArrowContent(this.channel.relatedStreams);
                         this.tabs.push({
                             translatedName: this.$t("video.videos"),
                         });
@@ -238,8 +237,6 @@ export default {
                 if (newItems.length > 0) {
                     this.contentItems.push(...newItems);
                 }
-
-                this.fetchDeArrowContent(json.relatedStreams);
             });
         },
         fetchChannelTabNextPage() {
@@ -264,7 +261,6 @@ export default {
                     this.contentItems.push(...newItems);
                 }
 
-                this.fetchDeArrowContent(json.content);
                 this.tabs[this.selectedTab].content = this.contentItems;
             });
         },
@@ -319,7 +315,6 @@ export default {
                     tab.content = this.filterLivestreams(tab.content);
                 }
                 this.contentItems = this.tabs[index].content = tab.content;
-                this.fetchDeArrowContent(tab.content);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
             });
         },

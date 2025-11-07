@@ -134,7 +134,7 @@ export default {
                 /(?:http(?:s)?:\/\/)?(?:www\.)?youtube\.com(\/[/a-zA-Z0-9_?=&-]*)/gm.exec(query)?.[1] ??
                 /(?:http(?:s)?:\/\/)?(?:www\.)?youtu\.be\/(?:watch\?v=)?([/a-zA-Z0-9_?=&-]*)/gm
                     .exec(query)?.[1]
-                    .replace(/^/, "/watch?v=");
+                    .replace(/^/, "/v/");
             if (url) {
                 this.$router.push(url);
                 return true;

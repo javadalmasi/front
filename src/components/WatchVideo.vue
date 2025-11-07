@@ -44,6 +44,7 @@
                                     :selected-auto-play="selectedAutoPlay"
                                     :selected-auto-loop="selectedAutoLoop"
                                     :theater-mode="theaterMode"
+                                    :playlist="playlist"
                                     @timeupdate="onTimeUpdate"
                                     @ended="onVideoEnded"
                                     @navigate-next="navigateNext"
@@ -330,7 +331,7 @@
                     <div v-show="showRecs" class="px-2">
                         <ContentItem
                             v-for="related in video.relatedStreams"
-                            :key="related.url"
+                            :key="related.id"
                             :item="related"
                             :prefer-listen="isListening"
                             :clamp-title-lines="false"
@@ -400,7 +401,7 @@
                 <div v-show="showRecs">
                     <ContentItem
                         v-for="related in video.relatedStreams"
-                        :key="related.url"
+                        :key="related.id"
                         :item="related"
                         :prefer-listen="isListening"
                         :clamp-title-lines="false"
@@ -700,6 +701,18 @@ export default {
             ? true
             : !this.getPreferenceBoolean("minimizeRecommendations", false);
         this.showChapters = !this.chaptersDisabled && !this.getPreferenceBoolean("minimizeChapters", false);
+        
+        // Clean up redundant query parameter if both path param and query param exist with same value
+        if (this.$route.params.v && this.$route.query.v && this.$route.params.v === this.$route.query.v) {
+            // Remove the redundant query parameter
+            const newQuery = { ...this.$route.query };
+            delete newQuery.v;
+            this.$router.replace({
+                path: this.$route.path,
+                query: newQuery
+            });
+        }
+        
         if (this.video?.duration) {
             document.title = this.video.title + " - " + this.getSiteName();
             this.$refs.videoPlayer.loadVideo();
@@ -715,6 +728,21 @@ export default {
         window.removeEventListener("scroll", this.handleScroll);
         window.removeEventListener("click", this.handleClick);
         this.dismiss();
+    },
+    watch: {
+        // Watch for changes to the video property and load the video player when it updates
+        video: {
+            handler(newVideo) {
+                if (newVideo && !newVideo.error && this.$refs.videoPlayer) {
+                    // Wait a little to ensure DOM is updated before loading video
+                    this.$nextTick(() => {
+                        this.$refs.videoPlayer.loadVideo();
+                    });
+                }
+            },
+            // Deep watch to detect changes to nested properties
+            deep: true
+        }
     },
     methods: {
         onDescriptionExpanded(isExpanded) {
@@ -734,8 +762,53 @@ export default {
                     video.uploadedDate === null)
             );
         },
-        fetchVideo() {
-            return this.fetchJson(this.apiUrl() + "/streams/" + this.getVideoId());
+        async fetchVideo() {
+            const videoId = this.getVideoId();
+            try {
+                // Fetch all three endpoints in parallel for efficiency
+                const [videoInfo, relatedStreams, playerData] = await Promise.all([
+                    this.fetchJson(this.apiUrl() + "/api/video/" + videoId),
+                    this.fetchJson(this.apiUrl() + "/api/video/related/" + videoId),
+                    this.fetchJson(this.apiUrl() + "/api/video/player/" + videoId)
+                ]);
+                
+                // Check if any of the API responses have errors
+                if (videoInfo.error) {
+                    console.error("Error fetching video info:", videoInfo.message);
+                    return videoInfo; // Return error object to be handled by UI
+                }
+                if (relatedStreams.error) {
+                    console.error("Error fetching related streams:", relatedStreams.message);
+                    relatedStreams = []; // Default to empty array if error
+                }
+                if (playerData.error) {
+                    console.error("Error fetching player data:", playerData.message);
+                    // Return error if player data is critical
+                    return { error: true, message: playerData.message || "Failed to load player data" };
+                }
+                
+                // Combine the data into a single object that matches the old structure
+                const result = {
+                    ...videoInfo,
+                    ...playerData,
+                    relatedStreams: Array.isArray(relatedStreams) ? relatedStreams : (relatedStreams?.relatedStreams || [])
+                };
+                
+                // If thumbnailUrl is not provided by API, generate it using the video ID and CDN
+                if (!result.thumbnailUrl && videoId) {
+                    const cdnBaseUrl = import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL || 
+                        "https://impx.global.ssl.fastly.net/fragrant-fire-439a.laagaw.workers.dev/vi/";
+                    result.thumbnailUrl = `${cdnBaseUrl}${videoId}?resize=320,180`;
+                }
+                
+                return result;
+            } catch (error) {
+                console.error("Error fetching video data:", error);
+                return { 
+                    error: true, 
+                    message: "Failed to load video data: " + error.message 
+                };
+            }
         },
         async fetchSponsors() {
             var selectedSkip = this.getPreferenceString(
@@ -828,8 +901,6 @@ export default {
                                 this.video.relatedStreams = this.filterLivestreams(this.video.relatedStreams);
                             }
                             this.updateWatched(this.video.relatedStreams);
-
-                            this.fetchDeArrowContent(this.video.relatedStreams);
                         }
 
                         const parser = new DOMParser();
@@ -853,8 +924,6 @@ export default {
                             this.video.relatedStreams = this.filterLivestreams(this.video.relatedStreams);
                         }
                         this.updateWatched(this.video.relatedStreams);
-
-                        this.fetchDeArrowContent(this.video.relatedStreams);
                     }
                 });
         },
@@ -864,7 +933,7 @@ export default {
                 await this.fetchPlaylistPages().then(() => {
                     if (!(this.index >= 0)) {
                         for (let i = 0; i < this.playlist.relatedStreams.length; i++)
-                            if (this.playlist.relatedStreams[i].url.substr(-11) == this.getVideoId()) {
+                            if (this.playlist.relatedStreams[i].id == this.getVideoId()) {
                                 this.index = i + 1;
                                 this.$router.replace({
                                     query: { ...this.$route.query, index: this.index },
@@ -881,9 +950,9 @@ export default {
                 await this.fetchJson(this.apiUrl() + "/nextpage/playlists/" + this.playlistId, {
                     nextpage: this.playlist.nextpage,
                 }).then(json => {
-                    // Filter out duplicate items based on URL before adding them
+                    // Filter out duplicate items based on ID before adding them
                     const newItems = json.relatedStreams.filter(
-                        newItem => !this.playlist.relatedStreams.some(existingItem => existingItem.url === newItem.url),
+                        newItem => !this.playlist.relatedStreams.some(existingItem => existingItem.id === newItem.id),
                     );
 
                     // Only add items if there are non-duplicate ones
@@ -892,7 +961,6 @@ export default {
                     }
 
                     this.playlist.nextpage = json.nextpage;
-                    this.fetchDeArrowContent(json.relatedStreams);
                 });
                 await this.fetchPlaylistPages();
             }
@@ -1010,11 +1078,11 @@ export default {
             const video_ids = this.$route.query.video_ids?.split(",") ?? [];
             let url;
             if (this.playlist) {
-                url = this.playlist?.relatedStreams?.[this.index]?.url ?? this.video.relatedStreams[0].url;
+                url = this.playlist?.relatedStreams?.[this.index]?.url ?? `/v/${this.video.relatedStreams[0].id}`;
             } else if (video_ids.length > this.index + 1) {
                 url = `${this.$route.path}?index=${this.index + 1}`;
             } else {
-                url = this.video.relatedStreams[0].url;
+                url = `/v/${this.video.relatedStreams[0].id}`;
             }
             const searchParams = new URLSearchParams();
             for (var param in params)
@@ -1036,7 +1104,11 @@ export default {
             // save the fullscreen state
             searchParams.set("fullscreen", this.$refs.videoPlayer.$ui.getControls().isFullScreenEnabled());
             const paramStr = searchParams.toString();
-            if (paramStr.length > 0) url += "&" + paramStr;
+            if (paramStr.length > 0) {
+                // Use '?' if there are no existing query parameters in the URL, otherwise use '&'
+                const separator = url.includes('?') ? '&' : '?';
+                url += separator + paramStr;
+            }
             this.$router.push(url);
         },
         downloadCurrentFrame() {

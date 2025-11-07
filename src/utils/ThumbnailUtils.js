@@ -18,7 +18,7 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
         import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL ||
         "https://impx.global.ssl.fastly.net/fragrant-fire-439a.laagaw.workers.dev/vi/";
 
-    // Extract video ID from the original URL if not provided
+    // Extract video ID - prioritize the one provided in options, then try extracting from URL
     let videoId = options.videoId;
     if (!videoId && originalThumbnailUrl) {
         // Extract video ID from YouTube thumbnail URL patterns
@@ -29,14 +29,13 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
         const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
         if (videoIdMatch && videoIdMatch[1]) {
             videoId = videoIdMatch[1];
-        } else {
-            // If we can't extract from the URL, try to get it from options
-            // If still not available, return the original URL
-            if (!options.videoId) {
-                console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
-                return originalThumbnailUrl;
-            }
         }
+    }
+
+    // If we still don't have a video ID, log an error and return original URL
+    if (!videoId) {
+        console.error("No video ID available for thumbnail generation:", { originalThumbnailUrl, options });
+        return originalThumbnailUrl || "";
     }
 
     // Determine dimensions (default 320x180)

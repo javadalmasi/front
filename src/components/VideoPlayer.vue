@@ -117,6 +117,7 @@ export default {
         selectedAutoLoop: Boolean,
         isEmbed: Boolean,
         theaterMode: Boolean,
+        playlist: Object,  // Add playlist prop to determine if we're in a playlist context
     },
     emits: ["timeupdate", "ended", "navigateNext", "toggle-theater", "toggle-loop", "cycle-autoplay"],
     data() {
@@ -139,7 +140,22 @@ export default {
     },
     computed: {
         shouldAutoPlay: _this => {
-            return _this.getPreferenceBoolean("playerAutoPlay", true) && !_this.isEmbed;
+            // Respect the autoplay setting as configured by the parent component
+            // If selectedAutoPlay is 0 (Never), don't autoplay
+            // If selectedAutoPlay is 1 (Playlists Only), only autoplay if in a playlist context
+            // If selectedAutoPlay is 2 (Always), always allow autoplay if other conditions are met
+            if (_this.selectedAutoPlay === 0) {
+                return false; // Never autoplay if user selected "Never"
+            } else {
+                // If user selected "Always" or "Playlists Only", check other conditions
+                const baseCondition = _this.getPreferenceBoolean("playerAutoPlay", true) && !_this.isEmbed;
+                if (_this.selectedAutoPlay === 2) { // Always
+                    return baseCondition;
+                } else { // Playlists Only (value 1)
+                    // For "Playlists Only", only allow autoplay if there's a playlist context
+                    return baseCondition && !!_this.playlist; // Only if base condition is met AND there's a playlist
+                }
+            }
         },
         preferredVideoCodecs: _this => {
             var preferredVideoCodecs = [];
@@ -455,6 +471,12 @@ export default {
             const component = this;
             const videoEl = this.$refs.videoEl;
 
+            // Check if video data exists before proceeding
+            if (!this.video) {
+                console.error("Video data is not available");
+                return;
+            }
+
             // Transform the thumbnail URL to use the CDN with 16:9 aspect ratio suitable for displays
             const cdnThumbnailUrl = this.getOptimalThumbnailUrlForPlayer(this.video.thumbnailUrl);
             videoEl.setAttribute("poster", cdnThumbnailUrl);
@@ -462,9 +484,27 @@ export default {
             const noPrevPlayer = !this.$player;
 
             var streams = [];
+            
+            // Safely get audio and video streams with default empty arrays
+            const audioStreams = this.video.audioStreams || [];
+            const videoStreams = this.video.videoStreams || [];
 
-            streams.push(...this.video.audioStreams);
-            streams.push(...this.video.videoStreams);
+            streams.push(...audioStreams);
+            streams.push(...videoStreams);
+
+            // Check if we have any streams or direct URLs for playback
+            const hasHls = this.video.hls;
+            const hasDash = this.video.dash;
+            const hasAnyStreams = streams.length > 0;
+            
+            if (!hasHls && !hasDash && !hasAnyStreams) {
+                console.error("No playback sources available for this video", this.video);
+                // Optionally show an error message to the user
+                if (this.$refs.videoEl) {
+                    this.$refs.videoEl.innerHTML = '<div class="text-center p-4">No video sources available</div>';
+                }
+                return;
+            }
 
             const MseSupport = window.MediaSource !== undefined || window.ManagedMediaSource !== undefined;
 
@@ -483,27 +523,49 @@ export default {
                 !this.getPreferenceBoolean("preferHls", false)
             ) {
                 if (!this.video.dash) {
-                    // Add proxyUrl to each stream format for CDN replacement
-                    const streamsWithProxy = streams.map(stream => ({
-                        ...stream,
-                        proxyUrl: this.video.proxyUrl,
-                    }));
-
-                    const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
-                        streamsWithProxy,
-                        this.video.duration,
+                    // Filter streams to only include those with essential properties needed for DASH generation
+                    const validStreams = streams.filter(stream => 
+                        stream && 
+                        stream.url && 
+                        stream.mimeType && 
+                        (stream.itag || stream.quality || stream.bitrate)
                     );
+                    
+                    if (validStreams.length > 0) {
+                        try {
+                            // Add proxyUrl to each stream format for CDN replacement
+                            const streamsWithProxy = validStreams.map(stream => ({
+                                ...stream,
+                                proxyUrl: this.video.proxyUrl,
+                            }));
 
-                    uri = "data:application/dash+xml;charset=utf-8;base64," + btoa(dash);
+                            const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
+                                streamsWithProxy,
+                                this.video.duration || 0, // Provide default duration if not available
+                            );
+
+                            uri = "data:application/dash+xml;charset=utf-8;base64," + btoa(dash);
+                        } catch (e) {
+                            console.error("Error generating DASH manifest:", e);
+                            // Fallback to HLS if available, otherwise let other conditions handle it
+                            if (this.video.hls) {
+                                uri = this.video.hls;
+                                mime = "application/x-mpegURL";
+                            }
+                        }
+                    }
+                        // If no valid streams for DASH, fallback to direct URL if available
+                        console.warn("No valid streams for DASH generation, checking for direct URLs...");
+                        // We'll let the other branches of the if statement handle fallback
                 } else {
                     const url = new URL(this.video.dash);
                     url.searchParams.set("rewrite", false);
                     uri = url.toString();
-                }
                 mime = "application/dash+xml";
+            }
             } else if (lbry) {
                 uri = lbry.url;
-                if (this.getPreferenceBoolean("proxyLBRY", false)) {
+                if (this.getPreferenceBoolean("proxyLBRY", false) && this.video.proxyUrl) {
                     const url = new URL(uri);
                     const proxyURL = new URL(this.video.proxyUrl);
                     let proxyPath = proxyURL.pathname;
@@ -542,10 +604,13 @@ export default {
 
                     const localPlayer = new this.$shaka.Player();
                     await localPlayer.attach(videoEl);
-                    const proxyURL = new URL(component.video.proxyUrl);
-                    let proxyPath = proxyURL.pathname;
-                    if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
-                        proxyPath = proxyPath.substring(0, proxyPath.length - 1);
+                    let proxyPath = "";
+                    if (component.video.proxyUrl) {
+                        const proxyURL = new URL(component.video.proxyUrl);
+                        proxyPath = proxyURL.pathname;
+                        if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
+                            proxyPath = proxyPath.substring(0, proxyPath.length - 1);
+                        }
                     }
 
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
@@ -553,13 +618,16 @@ export default {
                         var url = new URL(uri);
                         const headers = request.headers;
                         if (
-                            url.host.endsWith(".googlevideo.com") ||
+                            component.video.proxyUrl && 
+                            proxyPath && 
+                            (url.host.endsWith(".googlevideo.com") ||
                             (url.host.endsWith(".lbryplayer.xyz") &&
-                                (component.getPreferenceBoolean("proxyLBRY", false) || headers.Range))
+                                (component.getPreferenceBoolean("proxyLBRY", false) || headers.Range)))
                         ) {
                             url.searchParams.set("host", url.host);
-                            url.protocol = proxyURL.protocol;
-                            url.host = proxyURL.host;
+                            const tempProxyURL = new URL(component.video.proxyUrl);
+                            url.protocol = tempProxyURL.protocol;
+                            url.host = tempProxyURL.host;
                             url.pathname = proxyPath + url.pathname;
                             request.uris[0] = url.toString();
                         }
@@ -572,9 +640,9 @@ export default {
                         }
 
                         // Apply CDN replacement if enabled
-                        if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true") {
+                        if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true" && component.video.proxyUrl) {
                             const cdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
-                            const processedUrl = replaceWithCdnUrl(request.uris[0], proxyURL.toString(), cdnUrl);
+                            const processedUrl = replaceWithCdnUrl(request.uris[0], component.video.proxyUrl, cdnUrl);
                             request.uris[0] = processedUrl;
                         }
                     });
@@ -619,19 +687,21 @@ export default {
                 videoEl.addEventListener("ended", () => {
                     this.$emit("ended");
                 });
-
-                videoEl.addEventListener("toggle-theater", () => {
-                    this.$emit("toggle-theater");
-                });
-
-                videoEl.addEventListener("toggle-loop", () => {
-                    this.$emit("toggle-loop");
-                });
-
-                videoEl.addEventListener("cycle-autoplay", () => {
-                    this.$emit("cycle-autoplay");
-                });
             }
+            
+            // Always attach these essential UI event listeners regardless of whether there's a previous player
+            // This ensures UI controls work when switching between videos on the same player instance
+            videoEl.addEventListener("toggle-theater", () => {
+                this.$emit("toggle-theater");
+            });
+
+            videoEl.addEventListener("toggle-loop", () => {
+                this.$emit("toggle-loop");
+            });
+
+            videoEl.addEventListener("cycle-autoplay", () => {
+                this.$emit("cycle-autoplay");
+            });
             //TODO: Add sponsors on seekbar: https://github.com/ajayyy/SponsorBlock/blob/e39de9fd852adb9196e0358ed827ad38d9933e29/src/js-components/previewBar.ts#L12
         },
         findCurrentSegment(time) {
@@ -650,7 +720,7 @@ export default {
             segment.skipped = true;
         },
         async setPlayerAttrs(localPlayer, videoEl, uri, mime, shaka) {
-            const url = "/watch?v=" + this.video.id;
+            const url = "/v/" + this.video.id;
 
             if (!this.$ui) {
                 this.destroy();

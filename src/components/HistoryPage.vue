@@ -90,7 +90,7 @@ export default {
                     if (response.success && response.data) {
                         // Transform server data to match the expected format for VideoItem
                         this.videosStore = response.data.map(item => ({
-                            url: "/watch?v=" + item.video_id,
+                            url: "/v/" + item.video_id,
                             title: item.title || item.video_id, // title might not be in the DB yet
                             uploaderName: item.uploader_name || "",
                             uploaderUrl: item.uploader_url || "",
@@ -115,7 +115,7 @@ export default {
                                     const video = cursor.value;
                                     if (!this.shouldRemoveVideo(video)) {
                                         this.videosStore.push({
-                                            url: "/watch?v=" + video.videoId,
+                                            url: "/v/" + video.videoId,
                                             title: video.title,
                                             uploaderName: video.uploaderName,
                                             uploaderUrl: video.uploaderUrl ?? "", // Router doesn't like undefined
