@@ -29,6 +29,7 @@
                 </div>
                 <!-- Search Filters Dropdown (visible on desktop) -->
                 <select
+                    v-if="!searchFiltersDisabled"
                     :value="selectedFilterProp"
                     class="ddlSearchFilters hidden h-12 min-w-[100px] border border-gray-300 rounded-md bg-gray-100 px-2 text-base md:block dark:border-dark-200 dark:bg-dark-400"
                     @change="
@@ -92,6 +93,9 @@ export default {
             set(value) {
                 this.$emit("update:search-text", value);
             },
+        },
+        searchFiltersDisabled() {
+            return import.meta.env.VITE_DISABLE_SEARCH_FILTERS === "true";
         },
     },
     methods: {
