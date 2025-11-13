@@ -8,7 +8,6 @@ services:
         environment:
             - VITE_PIPED_API=https://api.vidioo.ir
             - VITE_PIPED_PROXY=https://pipedproxy.kavin.rocks
-            - VITE_IRONVEIN_USERS_API=https://users.vidioo.ir
             - VITE_SITE_NAME=vidioo
             - VITE_DEFAULT_LANGUAGE=fa
             - VITE_CALENDAR_TYPE=jalali
