@@ -58,7 +58,7 @@ export default {
         this.getPlaylists().then(json => {
             this.playlists = json;
         });
-        this.selectedPlaylist = this.getPreferenceString("selectedPlaylist" + this.hashCode(this.authApiUrl()));
+        this.selectedPlaylist = this.getPreferenceString("selectedPlaylist" + this.hashCode(this.apiUrl()));
         window.addEventListener("keydown", this.handleKeyDown);
         window.blur();
     },
@@ -84,7 +84,7 @@ export default {
             this.processing = true;
 
             this.addVideosToPlaylist(playlistId, [this.videoId], [this.videoInfo]).then(json => {
-                this.setPreference("selectedPlaylist" + this.hashCode(this.authApiUrl()), playlistId);
+                this.setPreference("selectedPlaylist" + this.hashCode(this.apiUrl()), playlistId);
                 this.$emit("close");
                 if (json.error) alert(json.error);
             });

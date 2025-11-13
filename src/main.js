@@ -168,12 +168,7 @@ const mixin = {
                 return JSON.parse(value);
             } else return defaultVal;
         },
-        userApiUrl() {
-            if (import.meta.env.DEV) {
-                return "/users-api";
-            }
-            return import.meta.env.VITE_IRONVEIN_USERS_API;
-        },
+
         apiUrl() {
             return import.meta.env.VITE_PIPED_API;
         },

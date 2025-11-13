@@ -193,7 +193,7 @@ export default {
             });
         },
         async fetchAuthConfig() {
-            this.fetchJson(this.authApiUrl() + "/config").then(config => {
+            this.fetchJson(this.apiUrl() + "/config").then(config => {
                 this.registrationDisabled = config?.registrationDisabled === true;
             });
         },

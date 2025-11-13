@@ -99,7 +99,7 @@ export default {
     },
     computed: {
         getRssUrl(_this) {
-            return _this.authApiUrl() + "/feed/unauthenticated/rss?channels=" + _this.getUnauthenticatedChannels();
+            return _this.apiUrl() + "/feed/unauthenticated/rss?channels=" + _this.getUnauthenticatedChannels();
         },
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable

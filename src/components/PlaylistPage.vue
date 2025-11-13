@@ -93,7 +93,7 @@ export default {
     },
     computed: {
         getRssUrl: _this => {
-            return _this.authApiUrl() + "/rss/playlists/" + _this.$route.query.list;
+            return _this.apiUrl() + "/rss/playlists/" + _this.$route.query.list;
         },
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
@@ -146,7 +146,7 @@ export default {
             if (this.loading || !this.playlist || !this.playlist.nextpage) return;
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - window.innerHeight) {
                 this.loading = true;
-                this.fetchJson(this.authApiUrl() + "/nextpage/playlists/" + this.$route.query.list, {
+                this.fetchJson(this.apiUrl() + "/nextpage/playlists/" + this.$route.query.list, {
                     nextpage: this.playlist.nextpage,
                 }).then(json => {
                     this.playlist.nextpage = json.nextpage;
