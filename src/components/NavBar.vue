@@ -117,12 +117,7 @@ export default {
         isOnSearchResultsPage() {
             return this.$route.name === "SearchResults";
         },
-        shouldShowLogin() {
-            return this.getAuthToken() == null;
-        },
-        shouldShowRegister() {
-            return !this.registrationDisabled && this.shouldShowLogin;
-        },
+
         shouldShowHistory() {
             return this.getPreferenceBoolean("watchHistory", false);
         },

@@ -138,27 +138,8 @@ export default {
             });
         },
         handleImport() {
-            if (this.authenticated) {
-                this.fetchJson(
-                    this.authApiUrl() + "/import",
-                    {
-                        override: this.override,
-                    },
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: this.getAuthToken(),
-                        },
-                        body: JSON.stringify(this.subscriptions),
-                    },
-                ).then(json => {
-                    if (json.message === "ok") window.location = "/feed";
-                });
-            } else {
-                this.importSubscriptionsLocally(this.subscriptions);
-                window.location = "/feed";
-            }
+            this.importSubscriptionsLocally(this.subscriptions);
+            window.location = "/feed";
         },
         importSubscriptionsLocally(newChannels) {
             const subscriptions = this.override

@@ -68,42 +68,13 @@ export default {
         };
     },
     mounted() {
-        // Redirect to login if not authenticated and trying to access protected functionality
-        if (!this.authenticated && this.getPreferenceBoolean("requireAuthForHistory", true)) {
-            this.$router.push("/login");
-            return;
-        }
-
         this.autoDeleteHistory = this.getPreferenceBoolean("autoDeleteWatchHistory", false);
         this.autoDeleteDelayHours = this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24");
 
         (async () => {
             try {
-                // If user is authenticated, fetch history from server
-                if (this.authenticated) {
-                    const response = await this.fetchJson(this.userApiUrl() + "/api/user/history", null, {
-                        headers: {
-                            Authorization: "Bearer " + this.getAuthToken(),
-                        },
-                    });
-
-                    if (response.success && response.data) {
-                        // Transform server data to match the expected format for VideoItem
-                        this.videosStore = response.data.map(item => ({
-                            url: "/watch?v=" + item.video_id,
-                            title: item.title || item.video_id, // title might not be in the DB yet
-                            uploaderName: item.uploader_name || "",
-                            uploaderUrl: item.uploader_url || "",
-                            duration: item.duration || 0,
-                            thumbnail: item.thumbnail || "",
-                            watchedAt: new Date(item.watched_at).getTime(),
-                            watched: true,
-                            currentTime: item.progress || 0,
-                        }));
-                    }
-                }
-                // Otherwise, use local IndexedDB history
-                else if (window.db) {
+                // Use local IndexedDB history
+                if (window.db) {
                     var tx = window.db.transaction("watch_history", "readwrite");
                     var store = tx.objectStore("watch_history");
                     const cursorRequest = store.index("watchedAt").openCursor(null, "prev");

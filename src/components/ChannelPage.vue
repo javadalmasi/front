@@ -33,7 +33,6 @@
 
             <div class="flex gap-2">
                 <button
-                    v-if="authenticated"
                     :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
                     @click="subscribeHandler"
                 >
@@ -45,13 +44,6 @@
                         numberFormat(channel.subscriberCount)
                     }}
                 </button>
-
-                <button
-                    v-if="authenticated && subscribed && !isAddToGroupDisabled"
-                    v-t="'actions.add_to_group'"
-                    class="btn btn-secondary"
-                    @click="showGroupModal = true"
-                ></button>
 
                 <!-- RSS Feed button -->
                 <a

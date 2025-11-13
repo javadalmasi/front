@@ -38,9 +38,7 @@
                     {{ $t(`actions.${isBookmarked ? "playlist_bookmarked" : "bookmark_playlist"}`)
                     }}<i class="i-fa6-solid:bookmark mr-3" />
                 </button>
-                <button v-if="authenticated && !isPipedPlaylist" class="btn btn-secondary mr-1" @click="clonePlaylist">
-                    {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone mr-3" />
-                </button>
+
                 <button v-if="!isTxtDownloadDisabled" class="btn mr-1" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}
                 </button>
@@ -115,12 +113,7 @@ export default {
     },
     mounted() {
         const playlistId = this.$route.query.list;
-        if (this.authenticated && playlistId?.length == 36)
-            this.getPlaylists().then(json => {
-                if (json.error) alert(json.error);
-                else if (json.some(playlist => playlist.id === playlistId)) this.admin = true;
-            });
-        else if (playlistId.startsWith("local")) this.admin = true;
+        if (playlistId.startsWith("local")) this.admin = true;
         this.isPlaylistBookmarked();
     },
     activated() {
@@ -184,22 +177,7 @@ export default {
         updateTotalDuration() {
             this.totalDuration = this.playlist.relatedStreams.map(video => video.duration).reduce((a, b) => a + b);
         },
-        async clonePlaylist() {
-            this.fetchJson(this.authApiUrl() + "/import/playlist", null, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: this.getAuthToken(),
-                },
-                body: JSON.stringify({
-                    playlistId: this.$route.query.list,
-                }),
-            }).then(resp => {
-                if (!resp.error) {
-                    alert(this.$t("actions.clone_playlist_success"));
-                } else alert(resp.error);
-            });
-        },
+
         downloadPlaylistAsTxt() {
             const data = this.playlist.relatedStreams
                 .map(video => {

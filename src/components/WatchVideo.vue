@@ -161,7 +161,6 @@
                             </button>
 
                             <button
-                                v-if="authenticated"
                                 :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
                                 @click="subscribeHandler"
                             >
@@ -215,7 +214,6 @@
                                     />
                                 </router-link>
                                 <button
-                                    v-if="authenticated"
                                     class="btn btn-secondary flex items-center"
                                     @click="showModal = !showModal"
                                 >

@@ -88,7 +88,6 @@
                     <i :class="preferListen ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'" />
                 </router-link>
                 <button
-                    v-if="authenticated"
                     :title="$t('actions.add_to_playlist')"
                     @click="showPlaylistModal = !showPlaylistModal"
                 >

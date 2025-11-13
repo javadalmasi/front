@@ -312,37 +312,7 @@
         <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
     </label>
 
-    <!-- options that are visible only when logged in -->
-    <div v-if="authenticated">
-        <h2 v-t="'titles.account'" class="text-center"></h2>
-        <label class="pref" for="txtDeleteAccountPassword">
-            <strong v-t="'actions.delete_account'" class="tooltip-hover" :title="$t('tooltips.delete_account')" />
-            <div class="flex items-center">
-                <input
-                    id="txtDeleteAccountPassword"
-                    ref="txtDeleteAccountPassword"
-                    v-model="password"
-                    :placeholder="$t('login.password')"
-                    :aria-label="$t('login.password')"
-                    class="input mr-2 w-auto"
-                    type="password"
-                    @keyup.enter="deleteAccount"
-                />
-                <a v-t="'actions.delete_account'" class="btn btn-danger" @click="deleteAccount" />
-            </div>
-        </label>
-        <div class="pref">
-            <a v-t="'actions.logout'" class="btn btn-secondary" @click="logout" />
-            <a
-                v-t="'actions.invalidate_session'"
-                class="btn btn-warning"
-                style="margin-left: 0.5em"
-                @click="invalidateSession"
-            />
-        </div>
-        <br />
-    </div>
-    <br />
+
     <p v-t="'info.preferences_note'" />
     <br />
     <button v-t="'actions.reset_preferences'" class="btn btn-warning" @click="showConfirmResetPrefsDialog = true" />
@@ -556,31 +526,12 @@ export default {
                 if (shouldReload) window.location.reload();
             }
         },
-        logout() {
-            // reset the auth token
-            localStorage.removeItem("authToken" + this.hashCode(this.authApiUrl()));
-            // redirect to trending page
-            window.location = import.meta.env.BASE_URL;
-        },
         resetPreferences() {
             this.showConfirmResetPrefsDialog = false;
             // clear the local storage
             localStorage.clear();
             // redirect to the home page
             window.location = import.meta.env.BASE_URL;
-        },
-        async invalidateSession() {
-            this.fetchJson(this.authApiUrl() + "/logout", null, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: this.getAuthToken(),
-                },
-            }).then(resp => {
-                if (!resp.error) {
-                    this.logout();
-                } else alert(resp.error);
-            });
         },
         backupPreferences() {
             const data = JSON.stringify(localStorage);

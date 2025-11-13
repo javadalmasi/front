@@ -85,7 +85,7 @@
             </router-link>
             <!-- subscribe / unsubscribe btn -->
             <button
-                v-if="authenticated || !subscription.subscribed"
+                v-if="!subscription.subscribed"
                 v-t="`actions.${subscription.subscribed ? 'unsubscribe' : 'subscribe'}`"
                 class="btn mt-2 w-full"
                 @click="handleButton(subscription)"
@@ -155,12 +155,6 @@ export default {
         },
     },
     mounted() {
-        // Redirect to login if not authenticated and trying to access protected functionality
-        if (!this.authenticated && this.getPreferenceBoolean("requireAuthForSubscriptions", true)) {
-            this.$router.push("/login");
-            return;
-        }
-
         this.fetchSubscriptions().then(json => {
             if (json.error) {
                 alert(json.error);
@@ -186,27 +180,7 @@ export default {
         },
         handleButton(subscription) {
             const channelId = subscription.url.split("/")[2];
-            if (this.authenticated) {
-                this.fetchJson(
-                    this.userApiUrl() +
-                        (subscription.subscribed
-                            ? "/api/user/subscriptions/unsubscribe"
-                            : "/api/user/subscriptions/subscribe"),
-                    null,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            channel_id: channelId,
-                        }),
-                        headers: {
-                            Authorization: "Bearer " + this.getAuthToken(),
-                            "Content-Type": "application/json",
-                        },
-                    },
-                );
-            } else {
-                this.handleLocalSubscriptions(channelId);
-            }
+            this.handleLocalSubscriptions(channelId);
             subscription.subscribed = !subscription.subscribed;
         },
         exportHandler() {

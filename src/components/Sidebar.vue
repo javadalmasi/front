@@ -28,7 +28,6 @@
                 </div>
                 <div
                     v-for="item in filteredPublicItems"
-                    v-show="!item.requiresAuth || authenticated"
                     :key="item.name"
                     class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
                     @click="navigateTo(item.route)"
@@ -103,44 +102,7 @@
             </div>
 
             <!-- Auth section -->
-            <div>
-                <div
-                    v-if="!authenticated && sidebarState === 'open'"
-                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65]"
-                >
-                    حساب کاربری
-                </div>
-                <div
-                    v-if="!authenticated"
-                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="navigateTo('/auth')"
-                >
-                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
-                        <div class="i-fa6-solid:right-to-bracket" />
-                    </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">ورود / ثبت نام</span>
-                </div>
-                <div
-                    v-if="authenticated"
-                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="navigateTo('/profile')"
-                >
-                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
-                        <div class="i-fa6-solid:user" />
-                    </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">پروفایل کاربری</span>
-                </div>
-                <div
-                    v-if="authenticated"
-                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="logout"
-                >
-                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
-                        <div class="i-fa6-solid:right-from-bracket" />
-                    </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">خروج از حساب</span>
-                </div>
-            </div>
+
         </div>
     </div>
 
@@ -180,10 +142,10 @@ export default {
             publicItems: [
                 { name: "صفحه اصلی", route: "/", icon: "i-fa6-solid:house" },
                 { name: "پرطرفدار", route: "/trending", icon: "i-fa6-solid:fire" },
-                { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss", requiresAuth: true },
-                { name: "اشتراک‌ها", route: "/subscriptions", icon: "i-fa6-solid:bell", requiresAuth: true },
-                { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left", requiresAuth: true },
-                { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered", requiresAuth: true },
+                { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss" },
+                { name: "اشتراک‌ها", route: "/subscriptions", icon: "i-fa6-solid:bell" },
+                { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left" },
+                { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered" },
                 { name: "تنظیمات", route: "/preferences", icon: "i-fa6-solid:gear" },
             ],
             categories: [
@@ -211,9 +173,7 @@ export default {
         };
     },
     computed: {
-        authenticated() {
-            return this.getAuthToken() !== undefined;
-        },
+
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
@@ -286,28 +246,7 @@ export default {
         emitToggleTheme() {
             this.$emit("toggle-theme");
         },
-        logout() {
-            localStorage.removeItem("authToken" + this.hashCode(this.authApiUrl()));
-            window.location = import.meta.env.BASE_URL;
-        },
-        getAuthToken() {
-            const key = "authToken" + this.hashCode(this.authApiUrl());
-            return localStorage.getItem(key) || undefined;
-        },
-        authApiUrl() {
-            // Use dedicated IronVein-Users API for authentication if available, fallback to main API
-            return (
-                import.meta.env.VITE_IRONVEIN_USERS_API ||
-                import.meta.env.VITE_PIPED_API ||
-                "https://pipedapi.kavin.rocks"
-            );
-        },
-        hashCode(s) {
-            return s.split("").reduce((a, b) => {
-                a = (a << 5) - a + b.charCodeAt(0);
-                return a & a;
-            }, 0);
-        },
+
     },
 };
 </script>

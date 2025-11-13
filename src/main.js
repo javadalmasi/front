@@ -177,15 +177,7 @@ const mixin = {
         apiUrl() {
             return import.meta.env.VITE_PIPED_API;
         },
-        getAuthToken() {
-            return this.getPreferenceString("authToken" + this.hashCode(this.userApiUrl()));
-        },
-        hashCode(s) {
-            return s.split("").reduce(function (a, b) {
-                a = (a << 5) - a + b.charCodeAt(0);
-                return a & a;
-            }, 0);
-        },
+
         timeAgo(time) {
             return timeAgo.format(time);
         },
@@ -235,51 +227,37 @@ const mixin = {
             return localSubscriptions.join(",");
         },
         async fetchSubscriptions() {
-            if (this.authenticated) {
-                return await this.fetchJson(this.userApiUrl() + "/api/user/subscriptions", null, {
+            const channels = this.getUnauthenticatedChannels();
+            const split = channels.split(",");
+            if (split.length > 100) {
+                return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", null, {
+                    method: "POST",
                     headers: {
-                        Authorization: "Bearer " + this.getAuthToken(),
+                        "Content-Type": "application/json",
                     },
+                    body: JSON.stringify(split),
                 });
             } else {
-                const channels = this.getUnauthenticatedChannels();
-                const split = channels.split(",");
-                if (split.length > 100) {
-                    return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", null, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(split),
-                    });
-                } else {
-                    return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", {
-                        channels: this.getUnauthenticatedChannels(),
-                    });
-                }
+                return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", {
+                    channels: this.getUnauthenticatedChannels(),
+                });
             }
         },
         async fetchFeed() {
-            if (this.authenticated) {
-                return await this.fetchJson(this.apiUrl() + "/feed", {
-                    authToken: this.getAuthToken(),
+            const channels = this.getUnauthenticatedChannels();
+            const split = channels.split(",");
+            if (split.length > 100) {
+                return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", null, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(split),
                 });
             } else {
-                const channels = this.getUnauthenticatedChannels();
-                const split = channels.split(",");
-                if (split.length > 100) {
-                    return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", null, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(split),
-                    });
-                } else {
-                    return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", {
-                        channels: channels,
-                    });
-                }
+                return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", {
+                    channels: channels,
+                });
             }
         },
         download(text, filename, mimeType) {
@@ -372,30 +350,23 @@ const mixin = {
             });
         },
         async getPlaylists() {
-            if (!this.authenticated) {
-                if (!window.db) return [];
-                return new Promise(resolve => {
-                    let playlists = [];
-                    var tx = window.db.transaction("playlists", "readonly");
-                    var store = tx.objectStore("playlists");
-                    const cursorRequest = store.openCursor();
-                    cursorRequest.onsuccess = e => {
-                        const cursor = e.target.result;
-                        if (cursor) {
-                            let playlist = cursor.value;
-                            playlist.videos = JSON.parse(playlist.videoIds).length;
-                            playlists.push(playlist);
-                            cursor.continue();
-                        } else {
-                            resolve(playlists);
-                        }
-                    };
-                });
-            }
-            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                },
+            if (!window.db) return [];
+            return new Promise(resolve => {
+                let playlists = [];
+                var tx = window.db.transaction("playlists", "readonly");
+                var store = tx.objectStore("playlists");
+                const cursorRequest = store.openCursor();
+                cursorRequest.onsuccess = e => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        let playlist = cursor.value;
+                        playlist.videos = JSON.parse(playlist.videoIds).length;
+                        playlists.push(playlist);
+                        cursor.continue();
+                    } else {
+                        resolve(playlists);
+                    }
+                };
             });
         },
         async getPlaylist(playlistId) {
@@ -409,148 +380,72 @@ const mixin = {
             return await this.fetchJson(this.apiUrl() + "/playlists/" + playlistId);
         },
         async createPlaylist(name) {
-            if (!this.authenticated) {
-                const uuid = crypto.randomUUID();
-                const playlistId = `local-${uuid}`;
-                this.createOrUpdateLocalPlaylist({
-                    playlistId: playlistId,
-                    id: playlistId,
-                    name: name,
-                    description: "",
-                    thumbnail: import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com",
-                    videoIds: "[]",
-                });
-                return { playlistId: playlistId };
-            }
-            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists", null, {
-                method: "POST",
-                body: JSON.stringify({
-                    name: name,
-                }),
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                    "Content-Type": "application/json",
-                },
+            const uuid = crypto.randomUUID();
+            const playlistId = `local-${uuid}`;
+            this.createOrUpdateLocalPlaylist({
+                playlistId: playlistId,
+                id: playlistId,
+                name: name,
+                description: "",
+                thumbnail: import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com",
+                videoIds: "[]",
             });
+            return { playlistId: playlistId };
         },
         async deletePlaylist(playlistId) {
-            if (!this.authenticated) {
-                const playlist = await this.getLocalPlaylist(playlistId);
-                var tx = window.db.transaction("playlists", "readwrite");
-                var store = tx.objectStore("playlists");
-                store.delete(playlistId);
-                const playlists = await this.getPlaylists();
-                const usedVideoIds = playlists
-                    .filter(playlist => playlist.id != playlistId)
-                    .map(playlist => JSON.parse(playlist.videoIds))
-                    .flat();
-                const potentialDeletableVideos = JSON.parse(playlist.videoIds);
-                var videoTx = window.db.transaction("playlist_videos", "readwrite");
-                var videoStore = videoTx.objectStore("playlist_videos");
-                for (let videoId of potentialDeletableVideos) {
-                    if (!usedVideoIds.includes(videoId)) videoStore.delete(videoId);
-                }
-                return { message: "ok" };
+            const playlist = await this.getLocalPlaylist(playlistId);
+            var tx = window.db.transaction("playlists", "readwrite");
+            var store = tx.objectStore("playlists");
+            store.delete(playlistId);
+            const playlists = await this.getPlaylists();
+            const usedVideoIds = playlists
+                .filter(playlist => playlist.id != playlistId)
+                .map(playlist => JSON.parse(playlist.videoIds))
+                .flat();
+            const potentialDeletableVideos = JSON.parse(playlist.videoIds);
+            var videoTx = window.db.transaction("playlist_videos", "readwrite");
+            var videoStore = videoTx.objectStore("playlist_videos");
+            for (let videoId of potentialDeletableVideos) {
+                if (!usedVideoIds.includes(videoId)) videoStore.delete(videoId);
             }
-            const response = await fetch(this.userApiUrl() + "/api/user/playlists/" + playlistId, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + this.getAuthToken(),
-                },
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Delete playlist error:", errorText);
-                throw new Error(errorText || "Failed to delete playlist");
-            }
-            return await response.json();
+            return { message: "ok" };
         },
         async renamePlaylist(playlistId, newName) {
-            if (!this.authenticated) {
-                const playlist = await this.getLocalPlaylist(playlistId);
-                playlist.name = newName;
-                this.createOrUpdateLocalPlaylist(playlist);
-                return { message: "ok" };
-            }
-            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
-                method: "POST",
-                body: JSON.stringify({
-                    name: newName,
-                }),
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                    "Content-Type": "application/json",
-                },
-            });
+            const playlist = await this.getLocalPlaylist(playlistId);
+            playlist.name = newName;
+            this.createOrUpdateLocalPlaylist(playlist);
+            return { message: "ok" };
         },
         async changePlaylistDescription(playlistId, newDescription) {
-            if (!this.authenticated) {
-                const playlist = await this.getLocalPlaylist(playlistId);
-                playlist.description = newDescription;
-                this.createOrUpdateLocalPlaylist(playlist);
-                return { message: "ok" };
-            }
-            return await this.fetchJson(this.userApiUrl() + "/api/user/playlists/" + playlistId, null, {
-                method: "POST",
-                body: JSON.stringify({
-                    description: newDescription,
-                }),
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                    "Content-Type": "application/json",
-                },
-            });
+            const playlist = await this.getLocalPlaylist(playlistId);
+            playlist.description = newDescription;
+            this.createOrUpdateLocalPlaylist(playlist);
+            return { message: "ok" };
         },
         async addVideosToPlaylist(playlistId, videoIds, videoInfos) {
-            if (!this.authenticated) {
-                const playlist = await this.getLocalPlaylist(playlistId);
-                const currentVideoIds = JSON.parse(playlist.videoIds);
-                currentVideoIds.push(...videoIds);
-                playlist.videoIds = JSON.stringify(currentVideoIds);
-                let streamInfos =
-                    videoInfos ??
-                    (await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/streams/" + videoId))));
-                playlist.thumbnail = streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl;
-                this.createOrUpdateLocalPlaylist(playlist);
-                for (let i in videoIds) {
-                    if (streamInfos[i].error) continue;
-                    this.createLocalPlaylistVideo(videoIds[i], streamInfos[i]);
-                }
-                return { message: "ok" };
+            const playlist = await this.getLocalPlaylist(playlistId);
+            const currentVideoIds = JSON.parse(playlist.videoIds);
+            currentVideoIds.push(...videoIds);
+            playlist.videoIds = JSON.stringify(currentVideoIds);
+            let streamInfos =
+                videoInfos ??
+                (await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/streams/" + videoId))));
+            playlist.thumbnail = streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl;
+            this.createOrUpdateLocalPlaylist(playlist);
+            for (let i in videoIds) {
+                if (streamInfos[i].error) continue;
+                this.createLocalPlaylistVideo(videoIds[i], streamInfos[i]);
             }
-            const results = [];
-            for (const videoId of videoIds) {
-                const result = await this.fetchJson(
-                    this.userApiUrl() + "/api/user/playlists/" + playlistId + "/add",
-                    null,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            video_id: videoId,
-                        }),
-                        headers: {
-                            Authorization: "Bearer " + this.getAuthToken(),
-                            "Content-Type": "application/json",
-                        },
-                    },
-                );
-                results.push(result);
-            }
-            return results.every(r => r.success) ? { message: "ok" } : { error: "Some videos failed to add" };
+            return { message: "ok" };
         },
         async removeVideoFromPlaylist(playlistId, index) {
-            if (!this.authenticated) {
-                const playlist = await this.getLocalPlaylist(playlistId);
-                const videoIds = JSON.parse(playlist.videoIds);
-                videoIds.splice(index, 1);
-                playlist.videoIds = JSON.stringify(videoIds);
-                if (videoIds.length == 0) playlist.thumbnail = import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com";
-                this.createOrUpdateLocalPlaylist(playlist);
-                return { message: "ok" };
-            }
-            console.error("Index-based removal not supported by current API. Use video_id instead.");
-            return { error: "Not supported" };
+            const playlist = await this.getLocalPlaylist(playlistId);
+            const videoIds = JSON.parse(playlist.videoIds);
+            videoIds.splice(index, 1);
+            playlist.videoIds = JSON.stringify(videoIds);
+            if (videoIds.length == 0) playlist.thumbnail = import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com";
+            this.createOrUpdateLocalPlaylist(playlist);
+            return { message: "ok" };
         },
         getHomePage(_this) {
             switch (_this.getPreferenceString("homepage", "trending")) {
@@ -605,107 +500,11 @@ const mixin = {
             });
         },
         async fetchSubscriptionStatus(channelId) {
-            if (!this.authenticated) {
-                return this.isSubscribedLocally(channelId);
-            }
-            const response = await this.fetchJson(this.userApiUrl() + "/api/user/subscriptions", null, {
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                },
-            });
-            if (response.success && response.data) {
-                return response.data.includes(channelId);
-            }
-            return false;
+            return this.isSubscribedLocally(channelId);
         },
-        async fetchAdminUsers(page = 1, limit = 10, search = null) {
-            if (!this.authenticated) {
-                throw new Error("User is not authenticated");
-            }
-            let url = `${this.userApiUrl()}/api/admin/users`;
-            const params = new URLSearchParams({
-                page: page.toString(),
-                limit: limit.toString(),
-            });
-            if (search) {
-                params.append("search", search);
-            }
-            const fullUrl = `${url}?${params.toString()}`;
-            return await this.fetchJson(fullUrl, null, {
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                },
-            });
-        },
-        async fetchAdminUser(userId) {
-            if (!this.authenticated) {
-                throw new Error("User is not authenticated");
-            }
-            return await this.fetchJson(`${this.userApiUrl()}/api/admin/users/${userId}`, null, {
-                headers: {
-                    Authorization: "Bearer " + this.getAuthToken(),
-                },
-            });
-        },
-        async updateAdminUser(userId, userData) {
-            if (!this.authenticated) {
-                throw new Error("User is not authenticated");
-            }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users/${userId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.getAuthToken()}`,
-                },
-                body: JSON.stringify(userData),
-            });
-            return await response.json();
-        },
-        async deleteAdminUser(userId) {
-            if (!this.authenticated) {
-                throw new Error("User is not authenticated");
-            }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users/${userId}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.getAuthToken()}`,
-                },
-            });
-            return await response.json();
-        },
-        async createAdminUser(userData) {
-            if (!this.authenticated) {
-                throw new Error("User is not authenticated");
-            }
-            const response = await fetch(`${this.userApiUrl()}/api/admin/users`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.getAuthToken()}`,
-                },
-                body: JSON.stringify(userData),
-            });
-            return await response.json();
-        },
+
         async toggleSubscriptionState(channelId, subscribed) {
-            if (!this.authenticated) return this.handleLocalSubscriptions(channelId);
-            const resp = await this.fetchJson(
-                this.userApiUrl() +
-                    (subscribed ? "/api/user/subscriptions/unsubscribe" : "/api/user/subscriptions/subscribe"),
-                null,
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-                        channel_id: channelId,
-                    }),
-                    headers: {
-                        Authorization: "Bearer " + this.getAuthToken(),
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-            return resp.success;
+            return this.handleLocalSubscriptions(channelId);
         },
         getCustomInstances() {
             return JSON.parse(window.localStorage.getItem("customInstances")) ?? [];
@@ -726,9 +525,6 @@ const mixin = {
         },
     },
     computed: {
-        authenticated(_this) {
-            return _this.getAuthToken() !== undefined;
-        },
         testLocalStorage() {
             try {
                 if (window.localStorage !== undefined) localStorage;
