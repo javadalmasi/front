@@ -254,11 +254,11 @@
         />
     </label>
 
-    <h2 class="text-center">SponsorBlock</h2>
-    <p class="text-center">
+    <h2 v-if="!isSponsorBlockDisabled" class="text-center">SponsorBlock</h2>
+    <p v-if="!isSponsorBlockDisabled" class="text-center">
         <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
     </p>
-    <label class="pref" for="chkEnableSponsorblock">
+    <label v-if="!isSponsorBlockDisabled" class="pref" for="chkEnableSponsorblock">
         <strong v-t="'actions.enable_sponsorblock'" class="tooltip-hover" :title="$t('tooltips.enable_sponsorblock')" />
         <input
             id="chkEnableSponsorblock"
@@ -268,7 +268,7 @@
             @change="onChange($event)"
         />
     </label>
-    <div v-if="sponsorBlock">
+    <div v-if="!isSponsorBlockDisabled && sponsorBlock">
         <label v-for="[name, item] in skipOptions" :key="name" class="pref" :for="'ddlSkip_' + name">
             <strong v-t="item.label" class="tooltip-hover" :title="getTooltipByActionLabel(item.label)" />
             <select :id="'ddlSkip_' + name" v-model="item.value" class="select w-auto" @change="onChange($event)">
@@ -411,6 +411,9 @@ export default {
         },
         isDeArrowIntegrationDisabled() {
             return import.meta.env.VITE_DISABLE_DEARROW_INTEGRATION === "true";
+        },
+        isSponsorBlockDisabled() {
+            return import.meta.env.VITE_DISABLE_SPONSORBLOCK === "true";
         },
     },
     activated() {

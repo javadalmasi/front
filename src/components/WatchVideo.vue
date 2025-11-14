@@ -511,6 +511,10 @@ export default {
             // Check if license info is disabled via environment variable
             return import.meta.env.VITE_DISABLE_LICENSE_INFO === "true";
         },
+        isSponsorBlockDisabled() {
+            // Check if SponsorBlock is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_SPONSORBLOCK === "true";
+        },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
             url.searchParams.set("listen", _this.isListening ? "0" : "1");
@@ -896,7 +900,7 @@ export default {
             }
         },
         async getSponsors() {
-            if (this.getPreferenceBoolean("sponsorblock", true))
+            if (!this.isSponsorBlockDisabled && this.getPreferenceBoolean("sponsorblock", true))
                 this.fetchSponsors().then(data => (this.sponsors = data));
         },
         async getComments() {
