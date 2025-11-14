@@ -375,7 +375,7 @@ export default {
             watchHistory: true,
             searchHistory: false,
             hideWatched: false,
-            enabledCodecs: ["vp9", "avc"],
+            enabledCodecs: ["vp9", "avc"], // Default to vp9 and avc initially
             disableLBRY: false,
             proxyLBRY: false,
             prefetchLimit: 2,
@@ -464,7 +464,14 @@ export default {
             this.watchHistory = this.getPreferenceBoolean("watchHistory", true);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
             // Persian (fa) is the default language, no need to save in local storage
-            this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");
+            // Get codecs from preferences or default to vp9,avc
+            let codecString = this.getPreferenceString("enabledCodecs", "vp9,avc");
+            this.enabledCodecs = codecString.split(",");
+            
+            // If user hasn't customized their codec settings (using defaults), check for AV1 support
+            if (codecString === "vp9,avc") {
+                this.checkAndEnableAV1IfSupported();
+            }
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
             this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
@@ -561,6 +568,42 @@ export default {
             }
             // Fallback to the action label itself if no specific tooltip exists
             return this.$t(label);
+        },
+        async browserSupportsAV1() {
+            // Check if MediaCapabilities API is available
+            if (navigator.mediaCapabilities && navigator.mediaCapabilities.encodingInfo) {
+                try {
+                    const result = await navigator.mediaCapabilities.encodingInfo({
+                        type: 'coded-frame',
+                        codec: 'av01.0.05M.08',
+                        width: 1920,
+                        height: 1080,
+                        bitrate: 5000000,
+                        framerate: 30
+                    });
+                    return result.supported;
+                } catch (e) {
+                    console.warn("Error checking AV1 support via MediaCapabilities API:", e);
+                }
+            }
+            
+            // Fallback: check if MediaSource is available and assume AV1 support on modern browsers
+            if (window.MediaSource) {
+                const video = document.createElement('video');
+                return video.canPlayType('video/webm; codecs="av01.0.05M.08"') !== '';
+            }
+            
+            // Default to false if APIs are not available
+            return false;
+        },
+        async checkAndEnableAV1IfSupported() {
+            const supportsAV1 = await this.browserSupportsAV1();
+            if (supportsAV1 && !this.enabledCodecs.includes('av1')) {
+                // Add av1 to the beginning of the array to make it highest priority
+                this.enabledCodecs = ['av1', ...this.enabledCodecs];
+                // Update localStorage to persist the change
+                localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
+            }
         },
     },
 };
