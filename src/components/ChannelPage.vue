@@ -261,7 +261,14 @@ export default {
             });
         },
         subscribeHandler() {
-            this.toggleSubscriptionState(this.channel.id, this.subscribed).then(success => {
+            // Pass channel data when subscribing so we can store full information
+            const channelData = {
+                id: this.channel.id,
+                name: this.channel.name,
+                avatar: this.channel.avatarUrl,
+                url: `/channel/${this.channel.id}`
+            };
+            this.toggleSubscriptionState(this.channel.id, this.subscribed, channelData).then(success => {
                 if (success) this.subscribed = !this.subscribed;
             });
         },

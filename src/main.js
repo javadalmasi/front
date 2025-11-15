@@ -193,68 +193,105 @@ const mixin = {
         },
         getLocalSubscriptions() {
             try {
-                return JSON.parse(localStorage.getItem("localSubscriptions"));
+                const subscriptions = JSON.parse(localStorage.getItem("localSubscriptions"));
+                // If it's an array of strings (old format), convert to new format
+                if (Array.isArray(subscriptions) && subscriptions.length > 0 && typeof subscriptions[0] === 'string') {
+                    // Convert old format to new format by fetching full data if needed
+                    console.warn("Detected old subscription format, consider updating stored data");
+                    return subscriptions.map(id => ({ id: id }));
+                }
+                return subscriptions || [];
             } catch {
                 return [];
             }
         },
+        // Get full channel subscription data by ID
+        getLocalSubscriptionById(channelId) {
+            const localSubscriptions = this.getLocalSubscriptions();
+            return localSubscriptions.find(sub => sub.id === channelId);
+        },
         isSubscribedLocally(channelId) {
             const localSubscriptions = this.getLocalSubscriptions();
             if (localSubscriptions == null) return false;
-            return localSubscriptions.includes(channelId);
+            return localSubscriptions.some(sub => sub.id === channelId);
         },
-        handleLocalSubscriptions(channelId) {
-            var localSubscriptions = this.getLocalSubscriptions() ?? [];
-            if (localSubscriptions.includes(channelId))
-                localSubscriptions.splice(localSubscriptions.indexOf(channelId), 1);
-            else localSubscriptions.push(channelId);
-            localSubscriptions.sort();
+        async handleLocalSubscriptions(channelId, channelData = null) {
+            var localSubscriptions = this.getLocalSubscriptions();
+            const existingIndex = localSubscriptions.findIndex(sub => sub.id === channelId);
+            
+            if (existingIndex > -1) {
+                // Unsubscribe: remove the channel
+                localSubscriptions.splice(existingIndex, 1);
+            } else {
+                // Subscribe: add the channel with full information
+                if (channelData) {
+                    // Use provided channel data
+                    localSubscriptions.push({
+                        id: channelData.id || channelId,
+                        name: channelData.name,
+                        avatar: channelData.avatar,
+                        url: channelData.url
+                    });
+                } else {
+                    // If no channel data provided, fetch it from API first
+                    try {
+                        const channelInfo = await this.fetchJson(this.apiUrl() + `/channels/${channelId}`);
+                        if (!channelInfo.error) {
+                            localSubscriptions.push({
+                                id: channelInfo.id,
+                                name: channelInfo.name,
+                                avatar: channelInfo.avatar,
+                                url: channelInfo.url
+                            });
+                        } else {
+                            // Fallback: store with minimal info if API call fails
+                            localSubscriptions.push({
+                                id: channelId,
+                                name: `Channel ${channelId}`,
+                                avatar: "",
+                                url: `/channel/${channelId}`
+                            });
+                        }
+                    } catch (e) {
+                        // If API fails, store with minimal info
+                        localSubscriptions.push({
+                            id: channelId,
+                            name: `Channel ${channelId}`,
+                            avatar: "",
+                            url: `/channel/${channelId}`
+                        });
+                    }
+                }
+            }
+            
+            localSubscriptions.sort((a, b) => {
+                const nameA = a.name || a.id || '';
+                const nameB = b.name || b.id || '';
+                return nameA.localeCompare(nameB);
+            });
             try {
                 localStorage.setItem("localSubscriptions", JSON.stringify(localSubscriptions));
                 return true;
             } catch {
                 alert(this.$t("info.local_storage"));
+                // Restore previous state if storage fails
+                localSubscriptions = this.getLocalSubscriptions();
+                if (existingIndex > -1) {
+                    // Was removing, add back
+                    localSubscriptions.push({ id: channelId });
+                } else {
+                    // Was adding, remove it
+                    localSubscriptions = localSubscriptions.filter(sub => sub.id !== channelId);
+                }
+                return false;
             }
-            return false;
         },
         getUnauthenticatedChannels() {
             const localSubscriptions = this.getLocalSubscriptions() ?? [];
-            return localSubscriptions.join(",");
+            return localSubscriptions.map(sub => sub.id).join(",");
         },
-        async fetchSubscriptions() {
-            const channels = this.getUnauthenticatedChannels();
-            const split = channels.split(",");
-            if (split.length > 100) {
-                return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", null, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(split),
-                });
-            } else {
-                return await this.fetchJson(this.apiUrl() + "/subscriptions/unauthenticated", {
-                    channels: this.getUnauthenticatedChannels(),
-                });
-            }
-        },
-        async fetchFeed() {
-            const channels = this.getUnauthenticatedChannels();
-            const split = channels.split(",");
-            if (split.length > 100) {
-                return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", null, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(split),
-                });
-            } else {
-                return await this.fetchJson(this.apiUrl() + "/feed/unauthenticated", {
-                    channels: channels,
-                });
-            }
-        },
+
+
         download(text, filename, mimeType) {
             var file = new Blob([text], { type: mimeType });
             const elem = document.createElement("a");
@@ -498,8 +535,8 @@ const mixin = {
             return this.isSubscribedLocally(channelId);
         },
 
-        async toggleSubscriptionState(channelId, subscribed) {
-            return this.handleLocalSubscriptions(channelId);
+        async toggleSubscriptionState(channelId, subscribed, channelData = null) {
+            return this.handleLocalSubscriptions(channelId, channelData);
         },
         getCustomInstances() {
             return JSON.parse(window.localStorage.getItem("customInstances")) ?? [];

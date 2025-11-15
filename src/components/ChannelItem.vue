@@ -101,7 +101,14 @@ export default {
             console.log(this.subscribed);
         },
         subscribeHandler() {
-            this.toggleSubscriptionState(this.channelId, this.subscribed).then(success => {
+            // Pass channel data when subscribing so we can store full information
+            const channelData = {
+                id: this.channelId,
+                name: this.item.name || this.item.title,
+                avatar: this.item.thumbnail || this.item.avatar,
+                url: this.item.url
+            };
+            this.toggleSubscriptionState(this.channelId, this.subscribed, channelData).then(success => {
                 if (success) this.subscribed = !this.subscribed;
             });
         },

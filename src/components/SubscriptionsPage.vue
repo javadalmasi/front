@@ -85,11 +85,13 @@
             </router-link>
             <!-- subscribe / unsubscribe btn -->
             <button
-                v-if="!subscription.subscribed"
-                v-t="`actions.${subscription.subscribed ? 'unsubscribe' : 'subscribe'}`"
-                class="btn mt-2 w-full"
+                :class="subscription.subscribed ? 'btn btn-unsubscribe mt-2 w-full' : 'btn btn-red mt-2 w-full'"
                 @click="handleButton(subscription)"
-            />
+            >
+                <i v-if="!subscription.subscribed" class="i-fa6-solid:bell mr-1.5" />
+                <i v-if="subscription.subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
+                {{ $t("actions." + (subscription.subscribed ? "unsubscribe" : "subscribe")) }}
+            </button>
         </div>
     </div>
     <br />
@@ -155,15 +157,7 @@ export default {
         },
     },
     mounted() {
-        this.fetchSubscriptions().then(json => {
-            if (json.error) {
-                alert(json.error);
-                return;
-            }
-
-            this.subscriptions = json;
-            this.subscriptions.forEach(subscription => (subscription.subscribed = true));
-        });
+        this.loadLocalSubscriptions();
 
         this.channelGroups.push(this.selectedGroup);
         if (!window.db) return;
@@ -174,6 +168,17 @@ export default {
         document.title = "Subscriptions - " + this.getSiteName();
     },
     methods: {
+        loadLocalSubscriptions() {
+            const localSubscriptions = this.getLocalSubscriptions();
+            // Transform the stored subscription data to match what the template expects
+            this.subscriptions = localSubscriptions.map(sub => ({
+                id: sub.id,
+                name: sub.name,
+                avatar: sub.avatar,
+                url: sub.url,
+                subscribed: true
+            }));
+        },
         async loadChannelGroups() {
             const groups = await this.getChannelGroups();
             this.channelGroups.push(...groups);

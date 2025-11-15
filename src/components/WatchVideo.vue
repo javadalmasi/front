@@ -917,7 +917,14 @@ export default {
             this.subscribed = await this.fetchSubscriptionStatus(this.channelId);
         },
         subscribeHandler() {
-            this.toggleSubscriptionState(this.channelId, this.subscribed).then(success => {
+            // Pass channel data when subscribing so we can store full information
+            const channelData = {
+                id: this.channelId,
+                name: this.video.uploader,
+                avatar: this.video.uploaderAvatar,
+                url: this.video.uploaderUrl
+            };
+            this.toggleSubscriptionState(this.channelId, this.subscribed, channelData).then(success => {
                 if (success) this.subscribed = !this.subscribed;
             });
         },
