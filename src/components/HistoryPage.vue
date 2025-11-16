@@ -33,7 +33,13 @@
 
     <hr />
 
-    <div class="video-grid">
+    <div v-if="videosStore.length === 0" class="flex flex-col items-center justify-center py-20">
+        <h2 class="text-xl font-bold mb-4">{{ $t('info.no_history') || 'No history found' }}</h2>
+        <p class="mb-4 text-center px-4">{{ $t('info.history_desc') || 'Your watched videos will appear here. Enable watch history in preferences to save your viewing history.' }}</p>
+        <router-link to="/preferences" class="btn">{{ $t('actions.enable_watch_history') || 'Enable Watch History' }}</router-link>
+    </div>
+    
+    <div v-else class="video-grid">
         <VideoItem v-for="video in videos" :key="video.url" :item="video" :clamp-title-lines="true" />
     </div>
 
@@ -119,6 +125,10 @@ export default {
             }
         })().then(() => {
             this.loadMoreVideos();
+            // Update watched status for all videos after loading
+            if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+                this.updateWatched(this.videos);
+            }
         });
     },
     activated() {
