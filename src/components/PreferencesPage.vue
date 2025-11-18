@@ -183,6 +183,34 @@
             @change="onChange($event)"
         />
     </label>
+    <label class="pref" for="chkHideDislikedVideos">
+        <strong 
+            v-t="'actions.hide_disliked_videos'" 
+            class="tooltip-hover" 
+            :title="$t('tooltips.hide_disliked_videos')" 
+        />
+        <input
+            id="chkHideDislikedVideos"
+            v-model="hideDislikedVideos"
+            class="checkbox"
+            type="checkbox"
+            @change="onChange($event)"
+        />
+    </label>
+    <label v-if="hideDislikedVideos" class="pref" for="chkShowAlertOnDislikedVideos">
+        <strong 
+            v-t="'actions.show_alert_on_disliked_videos'" 
+            class="tooltip-hover" 
+            :title="$t('tooltips.show_alert_on_disliked_videos')" 
+        />
+        <input
+            id="chkShowAlertOnDislikedVideos"
+            v-model="showAlertOnDislikedVideos"
+            class="checkbox"
+            type="checkbox"
+            @change="onChange($event)"
+        />
+    </label>
     <label v-if="!isSearchHistoryStorageDisabled" class="pref" for="chkStoreSearchHistory">
         <strong
             v-t="'actions.store_search_history'"
@@ -381,6 +409,8 @@ export default {
             prefetchLimit: 2,
             password: null,
             showConfirmResetPrefsDialog: false,
+            hideDislikedVideos: true, // Default to true as requested
+            showAlertOnDislikedVideos: true, // Default to true for showing alerts
         };
     },
     computed: {
@@ -463,6 +493,8 @@ export default {
             this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
             this.watchHistory = this.getPreferenceBoolean("watchHistory", true);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
+            this.hideDislikedVideos = this.getPreferenceBoolean("hideDislikedVideos", true);
+            this.showAlertOnDislikedVideos = this.getPreferenceBoolean("showAlertOnDislikedVideos", true);
             // Persian (fa) is the default language, no need to save in local storage
             // Get codecs from preferences or default to vp9,avc
             let codecString = this.getPreferenceString("enabledCodecs", "vp9,avc");
@@ -525,6 +557,8 @@ export default {
                 localStorage.setItem("searchSuggestions", this.searchSuggestions);
                 localStorage.setItem("watchHistory", this.watchHistory);
                 localStorage.setItem("searchHistory", this.searchHistory);
+                localStorage.setItem("hideDislikedVideos", this.hideDislikedVideos);
+                localStorage.setItem("showAlertOnDislikedVideos", this.showAlertOnDislikedVideos);
                 if (!this.searchHistory) localStorage.removeItem("search_history");
                 localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
                 localStorage.setItem("disableLBRY", this.disableLBRY);

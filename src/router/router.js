@@ -82,6 +82,16 @@ const routes = [
         component: () => import("../components/PlaylistsPage.vue"),
     },
     {
+        path: "/likes",
+        name: "Likes",
+        component: () => import("../components/LikesPage.vue"),
+    },
+    {
+        path: "/dislikes",
+        name: "Dislikes",
+        component: () => import("../components/DislikesPage.vue"),
+    },
+    {
         path: "/:pathMatch(.*)*",
         name: "Page Not Found",
         component: () => import("../components/PageNotFound.vue"),

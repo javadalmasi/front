@@ -172,6 +172,25 @@
                                     numberFormat(video.uploaderSubscriberCount)
                                 }}
                             </button>
+                            
+                            <!-- Like/Dislike Buttons -->
+                            <button
+                                v-if="!isLikeDislikeDisabled"
+                                :class="isVideoLiked(video.id) ? 'btn btn-success' : 'btn btn-secondary'"
+                                @click="handleLike"
+                                title="Like"
+                            >
+                                <i class="i-fa6-solid:thumbs-up mr-1" />
+                            </button>
+                            <button
+                                v-if="!isLikeDislikeDisabled"
+                                :class="isVideoDisliked(video.id) ? 'btn btn-error' : 'btn btn-secondary'"
+                                @click="handleDislike"
+                                title="Dislike"
+                            >
+                                <i class="i-fa6-solid:thumbs-down mr-1" />
+                            </button>
+                            
                             <div class="flex flex-wrap gap-1">
                                 <!-- RSS Feed button -->
                                 <a
@@ -515,6 +534,10 @@ export default {
             // Check if SponsorBlock is disabled via environment variable
             return import.meta.env.VITE_DISABLE_SPONSORBLOCK === "true";
         },
+        isLikeDislikeDisabled() {
+            // Check if like/dislike functionality is disabled via environment variable
+            return import.meta.env.VITE_DISABLE_LIKE_DISLIKE === "true";
+        },
         toggleListenUrl(_this) {
             const url = new URL(window.location.href);
             url.searchParams.set("listen", _this.isListening ? "0" : "1");
@@ -651,8 +674,25 @@ export default {
             this.isMobile = window.innerWidth < 1024;
         });
         this.getVideoData().then(() => {
-            (async () => {
-                const videoId = this.getVideoId();
+            // Check if the current video is disliked and show alert if user wants it
+            const videoId = this.getVideoId();
+            if (this.isVideoDisliked(videoId) && this.getPreferenceBoolean("showAlertOnDislikedVideos", true)) {
+                // Show alert that this video is disliked
+                const toast = document.createElement("div");
+                toast.className = "toast toast-top toast-center";
+                toast.innerHTML = `
+                    <div class="alert alert-warning">
+                        <span>${this.$t("info.this_video_is_disliked")}</span>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000); // Show for 5 seconds
+            }
+            
+            (async () => {                
                 const instance = this;
                 if (window.db && this.getPreferenceBoolean("watchHistory", false) && !this.video.error) {
                     var tx = window.db.transaction("watch_history", "readwrite");
@@ -1062,6 +1102,78 @@ export default {
             link.download = `${this.video.title}_${currentTime}s.png`;
             link.href = canvas.toDataURL();
             link.click();
+        },
+        
+        handleLike() {
+            if (!this.video) return;
+            
+            // Create video object with necessary data
+            const videoData = {
+                videoId: this.video.id,
+                title: this.video.title,
+                uploaderName: this.video.uploader,
+                thumbnail: this.video.thumbnailUrl,
+                duration: this.video.duration
+            };
+            
+            // Toggle like status and get result
+            const result = this.toggleLike(videoData);
+            
+            if (result) {
+                // Show success toast
+                this.showToastMessage(this.$t("info.video_liked"));
+            } else {
+                // If video was unliked, show different message
+                if (this.isVideoLiked(this.video.id)) {
+                    this.showToastMessage(this.$t("info.video_liked"));
+                } else {
+                    this.showToastMessage(this.$t("info.video_removed_from_likes"));
+                }
+            }
+        },
+        
+        handleDislike() {
+            if (!this.video) return;
+            
+            // Create video object with necessary data
+            const videoData = {
+                videoId: this.video.id,
+                title: this.video.title,
+                uploaderName: this.video.uploader,
+                thumbnail: this.video.thumbnailUrl,
+                duration: this.video.duration
+            };
+            
+            // Toggle dislike status and get result
+            const result = this.toggleDislike(videoData);
+            
+            if (result) {
+                // Show success toast
+                this.showToastMessage(this.$t("info.video_disliked"));
+            } else {
+                // If video was un-disliked, show different message
+                if (this.isVideoDisliked(this.video.id)) {
+                    this.showToastMessage(this.$t("info.video_disliked"));
+                } else {
+                    this.showToastMessage(this.$t("info.video_removed_from_dislikes"));
+                }
+            }
+        },
+        
+        showToastMessage(message) {
+            // Create and show toast notification
+            const toast = document.createElement("div");
+            toast.className = "toast toast-top toast-center";
+            toast.innerHTML = `
+                <div class="alert alert-success">
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
         },
     },
 };
