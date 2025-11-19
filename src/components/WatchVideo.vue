@@ -108,8 +108,8 @@
                         </div>
                     </div>
                     <!-- Channel info & options flex container -->
-                    <div class="flex items-center flex-wrap gap-1 px-2">
-                        <!-- Channel Image & Info -->
+                    <div class="flex items-center justify-between flex-wrap gap-1 px-2">
+                        <!-- Channel Image & Info on the left -->
                         <div class="flex items-center gap-3">
                             <router-link :to="video.uploaderUrl" class="mr-1.5">
                                 <div class="relative inline-block">
@@ -145,7 +145,8 @@
                             :playlist-index="index"
                             @close="showShareModal = !showShareModal"
                         />
-                        <div class="ml-auto flex items-center flex-wrap gap-1">
+                        <!-- Buttons on the right -->
+                        <div class="flex items-center flex-wrap gap-1">
                             <!-- Download Frame Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
