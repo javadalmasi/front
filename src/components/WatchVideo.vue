@@ -68,13 +68,14 @@
                             :player-position="currentTime"
                             @seek="navigate"
                         />
-                        <PlaylistVideos
+                        <!-- PlaylistVideos component is missing from the project -->
+                        <!-- <PlaylistVideos
                             v-if="playlist"
                             :playlist-id="playlistId"
                             :playlist="playlist"
                             :selected-index="index"
                             :prefer-listen="isListening"
-                        />
+                        /> -->
                     </div>
                     <!-- video title -->
                     <div class="mt-2 break-words px-2 text-2xl font-bold leading-[1.55]" v-text="video.title" />
@@ -391,13 +392,14 @@
                     :player-position="currentTime"
                     @seek="navigate"
                 />
-                <PlaylistVideos
+                <!-- PlaylistVideos component is missing from the project -->
+                <!-- <PlaylistVideos
                     v-if="playlist"
                     :playlist-id="playlistId"
                     :playlist="playlist"
                     :selected-index="index"
                     :prefer-listen="isListening"
-                />
+                /> -->
                 <a
                     v-if="!isRecommendationsToggleDisabled"
                     v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
@@ -430,7 +432,6 @@ import ChaptersBar from "./ChaptersBar.vue";
 
 
 import ShareModal from "./ShareModal.vue";
-import PlaylistVideos from "./PlaylistVideos.vue";
 import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
@@ -450,7 +451,6 @@ export default {
         ChaptersBar,
 
         ShareModal,
-        PlaylistVideos,
         WatchOnButton,
         LoadingIndicatorPage,
         ToastComponent,
