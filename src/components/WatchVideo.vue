@@ -146,66 +146,68 @@
                             @close="showShareModal = !showShareModal"
                         />
                         <div class="mr-auto flex flex-wrap gap-1">
-                            <!-- Subscribe Button -->
+                            <!-- Download Frame Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
-                                class="btn btn-danger flex items-center gap-1 <md:hidden"
+                                class="btn btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 <md:hidden"
                                 @click="downloadCurrentFrame"
+                                :title="$t('actions.download_frame')"
+                                aria-label="Download frame"
                             >
-                                {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
+                                <i class="i-fa6-solid:download" />
                             </button>
 
+                            <!-- Subscribe/Unsubscribe Button -->
                             <button
-                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'}`"
                                 @click="subscribeHandler"
+                                :title="$t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe'))"
+                                aria-label="Subscribe/Unsubscribe"
                             >
-                                <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
-                                <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
-                                {{
-                                    $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) +
-                                    " - " +
-                                    numberFormat(video.uploaderSubscriberCount)
-                                }}
+                                <i v-if="!subscribed" class="i-fa6-solid:bell" />
+                                <i v-if="subscribed" class="i-fa6-solid:bell-slash" />
                             </button>
                             
                             <!-- Like/Dislike Buttons -->
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="isVideoLiked(video.id) ? 'btn btn-success' : 'btn btn-secondary'"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoLiked(video.id) ? 'btn btn-success' : 'btn btn-secondary'}`"
                                 @click="handleLike"
-                                title="Like"
+                                :title="$t('actions.like')"
+                                aria-label="Like"
                             >
-                                <i class="i-fa6-solid:thumbs-up mr-1" />
+                                <i class="i-fa6-solid:thumbs-up" />
                             </button>
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="isVideoDisliked(video.id) ? 'btn btn-error' : 'btn btn-secondary'"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error' : 'btn btn-secondary'}`"
                                 @click="handleDislike"
-                                title="Dislike"
+                                :title="$t('actions.dislike')"
+                                aria-label="Dislike"
                             >
-                                <i class="i-fa6-solid:thumbs-down mr-1" />
+                                <i class="i-fa6-solid:thumbs-down" />
                             </button>
                             
                             <div class="flex flex-wrap gap-1">
                                 <!-- RSS Feed button -->
                                 <a
                                     v-if="video.uploaderUrl && !isRssFeedDisabled"
-                                    aria-label="RSS feed"
-                                    title="RSS feed"
-                                    role="button"
                                     :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
                                     target="_blank"
-                                    class="btn btn-secondary flex items-center"
+                                    class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
+                                    :title="$t('actions.rss_feed')"
+                                    aria-label="RSS feed"
                                 >
-                                    <i class="i-fa6-solid:rss mx-1.5" />
+                                    <i class="i-fa6-solid:rss" />
                                 </a>
                                 <!-- Share Dialog -->
                                 <button
-                                    class="btn btn-secondary flex items-center"
+                                    class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
                                     @click="showShareModal = !showShareModal"
+                                    :title="$t('actions.share')"
+                                    aria-label="Share"
                                 >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="span"></i18n-t>
-                                    <i class="i-fa6-solid:share mx-1.5" />
+                                    <i class="i-fa6-solid:share" />
                                 </button>
                                 <!-- YouTube -->
                                 <WatchOnButton :link="youtubeVideoHref" />
@@ -220,11 +222,10 @@
                                     :to="toggleListenUrl"
                                     :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                     :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    class="btn btn-secondary flex items-center"
+                                    class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
                                 >
                                     <i
                                         :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
-                                        class="mx-1.5"
                                     />
                                 </router-link>
 
@@ -1205,5 +1206,16 @@ export default {
     text-decoration: none;
     font-size: 0.875rem;
     line-height: 1.25rem;
+}
+
+.btn-icon {
+    width: 2.5rem !important; /* 40px */
+    height: 2.5rem !important; /* 40px */
+    min-height: 2.5rem !important; /* Fixed height */
+    border-radius: 50% !important; /* Circular shape */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
 }
 </style>

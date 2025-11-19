@@ -147,7 +147,7 @@ export default {
                 { name: "تاریخچه", route: "/history", icon: "i-fa6-solid:clock-rotate-left" },
                 { name: "پسند شده‌ها", route: "/likes", icon: "i-fa6-solid:thumbs-up" },
                 { name: "پسند نشده‌ها", route: "/dislikes", icon: "i-fa6-solid:thumbs-down" },
-                { name: "لیست‌پخش‌ها", route: "/playlists", icon: "i-fa6-solid:bars-staggered" },
+
                 { name: "تنظیمات", route: "/preferences", icon: "i-fa6-solid:gear" },
             ],
             categories: [
