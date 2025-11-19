@@ -459,14 +459,27 @@ const mixin = {
             const currentVideoIds = JSON.parse(playlist.videoIds);
             currentVideoIds.push(...videoIds);
             playlist.videoIds = JSON.stringify(currentVideoIds);
-            let streamInfos =
-                videoInfos ??
-                (await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/streams/" + videoId))));
-            playlist.thumbnail = streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl;
+            
+            let streamInfos;
+            if (videoInfos) {
+                // If videoInfos is provided, use it directly
+                streamInfos = videoInfos;
+            } else {
+                // Otherwise fetch the video information
+                streamInfos = await Promise.all(videoIds.map(videoId => this.fetchJson(this.apiUrl() + "/streams/" + videoId)));
+            }
+            
+            // Update thumbnail only if streamInfos[0] exists and has thumbnail info
+            if (streamInfos && streamInfos[0] && (streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl)) {
+                playlist.thumbnail = streamInfos[0].thumbnail || streamInfos[0].thumbnailUrl;
+            }
+            
             this.createOrUpdateLocalPlaylist(playlist);
-            for (let i in videoIds) {
-                if (streamInfos[i].error) continue;
-                this.createLocalPlaylistVideo(videoIds[i], streamInfos[i]);
+            
+            for (let i = 0; i < videoIds.length; i++) {
+                if (streamInfos[i] && !streamInfos[i].error) {
+                    this.createLocalPlaylistVideo(videoIds[i], streamInfos[i]);
+                }
             }
             return { message: "ok" };
         },
