@@ -68,13 +68,7 @@
                             :player-position="currentTime"
                             @seek="navigate"
                         />
-                        <PlaylistVideos
-                            v-if="playlist"
-                            :playlist-id="playlistId"
-                            :playlist="playlist"
-                            :selected-index="index"
-                            :prefer-listen="isListening"
-                        />
+
                     </div>
                     <!-- video title -->
                     <div class="mt-2 break-words px-2 text-2xl font-bold leading-[1.55]" v-text="video.title" />
@@ -136,18 +130,11 @@
                                 video.uploader
                             }}</router-link>
                         </div>
-                        <PlaylistAddModal
-                            v-if="showModal"
-                            :video-id="getVideoId()"
-                            :video-info="video"
-                            @close="showModal = !showModal"
-                        />
+
                         <ShareModal
                             v-if="showShareModal"
                             :video-id="getVideoId()"
                             :current-time="currentTime"
-                            :playlist-id="playlistId"
-                            :playlist-index="index"
                             @close="showShareModal = !showShareModal"
                         />
                         <div class="mr-auto flex flex-wrap gap-1">
@@ -232,13 +219,7 @@
                                         class="mx-1.5"
                                     />
                                 </router-link>
-                                <button
-                                    class="btn btn-secondary flex items-center"
-                                    @click="showModal = !showModal"
-                                >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.add_to_playlist" tag="span"></i18n-t>
-                                    <i class="i-fa6-solid:circle-plus mr-1" />
-                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -400,13 +381,7 @@
                     :player-position="currentTime"
                     @seek="navigate"
                 />
-                <PlaylistVideos
-                    v-if="playlist"
-                    :playlist-id="playlistId"
-                    :playlist="playlist"
-                    :selected-index="index"
-                    :prefer-listen="isListening"
-                />
+
                 <a
                     v-if="!isRecommendationsToggleDisabled"
                     v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
@@ -436,9 +411,7 @@ import VideoPlayer from "./VideoPlayer.vue";
 import ContentItem from "./ContentItem.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
-import PlaylistAddModal from "./PlaylistAddModal.vue";
 import ShareModal from "./ShareModal.vue";
-import PlaylistVideos from "./PlaylistVideos.vue";
 import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
@@ -456,9 +429,7 @@ export default {
         ContentItem,
         CommentItem,
         ChaptersBar,
-        PlaylistAddModal,
         ShareModal,
-        PlaylistVideos,
         WatchOnButton,
         LoadingIndicatorPage,
         ToastComponent,
@@ -469,9 +440,7 @@ export default {
         const smallViewQuery = window.matchMedia("(max-width: 640px)");
         return {
             video: null,
-            playlistId: null,
-            playlist: null,
-            index: null,
+
             sponsors: null,
             selectedAutoLoop: false,
             selectedAutoPlay: null,
@@ -661,9 +630,7 @@ export default {
             return fullDescription;
         },
         youtubeVideoHref() {
-            let link = `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}`;
-            if (this.playlistId) link += `&list=${this.playlistId}`;
-            return link;
+            return `https://youtu.be/${this.getVideoId()}?t=${Math.round(this.currentTime)}`;
         },
     },
     mounted() {
@@ -719,9 +686,7 @@ export default {
             })();
             if (this.active) this.$refs.videoPlayer.loadVideo();
         });
-        this.playlistId = this.$route.query.list;
-        this.index = Number(this.$route.query.index);
-        this.getPlaylistData();
+
         this.getSponsors();
         if (!this.isEmbed && this.showComments && this.commentsEnabled) this.getComments();
         if (this.isEmbed) document.querySelector("html").style.overflow = "hidden";
@@ -900,45 +865,8 @@ export default {
                     }
                 });
         },
-        async getPlaylistData() {
-            if (this.playlistId) {
-                this.playlist = await this.getPlaylist(this.playlistId);
-                await this.fetchPlaylistPages().then(() => {
-                    if (!(this.index >= 0)) {
-                        for (let i = 0; i < this.playlist.relatedStreams.length; i++)
-                            if (this.playlist.relatedStreams[i].url.substr(-11) == this.getVideoId()) {
-                                this.index = i + 1;
-                                this.$router.replace({
-                                    query: { ...this.$route.query, index: this.index },
-                                });
-                                break;
-                            }
-                    }
-                });
-                await this.fetchPlaylistPages();
-            }
-        },
-        async fetchPlaylistPages() {
-            if (this.playlist.nextpage) {
-                await this.fetchJson(this.apiUrl() + "/nextpage/playlists/" + this.playlistId, {
-                    nextpage: this.playlist.nextpage,
-                }).then(json => {
-                    // Filter out duplicate items based on URL before adding them
-                    const newItems = json.relatedStreams.filter(
-                        newItem => !this.playlist.relatedStreams.some(existingItem => existingItem.url === newItem.url),
-                    );
 
-                    // Only add items if there are non-duplicate ones
-                    if (newItems.length > 0) {
-                        this.playlist.relatedStreams.push(...newItems);
-                    }
 
-                    this.playlist.nextpage = json.nextpage;
-                    this.fetchDeArrowContent(json.relatedStreams);
-                });
-                await this.fetchPlaylistPages();
-            }
-        },
         async getSponsors() {
             if (!this.isSponsorBlockDisabled && this.getPreferenceBoolean("sponsorblock", true))
                 this.fetchSponsors().then(data => (this.sponsors = data));
@@ -1011,12 +939,6 @@ export default {
             }
         },
         getVideoId() {
-            if (this.$route.query.video_ids) {
-                const videos_list = this.$route.query.video_ids.split(",");
-                this.index = Number(this.$route.query.index ?? 0);
-                return videos_list[this.index];
-            }
-
             return this.$route.query.v || this.$route.params.v;
         },
         navigate(time) {
@@ -1028,8 +950,7 @@ export default {
         onVideoEnded() {
             if (
                 !this.selectedAutoLoop &&
-                ((this.selectedAutoPlay >= 1 && this.playlist?.relatedStreams?.length > this.index) ||
-                    (this.selectedAutoPlay >= 2 && this.video.relatedStreams.length > 0))
+                this.selectedAutoPlay >= 2 && this.video.relatedStreams.length > 0
             ) {
                 this.showToast();
             }
@@ -1058,9 +979,7 @@ export default {
             const params = this.$route.query;
             const video_ids = this.$route.query.video_ids?.split(",") ?? [];
             let url;
-            if (this.playlist) {
-                url = this.playlist?.relatedStreams?.[this.index]?.url ?? this.video.relatedStreams[0].url;
-            } else if (video_ids.length > this.index + 1) {
+            if (video_ids.length > this.index + 1) {
                 url = `${this.$route.path}?index=${this.index + 1}`;
             } else {
                 url = this.video.relatedStreams[0].url;
@@ -1071,13 +990,7 @@ export default {
                     case "v":
                     case "t":
                         break;
-                    case "index":
-                        if (this.playlist && this.index < this.playlist.relatedStreams.length)
-                            searchParams.set("index", this.index + 1);
-                        break;
-                    case "list":
-                        if (this.index < this.playlist.relatedStreams.length) searchParams.set("list", params.list);
-                        break;
+
                     default:
                         searchParams.set(param, params[param]);
                         break;

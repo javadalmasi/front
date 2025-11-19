@@ -6,8 +6,6 @@
                 path: '/watch',
                 query: {
                     v: item.url.substr(-11),
-                    ...(playlistId && { list: playlistId }),
-                    ...(index >= 0 && { index: index + 1 }),
                     ...(preferListen && { listen: 1 }),
                 },
             }"
@@ -77,8 +75,6 @@
                         path: '/watch',
                         query: {
                             v: item.url.substr(-11),
-                            ...(playlistId && { list: playlistId }),
-                            ...(index >= 0 && { index: index + 1 }),
                             ...(!preferListen && { listen: 1 }),
                         },
                     }"
@@ -87,23 +83,11 @@
                 >
                     <i :class="preferListen ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'" />
                 </router-link>
-                <button
-                    :title="$t('actions.add_to_playlist')"
-                    @click="showPlaylistModal = !showPlaylistModal"
-                >
-                    <i class="i-fa6-solid:circle-plus" />
-                </button>
+
                 <button :title="$t('actions.share')" @click="showShareModal = !showShareModal">
                     <i class="i-fa6-solid:share" />
                 </button>
-                <button
-                    v-if="admin"
-                    ref="removeButton"
-                    :title="$t('actions.remove_from_playlist')"
-                    @click="showConfirmRemove = true"
-                >
-                    <i class="i-fa6-solid:circle-minus" />
-                </button>
+
                 <button
                     v-if="showMarkOnWatched && isFeed"
                     ref="watchButton"
@@ -122,12 +106,7 @@
                     @close="showConfirmRemove = false"
                     @confirm="removeVideo(item.url.substr(-11))"
                 />
-                <PlaylistAddModal
-                    v-if="showPlaylistModal"
-                    :video-id="item.url.substr(-11)"
-                    :video-info="item"
-                    @close="showPlaylistModal = false"
-                />
+
                 <ShareModal
                     v-if="showShareModal"
                     :video-id="item.url.substr(-11)"
@@ -140,13 +119,13 @@
 </template>
 
 <script>
-import PlaylistAddModal from "./PlaylistAddModal.vue";
+
 import ShareModal from "./ShareModal.vue";
 import ConfirmModal from "./ConfirmModal.vue";
 import VideoThumbnail from "./VideoThumbnail.vue";
 
 export default {
-    components: { PlaylistAddModal, ConfirmModal, ShareModal, VideoThumbnail },
+    components: { ConfirmModal, ShareModal, VideoThumbnail },
     props: {
         item: {
             type: Object,
@@ -170,7 +149,7 @@ export default {
     emits: ["update:watched", "remove"],
     data() {
         return {
-            showPlaylistModal: false,
+
             showShareModal: false,
             showVideo: true,
             showConfirmRemove: false,
@@ -205,13 +184,7 @@ export default {
         this.shouldShowMarkOnWatched();
     },
     methods: {
-        removeVideo() {
-            this.$refs.removeButton.disabled = true;
-            this.removeVideoFromPlaylist(this.playlistId, this.index).then(json => {
-                if (json.error) alert(json.error);
-                else this.$emit("remove");
-            });
-        },
+
         shouldShowVideo() {
             if (!this.isFeed || !this.getPreferenceBoolean("hideWatched", false)) return;
 

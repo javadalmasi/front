@@ -124,20 +124,9 @@ export default {
                     const store = request.transaction.objectStore("watch_history");
                     store.createIndex("watchedAt", "watchedAt", { unique: false });
                 }
-                if (!db.objectStoreNames.contains("playlist_bookmarks")) {
-                    const store = db.createObjectStore("playlist_bookmarks", { keyPath: "playlistId" });
-                    store.createIndex("playlist_id_idx", "playlistId", { unique: true });
-                    store.createIndex("id_idx", "id", { unique: true, autoIncrement: true });
-                }
                 if (!db.objectStoreNames.contains("channel_groups")) {
                     const store = db.createObjectStore("channel_groups", { keyPath: "groupName" });
                     store.createIndex("groupName", "groupName", { unique: true });
-                }
-                if (!db.objectStoreNames.contains("playlists")) {
-                    const playlistStore = db.createObjectStore("playlists", { keyPath: "playlistId" });
-                    playlistStore.createIndex("playlistId", "playlistId", { unique: true });
-                    const playlistVideosStore = db.createObjectStore("playlist_videos", { keyPath: "videoId" });
-                    playlistVideosStore.createIndex("videoId", "videoId", { unique: true });
                 }
                 // migration to fix an invalid previous length of channel ids: 11 -> 24
                 (async () => {

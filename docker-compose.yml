@@ -28,7 +28,7 @@ services:
             - VITE_DISABLE_IMPORT_EXPORT=true
             - VITE_DISABLE_ADD_TO_GROUP=true
             - VITE_DISABLE_RECOMMENDATIONS_TOGGLE=true
-            - VITE_DISABLE_PLAYLIST_TXT_DOWNLOAD=true
+            
             - VITE_DISABLE_CHAPTERS=true
             - VITE_DISABLE_VIDEO_ITEM_ICONS=true
             - VITE_DISABLE_LICENSE_INFO=true

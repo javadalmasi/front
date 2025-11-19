@@ -103,11 +103,9 @@ export default {
                 "all",
                 "videos",
                 "channels",
-                "playlists",
                 "music_songs",
                 "music_videos",
                 "music_albums",
-                "music_playlists",
                 "music_artists",
             ],
             selectedFilter: this.$route.query?.filter ?? "videos", // Default to videos or use filter from URL
