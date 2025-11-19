@@ -381,26 +381,7 @@ const mixin = {
                 };
             });
         },
-        async getPlaylists() {
-            if (!window.db) return [];
-            return new Promise(resolve => {
-                let playlists = [];
-                var tx = window.db.transaction("playlists", "readonly");
-                var store = tx.objectStore("playlists");
-                const cursorRequest = store.openCursor();
-                cursorRequest.onsuccess = e => {
-                    const cursor = e.target.result;
-                    if (cursor) {
-                        let playlist = cursor.value;
-                        playlist.videos = JSON.parse(playlist.videoIds).length;
-                        playlists.push(playlist);
-                        cursor.continue();
-                    } else {
-                        resolve(playlists);
-                    }
-                };
-            });
-        },
+
         async getPlaylist(playlistId) {
             if (playlistId.startsWith("local")) {
                 const playlist = await this.getLocalPlaylist(playlistId);
@@ -410,19 +391,6 @@ const mixin = {
                 return playlist;
             }
             return await this.fetchJson(this.apiUrl() + "/playlists/" + playlistId);
-        },
-        async createPlaylist(name) {
-            const uuid = crypto.randomUUID();
-            const playlistId = `local-${uuid}`;
-            this.createOrUpdateLocalPlaylist({
-                playlistId: playlistId,
-                id: playlistId,
-                name: name,
-                description: "",
-                thumbnail: import.meta.env.VITE_PIPED_PROXY + "/?host=i.ytimg.com",
-                videoIds: "[]",
-            });
-            return { playlistId: playlistId };
         },
         async deletePlaylist(playlistId) {
             const playlist = await this.getLocalPlaylist(playlistId);

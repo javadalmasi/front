@@ -437,6 +437,7 @@ import ContentItem from "./ContentItem.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
 import PlaylistAddModal from "./PlaylistAddModal.vue";
+
 import ShareModal from "./ShareModal.vue";
 import PlaylistVideos from "./PlaylistVideos.vue";
 import WatchOnButton from "./WatchOnButton.vue";
@@ -456,6 +457,7 @@ export default {
         ContentItem,
         CommentItem,
         ChaptersBar,
+        PlaylistAddModal,
         PlaylistAddModal,
         ShareModal,
         PlaylistVideos,
