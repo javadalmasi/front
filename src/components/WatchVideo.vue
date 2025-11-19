@@ -171,7 +171,7 @@
                             <!-- Like/Dislike Buttons -->
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoLiked(video.id) ? 'btn btn-success' : 'btn btn-secondary'}`"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${(isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary')}`"
                                 @click="handleLike"
                                 :title="$t('actions.like')"
                                 aria-label="Like"
@@ -180,7 +180,7 @@
                             </button>
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error' : 'btn btn-secondary'}`"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
                                 @click="handleDislike"
                                 :title="$t('actions.dislike')"
                                 aria-label="Dislike"
@@ -1217,5 +1217,63 @@ export default {
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
+    transition: all 0.2s ease !important; /* Smooth transitions for hover/click */
+    transform: scale(1) !important; /* Initial scale */
+}
+
+.btn-icon:hover {
+    transform: scale(1.05) !important; /* Slight scale on hover */
+}
+
+.btn-icon:active {
+    transform: scale(0.95) !important; /* Scale down on click for press effect */
+    transition: all 0.1s ease !important; /* Quick transition for click */
+}
+
+/* Active state colors for various button types */
+.btn-icon.btn-success {
+    background-color: #28a745 !important; /* Green for like when active */
+    color: white !important;
+}
+
+.btn-icon.btn-error {
+    background-color: #dc3545 !important; /* Red for dislike when active */
+    color: white !important;
+}
+
+.btn-icon.btn-danger {
+    background-color: #ff0000 !important; /* Red for subscribe */
+    color: white !important;
+}
+
+.btn-icon.btn-secondary {
+    background-color: #6c757d !important; /* Gray for general buttons */
+    color: white !important;
+}
+
+.btn-icon.btn-unsubscribe {
+    background-color: #6c757d !important; /* Gray for unsubscribe */
+    color: white !important;
+}
+
+/* Inactive/normal state colors */
+.btn-icon.btn-secondary:not(.btn-success):not(.btn-error):not(.btn-danger):not(.btn-unsubscribe) {
+    background-color: rgba(108, 117, 125, 0.5) !important; /* Semi-transparent gray */
+    color: white !important;
+}
+
+.btn-icon.btn-success:not(.active) {
+    background-color: rgba(40, 167, 69, 0.3) !important; /* Semi-transparent green */
+    color: white !important;
+}
+
+.btn-icon.btn-error:not(.active) {
+    background-color: rgba(220, 53, 69, 0.3) !important; /* Semi-transparent red */
+    color: white !important;
+}
+
+.btn-icon.btn-danger:not(.subscribed) {
+    background-color: rgba(255, 0, 0, 0.3) !important; /* Semi-transparent red */
+    color: white !important;
 }
 </style>
