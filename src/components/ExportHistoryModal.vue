@@ -41,8 +41,8 @@ export default {
     },
     data() {
         return {
-            exportOptions: ["playlist", "history"],
-            exportAs: "playlist",
+            exportOptions: ["history"],
+            exportAs: "history",
             fields: [
                 "videoId",
                 "title",
@@ -84,15 +84,7 @@ export default {
             }
         },
         handleExport() {
-            if (this.exportAs === "playlist") {
-                this.fetchAllVideos()
-                    .then(() => {
-                        this.exportAsPlaylist();
-                    })
-                    .catch(e => {
-                        console.error(e);
-                    });
-            } else if (this.exportAs === "history") {
+            if (this.exportAs === "history") {
                 this.fetchAllVideos()
                     .then(() => {
                         this.exportAsHistory();
@@ -101,22 +93,6 @@ export default {
                         console.error(e);
                     });
             }
-        },
-        exportAsPlaylist() {
-            const dateStr = new Date().toISOString().split(".")[0];
-            let json = {
-                format: this.getSiteName(),
-                version: 1,
-                playlists: [
-                    {
-                        name: `${this.getSiteName()} History ${dateStr}`,
-                        type: "history",
-                        visibility: "private",
-                        videos: this.exportVideos.map(video => "https://youtube.com" + video.url),
-                    },
-                ],
-            };
-            this.download(JSON.stringify(json), `piped_history_${dateStr}.json`, "application/json");
         },
         exportAsHistory() {
             const dateStr = new Date().toISOString().split(".")[0];

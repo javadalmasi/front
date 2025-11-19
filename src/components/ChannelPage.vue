@@ -75,11 +75,7 @@
                 >
                     <span class="channel-tab-text" v-text="tab.translatedName"></span>
                 </button>
-                <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                    <button class="channel-tab-button">
-                        <span class="channel-tab-text" v-text="$t('actions.play_all')"></span>
-                    </button>
-                </router-link>
+
             </div>
             <div class="channel-tabs-divider"></div>
         </div>
@@ -278,9 +274,7 @@ export default {
                 case "livestreams":
                     translatedTabName = this.$t("titles.livestreams");
                     break;
-                case "playlists":
-                    translatedTabName = this.$t("titles.playlists");
-                    break;
+
                 case "albums":
                     translatedTabName = this.$t("titles.albums");
                     break;

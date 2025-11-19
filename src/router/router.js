@@ -21,11 +21,7 @@ const routes = [
         name: "SearchResults",
         component: () => import("../components/SearchResults.vue"),
     },
-    {
-        path: "/playlist",
-        name: "Playlist",
-        component: () => import("../components/PlaylistPage.vue"),
-    },
+
     {
         path: "/:path(v|w|embed|live|shorts|watch)/:v?",
         name: "WatchVideo",
