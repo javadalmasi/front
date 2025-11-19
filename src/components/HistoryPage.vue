@@ -35,8 +35,9 @@
 
     <div v-if="videosStore.length === 0" class="flex flex-col items-center justify-center py-20">
         <h2 class="text-xl font-bold mb-4">{{ $t('info.no_history') || 'No history found' }}</h2>
-        <p class="mb-4 text-center px-4">{{ $t('info.history_desc') || 'Your watched videos will appear here. Enable watch history in preferences to save your viewing history.' }}</p>
-        <router-link to="/preferences" class="btn">{{ $t('actions.enable_watch_history') || 'Enable Watch History' }}</router-link>
+        <p class="mb-4 text-center px-4" v-if="!getPreferenceBoolean('watchHistory', true)">{{ $t('info.history_desc') || 'Your watched videos will appear here. Enable watch history in preferences to save your viewing history.' }}</p>
+        <p class="mb-4 text-center px-4" v-else>{{ $t('info.no_videos_in_history') || 'You have not watched any videos yet.' }}</p>
+        <router-link v-if="!getPreferenceBoolean('watchHistory', true)" to="/preferences" class="btn">{{ $t('actions.enable_watch_history') || 'Enable Watch History' }}</router-link>
     </div>
     
     <div v-else class="video-grid">

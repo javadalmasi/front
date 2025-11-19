@@ -244,7 +244,7 @@
         "video_type": "نوع ویدیو",
         "all_types": "همه انواع",
         "short_videos": "ویدیوهای کوتاه",
-        "long_videos": "ویدیوهای بلند",
+        "long_videos": "ویدیوهای بلند (> ۲ ساعت)",
         "upload_date": "تاریخ آپلود",
         "any_date": "هر تاریخی",
         "sort_by": "مرتب سازی بر اساس",
@@ -262,7 +262,6 @@
         "under_50_minutes": "زیر ۵۰ دقیقه",
         "under_1_hour": "زیر ۱ ساعت",
         "under_2_hours": "زیر ۲ ساعت",
-        "long_videos": "ویدیوهای بلند (> ۲ ساعت)",
         "view_count_sort": "مرتب سازی بر اساس تعداد بازدید",
         "no_sort": "بدون مرتب سازی",
         "most_viewed": "بیشترین بازدید",
@@ -272,7 +271,13 @@
         "advanced_search": "جستجوی پیشرفته",
         "verified_uploader_only": "فقط ویدیوهای تأیید شده",
         "with_description_only": "فقط دارای توضیح",
-        "shorts": "کوتاه"
+        "shorts": "کوتاه",
+        "highest_views": "بیشترین بازدیدها",
+        "lowest_views": "کمترین بازدیدها",
+        "newest_first": "اول جدیدترها",
+        "oldest_first": "اول قدیمی‌ها",
+        "upload_date_sort": "مرتب‌سازی بر اساس تاریخ بارگذاری",
+        "view_count_combined": "مرتب‌سازی ترکیبی بر اساس تعداد بازدید"
     },
     "video": {
         "views": "{views} بازدید ها",
