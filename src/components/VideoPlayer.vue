@@ -608,6 +608,7 @@ export default {
 
                 videoEl.addEventListener("volumechange", () => {
                     this.setPreference("volume", videoEl.volume, true);
+                    this.setPreference("muted", videoEl.muted, true);
                 });
 
                 videoEl.addEventListener("ratechange", e => {
@@ -1003,7 +1004,20 @@ export default {
                             subtitle.name,
                         );
                     });
-                    videoEl.volume = this.getPreferenceNumber("volume", 1);
+                    // Set volume with 50% as default if no user preference exists
+                    const volume = this.getPreferenceNumber("volume", 0.5);
+                    videoEl.volume = volume;
+                    // Ensure the volume preference is saved if it wasn't previously set
+                    if (localStorage.getItem("volume") === null) {
+                        this.setPreference("volume", volume, true);
+                    }
+                    // Set muted state from preferences, defaulting to false
+                    const muted = this.getPreferenceBoolean("muted", false);
+                    videoEl.muted = muted;
+                    // Ensure the muted preference is saved if it wasn't previously set
+                    if (localStorage.getItem("muted") === null) {
+                        this.setPreference("muted", muted, true);
+                    }
                     const rate = this.getPreferenceNumber("rate", 1);
                     videoEl.playbackRate = rate;
                     videoEl.defaultPlaybackRate = rate;

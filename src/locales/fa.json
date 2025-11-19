@@ -153,7 +153,11 @@
         "never": "هیچ‌وقت",
         "playlists_only": "فقط لیست‌های پخش",
         "always": "همیشه",
-        "mark_as_watched": "نشانه‌گذاری به عنوان دیده شده"
+        "mark_as_watched": "نشانه‌گذاری به عنوان دیده شده",
+        "enable_watch_history": "فعال کردن تاریخچه تماشا",
+        "remove": "حذف",
+        "likes": "پسندیده‌ها",
+        "dislikes": "نپسندیده‌ها"
     },
     "tooltips": {
         "theme": "انتخاب تم تاریک، روشن یا خودکار برای رابط کاربری",
@@ -346,7 +350,23 @@
         "password_fair": "متوسط",
         "password_good": "خوب",
         "password_strong": "قوی",
-        "video_sections": "بخش بندی ویدیو"
+        "video_sections": "بخش بندی ویدیو",
+        "no_history": "تاریخچه‌ای یافت نشد",
+        "history_desc": "ویدیوهای تماشا شده توسط شما در اینجا نمایش داده می‌شوند. تاریخچه تماشا را در تنظیمات فعال کنید تا تاریخچه تماشای خود را ذخیره کنید.",
+        "no_videos_in_history": "شما هنوز هیچ ویدیویی را تماشا نکرده‌اید.",
+        "item_removed": "مورد حذف شد",
+        "confirm_delete_all_likes": "آیا از حذف همه ویدیوهای پسندیده شده مطمئن هستید؟",
+        "all_likes_removed": "همه ویدیوهای پسندیده حذف شدند",
+        "no_data_to_export": "داده‌ای برای صادر کردن وجود ندارد",
+        "video_id": "شناسه ویدیو",
+        "title": "عنوان",
+        "uploader": "آپلود کننده",
+        "thumbnail_url": "آدرس تصویر کوچک",
+        "exported_successfully": "با موفقیت صادر شد",
+        "imported_successfully": "با موفقیت وارد شد",
+        "import_failed": "وارد کردن شکست خورد",
+        "confirm_delete_all_dislikes": "آیا از حذف همه ویدیوهای نپسندیده شده مطمئن هستید؟",
+        "all_dislikes_removed": "همه ویدیوهای نپسندیده حذف شدند"
     },
     "subscriptions": {
         "subscribed_channels_count": "مشترک شده: {0}"
