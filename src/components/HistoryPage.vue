@@ -126,7 +126,7 @@ export default {
         })().then(() => {
             this.loadMoreVideos();
             // Update watched status for all videos after loading
-            if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+            if (window.db && this.getPreferenceBoolean("watchHistory", true)) {
                 this.updateWatched(this.videos);
             }
         });

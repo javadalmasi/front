@@ -177,7 +177,7 @@ const mixin = {
             return timeAgo.format(time);
         },
         async updateWatched(videos) {
-            if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+            if (window.db && this.getPreferenceBoolean("watchHistory", true)) {
                 var tx = window.db.transaction("watch_history", "readonly");
                 var store = tx.objectStore("watch_history");
                 videos.map(async video => {

@@ -226,7 +226,7 @@ export default {
             };
         },
         shouldShowMarkOnWatched() {
-            this.showMarkOnWatched = this.getPreferenceBoolean("watchHistory", false);
+            this.showMarkOnWatched = this.getPreferenceBoolean("watchHistory", true);
         },
         toggleWatched(videoId) {
             if (window.db) {

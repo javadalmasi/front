@@ -910,7 +910,7 @@ export default {
             if (time) {
                 startTime = 0; // The parseTimeParam function was removed, so we'll just start at 0
                 this.initialSeekComplete = true;
-            } else if (window.db && this.getPreferenceBoolean("watchHistory", false)) {
+            } else if (window.db && this.getPreferenceBoolean("watchHistory", true)) {
                 await new Promise(resolve => {
                     var tx = window.db.transaction("watch_history", "readonly");
                     var store = tx.objectStore("watch_history");

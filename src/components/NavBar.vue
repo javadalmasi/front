@@ -119,7 +119,7 @@ export default {
         },
 
         shouldShowHistory() {
-            return this.getPreferenceBoolean("watchHistory", false);
+            return this.getPreferenceBoolean("watchHistory", true);
         },
         shouldShowTrending() {
             return this.getPreferenceString("homepage", "trending") !== "trending";
