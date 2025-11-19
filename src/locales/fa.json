@@ -157,7 +157,13 @@
         "enable_watch_history": "فعال کردن تاریخچه تماشا",
         "remove": "حذف",
         "likes": "پسندیده‌ها",
-        "dislikes": "نپسندیده‌ها"
+        "dislikes": "نپسندیده‌ها",
+        "delete_all": "حذف همه",
+        "export_csv": "صادر کردن CSV",
+        "export_json": "صادر کردن JSON",
+        "hide_disliked_videos": "مخفی کردن ویدیوهای نپسندیده شده",
+        "import_data": "وارد کردن داده",
+        "show_alert_on_disliked_videos": "نمایش هشدار برای ویدیوهای نپسندیده"
     },
     "tooltips": {
         "theme": "انتخاب تم تاریک، روشن یا خودکار برای رابط کاربری",
@@ -200,8 +206,8 @@
         "delete_account": "حذف دائمی حساب کاربری و تمام اطلاعات مرتبط",
         "logout": "خروج از حساب کاربری در این دستگاه",
         "invalidate_session": "خروج از حساب در تمام دستگاه های متصل",
-        "hide_disliked_videos": "مخفی کردن ویدیوهایی که نپسندیده اید",
-        "show_alert_on_disliked_videos": "نمایش هشدار وقتی ویدیویی نپسندیده را تماشا می کنید"
+        "hide_disliked_videos": "ویدیوهایی که نپسندیده‌اید را مخفی کن",
+        "show_alert_on_disliked_videos": "هنگام تماشای ویدیویی که نپسندیده‌اید، یک هشدار نمایش بده"
     },
     "titles": {
         "history": "تاریخچه",
@@ -366,7 +372,14 @@
         "imported_successfully": "با موفقیت وارد شد",
         "import_failed": "وارد کردن شکست خورد",
         "confirm_delete_all_dislikes": "آیا از حذف همه ویدیوهای نپسندیده شده مطمئن هستید؟",
-        "all_dislikes_removed": "همه ویدیوهای نپسندیده حذف شدند"
+        "all_dislikes_removed": "همه ویدیوهای نپسندیده حذف شدند",
+        "no_disliked_videos": "ویدیوی نپسندیده شده‌ای یافت نشد",
+        "no_liked_videos": "ویدیوی پسندیده شده‌ای یافت نشد",
+        "video_liked": "ویدیو پسندیده شد",
+        "video_disliked": "ویدیو نپسندیده شد",
+        "this_video_is_disliked": "این ویدیو نپسندیده شده است",
+        "video_removed_from_likes": "ویدیو از پسندیده‌ها حذف شد",
+        "video_removed_from_dislikes": "ویدیو از نپسندیده‌ها حذف شد"
     },
     "subscriptions": {
         "subscribed_channels_count": "مشترک شده: {0}"

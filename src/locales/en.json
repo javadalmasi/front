@@ -157,7 +157,13 @@
         "enable_watch_history": "Enable Watch History",
         "remove": "Remove",
         "likes": "Likes",
-        "dislikes": "Dislikes"
+        "dislikes": "Dislikes",
+        "delete_all": "Delete All",
+        "export_csv": "Export CSV",
+        "export_json": "Export JSON",
+        "hide_disliked_videos": "Hide Disliked Videos",
+        "import_data": "Import Data",
+        "show_alert_on_disliked_videos": "Show Alert on Disliked Videos"
     },
     "tooltips": {
         "theme": "Select dark, light, or auto theme for the UI",
@@ -199,7 +205,9 @@
         "enable_dearrow": "Use improved titles and thumbnails from DeArrow",
         "delete_account": "Permanently delete your account and all associated data",
         "logout": "Log out of your account on this device",
-        "invalidate_session": "Log out of your account on all devices"
+        "invalidate_session": "Log out of your account on all devices",
+        "hide_disliked_videos": "Hide videos you have disliked",
+        "show_alert_on_disliked_videos": "Show an alert when you watch a video you disliked"
     },
     "titles": {
         "history": "History",
@@ -337,7 +345,14 @@
         "imported_successfully": "Imported successfully",
         "import_failed": "Import failed",
         "confirm_delete_all_dislikes": "Are you sure you want to remove all disliked videos?",
-        "all_dislikes_removed": "All disliked videos removed"
+        "all_dislikes_removed": "All disliked videos removed",
+        "no_disliked_videos": "No disliked videos found",
+        "no_liked_videos": "No liked videos found",
+        "video_liked": "Video liked",
+        "video_disliked": "Video disliked",
+        "this_video_is_disliked": "This video is disliked",
+        "video_removed_from_likes": "Video removed from likes",
+        "video_removed_from_dislikes": "Video removed from dislikes"
     },
     "comment": {
         "pinned_by": "Pinned by {author}",
