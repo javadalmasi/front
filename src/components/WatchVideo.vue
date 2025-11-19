@@ -104,7 +104,7 @@
                     <!-- Channel info & options flex container -->
                     <div class="flex flex-wrap gap-1 px-2">
                         <!-- Channel Image & Info -->
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-1 items-center gap-3 lt-lg:w-full">
                             <router-link :to="video.uploaderUrl" class="mr-1.5">
                                 <div class="relative inline-block">
                                     <img
@@ -126,9 +126,14 @@
                                     </div>
                                 </div>
                             </router-link>
-                            <router-link v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
-                                video.uploader
-                            }}</router-link>
+                            <div class="flex flex-1 flex-col">
+                                <router-link v-if="video.uploaderUrl" class="link" :to="video.uploaderUrl">{{
+                                    video.uploader
+                                }}</router-link>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ numberFormat(video.uploaderSubscriberCount) }} subscribers
+                                </span>
+                            </div>
                         </div>
 
                         <ShareModal
@@ -137,89 +142,94 @@
                             :current-time="currentTime"
                             @close="showShareModal = !showShareModal"
                         />
-                        <div class="mr-auto flex flex-wrap gap-1">
+                        <div class="mr-auto flex flex-wrap gap-1 lt-lg:w-full lt-lg:justify-end">
                             <!-- Subscribe Button -->
                             <button
-                                v-if="!isDownloadThumbnailDisabled"
-                                class="btn btn-danger flex items-center gap-1 <md:hidden"
-                                @click="downloadCurrentFrame"
-                            >
-                                {{ $t("actions.download_frame") }}<i class="i-fa6-solid:download" />
-                            </button>
-
-                            <button
-                                :class="subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'"
+                                :class="subscribed ? 'btn-secondary' : 'btn-dark dark:btn-light'"
+                                class="btn rounded-full!"
                                 @click="subscribeHandler"
                             >
                                 <i v-if="!subscribed" class="i-fa6-solid:bell mr-1.5" />
                                 <i v-if="subscribed" class="i-fa6-solid:bell-slash mr-1.5" />
                                 {{
-                                    $t("actions." + (subscribed ? "unsubscribe" : "subscribe")) +
-                                    " - " +
-                                    numberFormat(video.uploaderSubscriberCount)
+                                    $t("actions." + (subscribed ? "unsubscribe" : "subscribe"))
                                 }}
                             </button>
                             
-                            <!-- Like/Dislike Buttons -->
-                            <button
-                                v-if="!isLikeDislikeDisabled"
-                                :class="isVideoLiked(video.id) ? 'btn btn-success' : 'btn btn-secondary'"
-                                @click="handleLike"
-                                title="Like"
-                            >
-                                <i class="i-fa6-solid:thumbs-up mr-1" />
-                            </button>
-                            <button
-                                v-if="!isLikeDislikeDisabled"
-                                :class="isVideoDisliked(video.id) ? 'btn btn-error' : 'btn btn-secondary'"
-                                @click="handleDislike"
-                                title="Dislike"
-                            >
-                                <i class="i-fa6-solid:thumbs-down mr-1" />
-                            </button>
-                            
+                            <!-- Action Buttons -->
                             <div class="flex flex-wrap gap-1">
-                                <!-- RSS Feed button -->
-                                <a
-                                    v-if="video.uploaderUrl && !isRssFeedDisabled"
-                                    aria-label="RSS feed"
-                                    title="RSS feed"
-                                    role="button"
-                                    :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
-                                    target="_blank"
-                                    class="btn btn-secondary flex items-center"
-                                >
-                                    <i class="i-fa6-solid:rss mx-1.5" />
-                                </a>
+                                <!-- Like/Dislike Buttons -->
+                                <div class="flex overflow-hidden rounded-full bg-light-800 dark:bg-dark-200">
+                                    <button
+                                        v-if="!isLikeDislikeDisabled"
+                                        class="btn btn-ghost rounded-none! border-r !border-gray-300 dark:!border-gray-600"
+                                        @click="handleLike"
+                                        title="Like"
+                                    >
+                                        <i class="i-fa6-solid:thumbs-up" />
+                                        <span class="ml-2 font-bold">{{ video.likes }}</span>
+                                    </button>
+                                    <button
+                                        v-if="!isLikeDislikeDisabled"
+                                        class="btn btn-ghost rounded-none!"
+                                        @click="handleDislike"
+                                        title="Dislike"
+                                    >
+                                        <i class="i-fa6-solid:thumbs-down" />
+                                    </button>
+                                </div>
                                 <!-- Share Dialog -->
                                 <button
-                                    class="btn btn-secondary flex items-center"
+                                    class="btn rounded-full! bg-light-800 dark:bg-dark-200"
                                     @click="showShareModal = !showShareModal"
                                 >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.share" tag="span"></i18n-t>
                                     <i class="i-fa6-solid:share mx-1.5" />
+                                    <span class="lt-lg:hidden" v-t="'actions.share'"></span>
                                 </button>
-                                <!-- YouTube -->
-                                <WatchOnButton :link="youtubeVideoHref" />
-                                <!-- Odysee -->
-                                <WatchOnButton
-                                    v-if="video.lbryId"
-                                    :link="`https://odysee.com/${video.lbryId}`"
-                                    platform="Odysee"
-                                />
-                                <!-- listen / watch toggle -->
-                                <router-link
-                                    :to="toggleListenUrl"
-                                    :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
-                                    class="btn btn-secondary flex items-center"
+                                <!-- Download Button -->
+                                <button
+                                    v-if="!isDownloadThumbnailDisabled"
+                                    class="btn rounded-full! bg-light-800 dark:bg-dark-200"
+                                    @click="downloadCurrentFrame"
                                 >
-                                    <i
-                                        :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
-                                        class="mx-1.5"
+                                    <i class="i-fa6-solid:download mx-1.5" />
+                                    <span class="lt-lg:hidden" v-t="'actions.download_frame'"></span>
+                                </button>
+                                <!-- Other Buttons -->
+                                <div class="flex flex-wrap gap-1">
+                                    <!-- RSS Feed button -->
+                                    <a
+                                        v-if="video.uploaderUrl && !isRssFeedDisabled"
+                                        aria-label="RSS feed"
+                                        title="RSS feed"
+                                        role="button"
+                                        :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${video.uploaderUrl.split('/')[2]}`"
+                                        target="_blank"
+                                        class="btn btn-secondary flex items-center"
+                                    >
+                                        <i class="i-fa6-solid:rss mx-1.5" />
+                                    </a>
+                                    <!-- YouTube -->
+                                    <WatchOnButton :link="youtubeVideoHref" />
+                                    <!-- Odysee -->
+                                    <WatchOnButton
+                                        v-if="video.lbryId"
+                                        :link="`https://odysee.com/${video.lbryId}`"
+                                        platform="Odysee"
                                     />
-                                </router-link>
-
+                                    <!-- listen / watch toggle -->
+                                    <router-link
+                                        :to="toggleListenUrl"
+                                        :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
+                                        :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
+                                        class="btn btn-secondary flex items-center"
+                                    >
+                                        <i
+                                            :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
+                                            class="mx-1.5"
+                                        />
+                                    </router-link>
+                                </div>
                             </div>
                         </div>
                     </div>
