@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <!-- Channel info & options flex container -->
-                    <div class="flex flex-wrap gap-1 px-2">
+                    <div class="flex items-center flex-wrap gap-1 px-2">
                         <!-- Channel Image & Info -->
                         <div class="flex items-center gap-3">
                             <router-link :to="video.uploaderUrl" class="mr-1.5">
@@ -145,7 +145,7 @@
                             :playlist-index="index"
                             @close="showShareModal = !showShareModal"
                         />
-                        <div class="mr-auto flex flex-wrap gap-1">
+                        <div class="ml-auto flex items-center flex-wrap gap-1">
                             <!-- Download Frame Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
@@ -188,7 +188,7 @@
                                 <i class="i-fa6-solid:thumbs-down" />
                             </button>
                             
-                            <div class="flex flex-wrap gap-1">
+                            <div class="flex items-center flex-wrap gap-1">
                                 <!-- RSS Feed button -->
                                 <a
                                     v-if="video.uploaderUrl && !isRssFeedDisabled"
