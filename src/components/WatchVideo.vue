@@ -734,7 +734,7 @@ export default {
         this.active = true;
         this.theaterMode = this.getPreferenceBoolean(
             "theaterMode",
-            window.innerWidth < (window.innerHeight * 4) / 3 + 467, //if the video player is limited by width rather than height, then clear up some horizontal room
+            false // Default to false instead of based on screen size
         );
         this.selectedAutoPlay = this.getPreferenceNumber("autoplay", 1);
         this.showComments = !this.getPreferenceBoolean("minimizeComments", false);
