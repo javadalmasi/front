@@ -136,12 +136,7 @@
                                 video.uploader
                             }}</router-link>
                         </div>
-                        <PlaylistAddModal
-                            v-if="showModal"
-                            :video-id="getVideoId()"
-                            :video-info="video"
-                            @close="showModal = !showModal"
-                        />
+
                         <ShareModal
                             v-if="showShareModal"
                             :video-id="getVideoId()"
@@ -232,13 +227,7 @@
                                         class="mx-1.5"
                                     />
                                 </router-link>
-                                <button
-                                    class="btn btn-secondary flex items-center"
-                                    @click="showModal = !showModal"
-                                >
-                                    <i18n-t class="lt-lg:hidden" keypath="actions.add_to_playlist" tag="span"></i18n-t>
-                                    <i class="i-fa6-solid:circle-plus mr-1" />
-                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -436,7 +425,7 @@ import VideoPlayer from "./VideoPlayer.vue";
 import ContentItem from "./ContentItem.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
-import PlaylistAddModal from "./PlaylistAddModal.vue";
+
 
 import ShareModal from "./ShareModal.vue";
 import PlaylistVideos from "./PlaylistVideos.vue";
@@ -457,8 +446,7 @@ export default {
         ContentItem,
         CommentItem,
         ChaptersBar,
-        PlaylistAddModal,
-        PlaylistAddModal,
+
         ShareModal,
         PlaylistVideos,
         WatchOnButton,
@@ -487,7 +475,7 @@ export default {
             active: true,
             smallViewQuery: smallViewQuery,
             smallView: smallViewQuery.matches,
-            showModal: false,
+
             showShareModal: false,
             isMobile: true,
             currentTime: 0,
