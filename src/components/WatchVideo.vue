@@ -882,11 +882,6 @@ export default {
                                             if (url.hostname.includes('vidioo.ir')) {
                                                 elem.setAttribute('referrerpolicy', 'origin');
                                             }
-                                            // Add refer parameter to the URL
-                                            const currentHref = elem.getAttribute('href');
-                                            const newUrl = new URL(currentHref, window.location.origin);
-                                            newUrl.searchParams.set('refer', 'vidioo.ir');
-                                            elem.setAttribute('href', newUrl.toString());
                                         }
                                     } catch (e) {
                                         // If URL parsing fails, treat as external link for safety
@@ -945,11 +940,6 @@ export default {
                                         if (url.hostname.includes('vidioo.ir')) {
                                             elem.setAttribute('referrerpolicy', 'origin');
                                         }
-                                        // Add refer parameter to the URL
-                                        const currentHref = elem.getAttribute('href');
-                                        const newUrl = new URL(currentHref, window.location.origin);
-                                        newUrl.searchParams.set('refer', 'vidioo.ir');
-                                        elem.setAttribute('href', newUrl.toString());
                                     }
                                 } catch (e) {
                                     // If URL parsing fails, treat as external link for safety
