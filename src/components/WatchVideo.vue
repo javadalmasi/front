@@ -734,6 +734,12 @@ export default {
             ? true
             : !this.getPreferenceBoolean("minimizeRecommendations", false);
         this.showChapters = !this.chaptersDisabled && !this.getPreferenceBoolean("minimizeChapters", false);
+        
+        // Set default quality to 720p if no quality preference is set
+        if (localStorage.getItem("quality") === null) {
+            localStorage.setItem("quality", "720");
+        }
+        
         if (this.video?.duration) {
             document.title = this.video.title + " - " + this.getSiteName();
             this.$refs.videoPlayer.loadVideo();
