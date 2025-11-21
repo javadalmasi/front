@@ -98,6 +98,14 @@ export default {
         generatedLink() {
             const baseUrl = window.location.origin + "/watch?v=" + this.videoId;
             const url = new URL(baseUrl);
+            
+            // Preserve all existing query parameters from the current route, except 't' which we might replace
+            const currentUrl = new URL(window.location.href);
+            for (const [key, value] of currentUrl.searchParams) {
+                if (key !== 't') { // Don't include the old 't' parameter if we're adding a new one
+                    url.searchParams.append(key, value);
+                }
+            }
 
             if (this.withTimeCode && this.timeStamp)
                 url.searchParams.append("t", this.parseTimeStampToSeconds(this.timeStamp));
