@@ -121,6 +121,7 @@ export default {
             selectedTab: 0,
             contentItems: [],
             showGroupModal: false,
+            loading: false,
         };
     },
     computed: {
@@ -173,9 +174,14 @@ export default {
                         this.fetchSubscribedStatus();
                         this.updateWatched(this.channel.relatedStreams);
                         this.fetchDeArrowContent(this.channel.relatedStreams);
+                        
+                        // Add the default videos tab
                         this.tabs.push({
+                            name: "videos",
                             translatedName: this.$t("video.videos"),
+                            content: this.channel.relatedStreams,
                         });
+                        
                         const tabQuery = this.$route.query.tab;
                         for (let i = 0; i < this.channel.tabs.length; i++) {
                             let tab = this.channel.tabs[i];
@@ -243,9 +249,9 @@ export default {
                 }
 
                 // Filter out duplicate items based on URL before adding them
-                const newItems = json.content.filter(
+                const newItems = json.content ? json.content.filter(
                     newItem => !this.contentItems.some(existingItem => existingItem.url === newItem.url),
-                );
+                ) : [];
 
                 // Only add items if there are non-duplicate ones
                 if (newItems.length > 0) {
@@ -253,7 +259,10 @@ export default {
                 }
 
                 this.fetchDeArrowContent(json.content);
-                this.tabs[this.selectedTab].content = this.contentItems;
+                this.tabs[this.selectedTab].content = [...this.contentItems]; // Create a new array reference
+            }).catch(error => {
+                this.loading = false;
+                console.error('Error loading more tab content:', error);
             });
         },
         subscribeHandler() {
@@ -281,6 +290,9 @@ export default {
                 case "shorts":
                     translatedTabName = this.$t("video.shorts");
                     break;
+                case "playlists":
+                    translatedTabName = this.$t("titles.playlists");
+                    break;
                 default:
                     console.error(`Tab name "${tabName}" is not translated yet!`);
                     break;
@@ -300,20 +312,30 @@ export default {
                 return;
             }
 
-            if (this.tabs[index].content) {
+            if (this.tabs[index].content && this.tabs[index].content.length > 0) {
                 this.contentItems = this.tabs[index].content;
                 return;
             }
+            
+            // Show loading state while fetching tab content
+            this.loading = true;
+            
             this.fetchJson(this.apiUrl() + "/channels/tabs", {
                 data: this.tabs[index].data,
             }).then(tab => {
+                this.loading = false;
                 // Filter livestreams if they are disabled
                 if (this.filterLivestreams) {
                     tab.content = this.filterLivestreams(tab.content);
                 }
-                this.contentItems = this.tabs[index].content = tab.content;
+                this.contentItems = this.tabs[index].content = tab.content || [];
                 this.fetchDeArrowContent(tab.content);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
+            }).catch(error => {
+                this.loading = false;
+                console.error('Error loading tab content:', error);
+                // Set empty array if there's an error to prevent endless loading state
+                this.contentItems = this.tabs[index].content = [];
             });
         },
     },
