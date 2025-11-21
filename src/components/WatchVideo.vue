@@ -887,11 +887,10 @@ export default {
                                         // If URL parsing fails, treat as external link for safety
                                         elem.setAttribute('rel', 'nofollow noopener noindex');
                                         elem.setAttribute('target', '_blank');
-                                        // Add refer parameter to the URL
-                                        const currentHref = elem.getAttribute('href');
-                                        const url = new URL(currentHref, window.location.origin);
-                                        url.searchParams.set('refer', 'vidioo.ir');
-                                        elem.setAttribute('href', url.toString());
+                                        // Add referrer policy for vidioo.ir
+                                        if (url.hostname.includes('vidioo.ir')) {
+                                            elem.setAttribute('referrerpolicy', 'origin');
+                                        }
                                     }
                                 }
                             });
@@ -945,11 +944,10 @@ export default {
                                     // If URL parsing fails, treat as external link for safety
                                     elem.setAttribute('rel', 'nofollow noopener noindex');
                                     elem.setAttribute('target', '_blank');
-                                    // Add refer parameter to the URL
-                                    const currentHref = elem.getAttribute('href');
-                                    const url = new URL(currentHref, window.location.origin);
-                                    url.searchParams.set('refer', 'vidioo.ir');
-                                    elem.setAttribute('href', url.toString());
+                                    // Add referrer policy for vidioo.ir
+                                    if (url.hostname.includes('vidioo.ir')) {
+                                        elem.setAttribute('referrerpolicy', 'origin');
+                                    }
                                 }
                             }
                         });
