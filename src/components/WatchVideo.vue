@@ -858,8 +858,33 @@ export default {
                                     // Convert to text content without the link, preserving just the hashtag text
                                     elem.outerHTML = elem.innerText || "";
                                 } else if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/)) {
-                                    // Convert other links to their href values (original behavior for non-hashtag links)
-                                    elem.outerHTML = elem.getAttribute("href");
+                                    // Determine if this is an internal link or external link
+                                    try {
+                                        const url = new URL(href, window.location.origin);
+                                        const isInternal = url.origin === window.location.origin || 
+                                                          url.hostname === 'vidioo.ir' || 
+                                                          (url.hostname === window.location.hostname && url.hostname !== 'www.youtube.com');
+                                        
+                                        if (isInternal) {
+                                            // For internal links, convert to relative path if needed and keep as links
+                                            let relativePath = url.pathname + url.search;
+                                            elem.setAttribute('href', relativePath);
+                                            // Remove target attribute for internal links
+                                            elem.removeAttribute('target');
+                                        } else {
+                                            // For external links, add proper attributes
+                                            elem.setAttribute('rel', 'nofollow noopener noindex');
+                                            elem.setAttribute('target', '_blank');
+                                            // Add referrer policy for vidioo.ir
+                                            if (url.hostname.includes('vidioo.ir')) {
+                                                elem.setAttribute('referrerpolicy', 'origin');
+                                            }
+                                        }
+                                    } catch (e) {
+                                        // If URL parsing fails, treat as external link for safety
+                                        elem.setAttribute('rel', 'nofollow noopener noindex');
+                                        elem.setAttribute('target', '_blank');
+                                    }
                                 }
                             });
                             xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
@@ -883,8 +908,33 @@ export default {
                                 // Convert to text content without the link, preserving just the hashtag text
                                 elem.outerHTML = elem.innerText || "";
                             } else if (!elem.innerText.match(/(?:[\d]{1,2}:)?(?:[\d]{1,2}):(?:[\d]{1,2})/)) {
-                                // Convert other links to their href values (original behavior for non-hashtag links)
-                                elem.outerHTML = elem.getAttribute("href");
+                                // Determine if this is an internal link or external link
+                                try {
+                                    const url = new URL(href, window.location.origin);
+                                    const isInternal = url.origin === window.location.origin || 
+                                                      url.hostname === 'vidioo.ir' || 
+                                                      (url.hostname === window.location.hostname && url.hostname !== 'www.youtube.com');
+                                    
+                                    if (isInternal) {
+                                        // For internal links, convert to relative path if needed and keep as links
+                                        let relativePath = url.pathname + url.search;
+                                        elem.setAttribute('href', relativePath);
+                                        // Remove target attribute for internal links
+                                        elem.removeAttribute('target');
+                                    } else {
+                                        // For external links, add proper attributes
+                                        elem.setAttribute('rel', 'nofollow noopener noindex');
+                                        elem.setAttribute('target', '_blank');
+                                        // Add referrer policy for vidioo.ir
+                                        if (url.hostname.includes('vidioo.ir')) {
+                                            elem.setAttribute('referrerpolicy', 'origin');
+                                        }
+                                    }
+                                } catch (e) {
+                                    // If URL parsing fails, treat as external link for safety
+                                    elem.setAttribute('rel', 'nofollow noopener noindex');
+                                    elem.setAttribute('target', '_blank');
+                                }
                             }
                         });
                         xmlDoc.querySelectorAll("br").forEach(elem => (elem.outerHTML = "\n"));
