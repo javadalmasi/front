@@ -71,6 +71,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
+import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils';
 
 export default {
     props: {
@@ -100,6 +101,16 @@ export default {
             }
             // Return an empty style object when not clamping
             return {};
+        },
+    },
+    methods: {
+        getOptimalThumbnailUrl,
+        numberFormat(num) {
+            // Use the same number formatting as in main.js
+            const formatter = Intl.NumberFormat('en-US', {
+                notation: "compact",
+            });
+            return formatter.format(num);
         },
     },
 };
