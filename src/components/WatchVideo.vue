@@ -871,6 +871,9 @@ export default {
                                             elem.setAttribute('href', relativePath);
                                             // Remove target attribute for internal links
                                             elem.removeAttribute('target');
+                                            // Remove external link attributes for internal links
+                                            elem.removeAttribute('rel');
+                                            elem.removeAttribute('referrerpolicy');
                                         } else {
                                             // For external links, add proper attributes
                                             elem.setAttribute('rel', 'nofollow noopener noindex');
@@ -879,6 +882,11 @@ export default {
                                             if (url.hostname.includes('vidioo.ir')) {
                                                 elem.setAttribute('referrerpolicy', 'origin');
                                             }
+                                            // Add refer parameter to the URL
+                                            const currentHref = elem.getAttribute('href');
+                                            const newUrl = new URL(currentHref, window.location.origin);
+                                            newUrl.searchParams.set('refer', 'vidioo.ir');
+                                            elem.setAttribute('href', newUrl.toString());
                                         }
                                     } catch (e) {
                                         // If URL parsing fails, treat as external link for safety
@@ -926,6 +934,9 @@ export default {
                                         elem.setAttribute('href', relativePath);
                                         // Remove target attribute for internal links
                                         elem.removeAttribute('target');
+                                        // Remove external link attributes for internal links
+                                        elem.removeAttribute('rel');
+                                        elem.removeAttribute('referrerpolicy');
                                     } else {
                                         // For external links, add proper attributes
                                         elem.setAttribute('rel', 'nofollow noopener noindex');
@@ -934,6 +945,11 @@ export default {
                                         if (url.hostname.includes('vidioo.ir')) {
                                             elem.setAttribute('referrerpolicy', 'origin');
                                         }
+                                        // Add refer parameter to the URL
+                                        const currentHref = elem.getAttribute('href');
+                                        const newUrl = new URL(currentHref, window.location.origin);
+                                        newUrl.searchParams.set('refer', 'vidioo.ir');
+                                        elem.setAttribute('href', newUrl.toString());
                                     }
                                 } catch (e) {
                                     // If URL parsing fails, treat as external link for safety
@@ -1247,7 +1263,8 @@ export default {
 
 .description a {
     text-decoration: underline;
-    filter: brightness(0.75);
+    text-decoration-color: #039be5; /* Blue color for links */
+    text-decoration-thickness: 2px; /* Slightly thicker underline */
 }
 
 .description-box {
@@ -1257,8 +1274,12 @@ export default {
 }
 
 .description-box a {
-    text-decoration: none;
     color: #039be5;
+}
+
+/* Dark mode support for description links */
+.dark .description a {
+    text-decoration-color: #60a5fa; /* Lighter blue for dark mode */
 }
 
 .description-box a:hover {
