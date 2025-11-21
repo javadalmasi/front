@@ -438,6 +438,7 @@ import ToastComponent from "./ToastComponent.vue";
 import PageNotFound from "./PageNotFound.vue";
 import CollapsableText from "./CollapsableText.vue";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
+import { parseTimeParam } from "@/utils/Misc.js";
 
 // Import Jalali moment for date conversion
 import moment from "jalali-moment";
@@ -985,7 +986,7 @@ export default {
                 ) {
                     return false;
                 }
-                const time = 0; // The parseTimeParam function was removed, so we'll just start at 0
+                const time = parseTimeParam(url.searchParams.get("t"));
                 if (time) {
                     this.navigate(time);
                 }
