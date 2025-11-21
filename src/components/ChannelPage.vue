@@ -75,7 +75,11 @@
                 >
                     <span class="channel-tab-text" v-text="tab.translatedName"></span>
                 </button>
-
+                <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
+                    <button class="channel-tab-button">
+                        <span class="channel-tab-text" v-text="$t('actions.play_all')"></span>
+                    </button>
+                </router-link>
             </div>
             <div class="channel-tabs-divider"></div>
         </div>
@@ -121,7 +125,6 @@ export default {
             selectedTab: 0,
             contentItems: [],
             showGroupModal: false,
-            loading: false,
         };
     },
     computed: {
@@ -254,9 +257,9 @@ export default {
                 }
 
                 // Filter out duplicate items based on URL before adding them
-                const newItems = json.content ? json.content.filter(
+                const newItems = json.content.filter(
                     newItem => !this.contentItems.some(existingItem => existingItem.url === newItem.url),
-                ) : [];
+                );
 
                 // Only add items if there are non-duplicate ones
                 if (newItems.length > 0) {
@@ -264,10 +267,12 @@ export default {
                 }
 
                 this.fetchDeArrowContent(json.content);
-                this.tabs[this.selectedTab].content = [...this.contentItems]; // Create a new array reference
+                this.tabs[this.selectedTab].content = this.contentItems;
             }).catch(error => {
                 this.loading = false;
                 console.error('Error loading more tab content:', error);
+                // Set empty array if there's an error to prevent endless loading state
+                this.contentItems = this.tabs[this.selectedTab].content = [];
             });
         },
         subscribeHandler() {
@@ -288,15 +293,14 @@ export default {
                 case "livestreams":
                     translatedTabName = this.$t("titles.livestreams");
                     break;
-
+                case "playlists":
+                    translatedTabName = this.$t("titles.playlists");
+                    break;
                 case "albums":
                     translatedTabName = this.$t("titles.albums");
                     break;
                 case "shorts":
                     translatedTabName = this.$t("video.shorts");
-                    break;
-                case "playlists":
-                    translatedTabName = this.$t("titles.playlists");
                     break;
                 default:
                     console.error(`Tab name "${tabName}" is not translated yet!`);
@@ -317,7 +321,7 @@ export default {
                 return;
             }
 
-            if (this.tabs[index].content && this.tabs[index].content.length > 0) {
+            if (this.tabs[index].content) {
                 this.contentItems = this.tabs[index].content;
                 return;
             }
@@ -333,7 +337,7 @@ export default {
                 if (this.filterLivestreams) {
                     tab.content = this.filterLivestreams(tab.content);
                 }
-                this.contentItems = this.tabs[index].content = tab.content || [];
+                this.contentItems = this.tabs[index].content = tab.content;
                 this.fetchDeArrowContent(tab.content);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
             }).catch(error => {

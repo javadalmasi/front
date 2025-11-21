@@ -2,7 +2,7 @@
     <div class="h-full flex flex-col flex-justify-between">
         <router-link
             class="link inline-block w-full"
-            :to="item.url"
+            :to="item.url || '/playlist/' + item.id"
         >
             <div class="relative">
                 <img
@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
 import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils';
 
 export default {
@@ -88,7 +87,7 @@ export default {
     },
     computed: {
         title() {
-            return this.item.title;
+            return this.item.title || this.item.name || "Untitled";
         },
         lineClampStyle() {
             // Apply line clamping only if the prop is true
