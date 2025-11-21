@@ -99,16 +99,19 @@ export default {
             const baseUrl = window.location.origin + "/watch?v=" + this.videoId;
             const url = new URL(baseUrl);
             
-            // Preserve all existing query parameters from the current route, except 't' which we might replace
+            // Preserve all existing query parameters from the current route, except 't' and 'v' which we handle separately
             const currentUrl = new URL(window.location.href);
             for (const [key, value] of currentUrl.searchParams) {
-                if (key !== 't') { // Don't include the old 't' parameter if we're adding a new one
+                if (key !== 't' && key !== 'v') { // Don't include old 't' and 'v' parameters since we set them explicitly
                     url.searchParams.append(key, value);
                 }
             }
 
-            if (this.withTimeCode && this.timeStamp)
-                url.searchParams.append("t", this.parseTimeStampToSeconds(this.timeStamp));
+            // Always include time parameter - either from current playback time or default to 0
+            if (this.withTimeCode) {
+                const timeValue = this.timeStamp ? this.parseTimeStampToSeconds(this.timeStamp) : 0;
+                url.searchParams.append("t", timeValue);
+            }
 
             if (this.hasPlaylist && this.withPlaylist) {
                 url.searchParams.append("list", this.playlistId);
