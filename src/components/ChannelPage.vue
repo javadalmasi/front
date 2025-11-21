@@ -189,7 +189,12 @@ export default {
                             if (this.isLiveStreamDisabled && tab.name === "livestreams") continue;
                             tab.translatedName = this.getTranslatedTabName(tab.name);
                             this.tabs.push(tab);
-                            if (tab.name === tabQuery) this.loadTab(i + 1);
+                            if (tab.name === tabQuery) {
+                                // Wait for the tabs to be fully set up before loading the selected tab
+                                this.$nextTick(() => {
+                                    this.loadTab(i + 1);
+                                });
+                            }
                         }
                     }
                 });
