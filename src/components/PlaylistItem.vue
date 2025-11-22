@@ -1,126 +1,118 @@
 <template>
-    <div class="h-full flex flex-col flex-justify-between">
-        <router-link
-            class="link inline-block w-full"
-            :to="item.url || '/playlist/' + item.id"
-        >
+    <div class="flex flex-col flex-justify-between">
+        <router-link :to="videoUrl" class="link inline-block">
             <div class="relative">
-                <img
-                    :src="getOptimalThumbnailUrl(item.thumbnail, { width: '302', height: '169', quality: 85 })"
-                    :alt="title"
-                    class="h-full w-full object-contain"
-                    width="302"
-                    height="169"
-                />
+                <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
                 <div
-                    v-if="item.videos >= 0"
-                    class="absolute bottom-1 end-1 rounded-md bg-black/80 px-1 text-[11px] font-bold text-white"
-                    v-text="`${item.videos}`"
-                />
-            </div>
-
-            <div>
-                <p
-                    :style="lineClampStyle"
-                    class="link flex overflow-hidden pt-2 font-bold"
-                    :title="title"
-                    v-text="title"
-                />
-            </div>
-        </router-link>
-
-        <div class="flex items-center">
-            <router-link :to="item.uploaderUrl" class="mr-0.5 mt-0.5 flex-shrink-0">
-                <div class="relative inline-block">
-                    <img
-                        v-if="item.uploaderAvatar"
-                        loading="lazy"
-                        :src="getOptimalThumbnailUrl(item.uploaderAvatar, { width: '68', height: '68', quality: 85 })"
-                        :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
-                        class="h-32px w-32px"
-                        width="68"
-                        height="68"
-                    />
-                    <div
-                        v-if="item.uploaderVerified && item.uploaderAvatar"
-                        class="absolute end-0 bottom-0 h-4 w-4 flex items-center justify-center rounded-full bg-blue-700"
-                    >
-                        <i class="i-fa6-solid:check text-[8px] text-white" />
-                    </div>
-                </div>
-            </router-link>
-
-            <div class="min-w-0 flex-1 px-2">
-                <!-- Added min-w-0 to prevent flex item from overflowing -->
-                <router-link
-                    v-if="item.uploaderUrl && item.uploaderName && !hideChannel"
-                    class="link-secondary overflow-hidden text-sm leading-[1.65] no-underline hover:underline-dashed"
-                    :to="item.uploaderUrl"
-                    :title="item.uploaderName"
+                    class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white leading-[1.6]"
                 >
-                    <span v-text="item.uploaderName" />
-                </router-link>
-
-                <div v-if="item.videos >= 0" class="video-info">
-                    <span class="pr-1" v-text="`${numberFormat(item.videos)} videos`" />
+                    <i class="i-fa6-solid:bars text-2xs"></i>
+                    <span>{{ props.item.videos }} {{ $t("video.videos") }}</span>
                 </div>
             </div>
-        </div>
+            <p :style="titleStyle" class="link pt-2 font-bold" :title="props.item.name" v-text="props.item.name" />
+        </router-link>
+        <p v-if="props.item.description" v-text="props.item.description" />
+
+        <router-link
+            v-if="props.item.uploaderUrl && props.item.uploaderName && !props.hideChannel"
+            class="link-secondary text-sm leading-[1.65] no-underline hover:underline-dashed"
+            :to="props.item.uploaderUrl"
+        >
+            <p>
+                <span ref="uploaderNameRef" v-text="props.item.uploaderName" />
+                <i v-if="props.item.uploaderVerified" class="i-fa6-solid:check mr-1.5" />
+            </p>
+        </router-link>
+        <a
+            v-else-if="props.item.uploaderName && !props.hideChannel"
+            ref="uploaderNameRef"
+            class="link no-underline hover:underline-dashed"
+            v-text="props.item.uploaderName"
+        />
+
+        <br />
     </div>
 </template>
 
-<script>
-import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils';
+<script setup>
+import { computed, ref } from "vue";
+import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
 
-export default {
-    props: {
-        item: {
-            type: Object,
-            default: () => {
-                return {};
-            },
-        },
-        height: { type: String, default: "118" },
-        width: { type: String, default: "210" },
-        hideChannel: { type: Boolean, default: false },
-        clampTitleLines: { type: Boolean, default: true },
+const props = defineProps({
+    item: {
+        type: Object,
+        required: true,
     },
-    computed: {
-        title() {
-            return this.item.title || this.item.name || "Untitled";
-        },
-        lineClampStyle() {
-            // Apply line clamping only if the prop is true
-            if (this.clampTitleLines) {
-                return {
-                    display: "-webkit-box",
-                    "-webkit-line-clamp": "2",
-                    "-webkit-box-orient": "vertical",
-                };
+    hideChannel: {
+        type: Boolean,
+        default: false,
+    },
+    clampTitleLines: {
+        type: Boolean,
+        default: true,
+    },
+});
+
+const uploaderNameRef = ref(null);
+
+const optimizedThumbnail = computed(() => {
+    // Apply the same thumbnail optimization as used in VideoThumbnail
+    if (props.item.thumbnail) {
+        // Check if this is likely a video thumbnail by checking for common video ID patterns
+        if (props.item.thumbnail.includes("ytimg.com") || props.item.thumbnail.includes("youtube.com")) {
+            // Extract video ID from the URL and use it for the CDN transformation
+            const videoIdMatch = props.item.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+            if (videoIdMatch && videoIdMatch[1]) {
+                // Use getOptimalThumbnailUrl to automatically determine size based on device characteristics
+                return getOptimalThumbnailUrl(props.item.thumbnail);
+            } else {
+                // If we can't extract the video ID, use the original URL
+                return props.item.thumbnail;
             }
-            // Return an empty style object when not clamping
-            return {};
-        },
-    },
-    methods: {
-        getOptimalThumbnailUrl,
-        numberFormat(num) {
-            // Use the same number formatting as in main.js
-            const formatter = Intl.NumberFormat('en-US', {
-                notation: "compact",
-            });
-            return formatter.format(num);
-        },
-    },
-};
+        }
+        // For other images (like channel avatars), return the original URL
+        return props.item.thumbnail;
+    }
+    return props.item.thumbnail;
+});
+
+const titleStyle = computed(() => {
+    // Apply line clamping only if the prop is true
+    if (props.clampTitleLines) {
+        return {
+            display: "-webkit-box",
+            "-webkit-line-clamp": "2",
+            "-webkit-box-orient": "vertical",
+            overflow: "hidden",
+        };
+    }
+    // Return an empty style object when not clamping
+    return {};
+});
+
+const videoUrl = computed(() => {
+    const videoIdMatch = props.item.thumbnail?.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+    const videoId = videoIdMatch ? videoIdMatch[1] : null;
+    
+    // Convert playlist URL format from `/playlist?list=...` to `&list=...` for watch URL
+    let playlistParams = '';
+    if (props.item.url) {
+        // Replace `/playlist?` with `&list=` to create a proper query parameter
+        const playlistMatch = props.item.url.match(/\/playlist\?list=([^&]+)/);
+        if (playlistMatch && playlistMatch[1]) {
+            const listId = playlistMatch[1];
+            const indexMatch = props.item.url.match(/[&?]index=(\d+)/);
+            const index = indexMatch ? `&index=${indexMatch[1]}` : '';
+            playlistParams = `&list=${listId}${index}`;
+        }
+    }
+    
+    if (videoId) {
+        return `/watch?v=${videoId}${playlistParams}`;
+    }
+    
+    // Fallback to original URL if video ID extraction fails
+    return props.item.url;
+});
 </script>
-
-<style>
-.video-info {
-    @apply mt-1 text-xs leading-[1.6] text-gray-600 font-normal;
-}
-
-.dark .video-info {
-    @apply text-gray-400;
-}
-</style>

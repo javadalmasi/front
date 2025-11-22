@@ -75,11 +75,6 @@
                 >
                     <span class="channel-tab-text" v-text="tab.translatedName"></span>
                 </button>
-                <router-link :to="`/playlist?list=UU${channel.id.substring(2)}`">
-                    <button class="channel-tab-button">
-                        <span class="channel-tab-text" v-text="$t('actions.play_all')"></span>
-                    </button>
-                </router-link>
             </div>
             <div class="channel-tabs-divider"></div>
         </div>

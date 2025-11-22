@@ -69,13 +69,13 @@
                             @seek="navigate"
                         />
                         <!-- PlaylistVideos component is missing from the project -->
-                        <!-- <PlaylistVideos
+                        <PlaylistVideos
                             v-if="playlist"
                             :playlist-id="playlistId"
                             :playlist="playlist"
                             :selected-index="index"
                             :prefer-listen="isListening"
-                        /> -->
+                        />
                     </div>
                     <!-- video title -->
                     <div class="mt-2 break-words px-2 text-2xl font-bold leading-[1.55]" v-text="video.title" />
@@ -393,13 +393,13 @@
                     @seek="navigate"
                 />
                 <!-- PlaylistVideos component is missing from the project -->
-                <!-- <PlaylistVideos
+                <PlaylistVideos
                     v-if="playlist"
                     :playlist-id="playlistId"
                     :playlist="playlist"
                     :selected-index="index"
                     :prefer-listen="isListening"
-                /> -->
+                />
                 <a
                     v-if="!isRecommendationsToggleDisabled"
                     v-t="`actions.${showRecs ? 'minimize_recommendations' : 'show_recommendations'}`"
@@ -429,8 +429,7 @@ import VideoPlayer from "./VideoPlayer.vue";
 import ContentItem from "./ContentItem.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
-
-
+import PlaylistVideos from "./PlaylistVideos.vue";
 import ShareModal from "./ShareModal.vue";
 import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
@@ -450,7 +449,7 @@ export default {
         ContentItem,
         CommentItem,
         ChaptersBar,
-
+        PlaylistVideos,
         ShareModal,
         WatchOnButton,
         LoadingIndicatorPage,
