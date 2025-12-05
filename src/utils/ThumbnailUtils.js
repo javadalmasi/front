@@ -2,14 +2,18 @@
  * Utility functions for handling thumbnail URLs
  */
 
+import { resizeImage, findClosestAllowedDimension, determineFormat } from './ImageResizer.js';
+
 /**
  * Transforms a YouTube thumbnail URL to the new CDN format
  * @param {string} originalThumbnailUrl - The original thumbnail URL (e.g., from YouTube)
  * @param {Object} options - Options for the transformation
  * @param {string} options.videoId - The video ID (if not extractable from URL)
- * @param {string} options.width - Width for resizing (default: 320)
- * @param {string} options.height - Height for resizing (default: 180)
- * @param {number} options.quality - Quality parameter as number between 1-100 (optional)
+ * @param {string} options.width - Width for resizing (will be constrained to allowed values)
+ * @param {string} options.height - Height for resizing (will be constrained to allowed values)
+ * @param {number} options.quality - Quality parameter as number between 1-100 (will be constrained to allowed values)
+ * @param {string} options.format - Format parameter (avif, webp, jpeg) with browser priority
+ * @param {string} options.type - Type of image ('general' for search/sidebar or 'player' for video player), defaults to 'general'
  * @returns {string} The transformed thumbnail URL using the CDN format
  */
 export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
@@ -39,114 +43,188 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
         }
     }
 
-    // Determine dimensions (default 320x180)
-    const width = options.width || "320";
-    const height = options.height || "180";
+    // Determine dimensions and constrain to allowed values based on type
+    const [width, height] = findClosestAllowedDimension(
+        parseInt(options.width) || 0,
+        parseInt(options.height) || 0,
+        options.type || 'general'
+    );
 
     // Build the CDN URL
     let cdnUrl = `${cdnBaseUrl}${videoId}?resize=${width},${height}`;
 
-    // Add quality parameter if specified (as number between 1-100)
+    // Constrain quality to allowed values [75, 85]
+    let quality = 85; // Default to 85 if not specified
     if (options.quality !== undefined) {
-        cdnUrl += `&quality=${options.quality}`;
+        const allowedQualities = [75, 85];
+        quality = allowedQualities.reduce((prev, curr) => {
+            const currDiff = Math.abs(curr - options.quality);
+            const prevDiff = Math.abs(prev - options.quality);
+            if (currDiff < prevDiff) return curr;
+            if (currDiff === prevDiff && curr > prev) return curr; // Choose higher in case of tie
+            return prev;
+        });
+    }
+    // Always add quality parameter as it's required
+    cdnUrl += `&quality=${quality}`;
+
+    // Add format parameter if specified and valid
+    const format = determineFormat(options.format);
+    if (format) {
+        cdnUrl += `&format=${format}`;
     }
 
     return cdnUrl;
 }
 
 /**
- * Gets appropriate dimensions and quality based on screen size, device characteristics, and pixel density
- * @returns {Object} width, height, and quality suitable for the device
+ * Gets appropriate dimensions and quality for general thumbnails (search results, sidebar, etc.)
+ * based on screen size, device characteristics, and pixel density
+ * @returns {Object} width, height, and quality suitable for general thumbnails (constrained to allowed values)
  */
-export function getOptimalThumbnailSettings() {
+export function getGeneralThumbnailSettings() {
     // Define optimal dimensions based on screen width
+    if (typeof window === 'undefined') {
+        // Default to a common size when not in browser (SSR or testing)
+        const [width, height] = findClosestAllowedDimension(640, 360, 'general');
+        return {
+            width: width.toString(),
+            height: height.toString(),
+            quality: 85,
+        };
+    }
+    
     const screenWidth = window.innerWidth || screen.width;
     // Get pixel ratio for high-DPI displays (Retina, etc.)
     const pixelRatio = window.devicePixelRatio || 1;
 
-    // Calculate base dimensions and upscale based on pixel ratio for better quality on high-DPI displays
-    let baseWidth, quality;
+    let baseWidth, baseHeight, quality;
 
     if (screenWidth <= 480) {
         // Mobile: smaller thumbnails
-        baseWidth = 120; // Smaller base size for mobile
-        quality = 70; // Lower quality on smaller screens to save bandwidth (1-100 scale)
+        baseWidth = 426; // Use allowed dimension for general
+        baseHeight = 240;
+        quality = 75; // Use allowed quality
     } else if (screenWidth <= 768) {
         // Tablet: medium thumbnails
-        baseWidth = 180; // Medium size for tablets
-        quality = 75;
+        baseWidth = 640; // Use allowed dimension for general
+        baseHeight = 360;
+        quality = 75; // Use allowed quality
     } else if (screenWidth <= 1024) {
         // Small desktop: standard thumbnails
-        baseWidth = 240; // Standard size for desktop
-        quality = 80;
+        baseWidth = 854; // Use allowed dimension for general
+        baseHeight = 480;
+        quality = 85; // Use allowed quality
     } else {
         // Large desktop: larger thumbnails
-        baseWidth = 320; // Appropriate size for large desktop
-        quality = 85; // Higher quality on larger screens
+        baseWidth = 960; // Use allowed dimension for general
+        baseHeight = 540;
+        quality = 85; // Use allowed quality
     }
 
-    // Scale dimensions by pixel ratio for high-DPI displays but use standardized sizes
+    // Scale dimensions by pixel ratio for high-DPI displays but ensure they're allowed
     const scaledWidth = Math.round(baseWidth * pixelRatio);
+    const scaledHeight = Math.round(baseHeight * pixelRatio);
 
-    // Use standardized dimensions rounded to common multiples to improve caching and efficiency
-    const standardizedWidth = Math.min(standardizeDimension(scaledWidth), 1280);
-    // Calculate corresponding height to maintain 16:9 ratio
-    const standardizedHeight = Math.round((standardizedWidth * 9) / 16);
+    // Find closest allowed dimension for general type
+    const [finalWidth, finalHeight] = findClosestAllowedDimension(scaledWidth, scaledHeight, 'general');
 
     return {
-        width: standardizedWidth.toString(),
-        height: standardizedHeight.toString(),
+        width: finalWidth.toString(),
+        height: finalHeight.toString(),
         quality: quality,
     };
 }
 
 /**
- * Rounds dimensions to standardized sizes to improve caching efficiency
- * @param {number} dimension - The dimension to standardize
- * @returns {number} - Standardized dimension
+ * Gets appropriate dimensions and quality for player thumbnails
+ * based on screen size, device characteristics, and pixel density
+ * @returns {Object} width, height, and quality suitable for player thumbnails (constrained to allowed values)
  */
-function standardizeDimension(dimension) {
-    // Define common standardized sizes
-    const standardSizes = [64, 96, 120, 160, 180, 240, 320, 360, 480, 640, 720, 768, 800, 960, 1024, 1280];
+export function getPlayerThumbnailSettings() {
+    // Define optimal dimensions based on screen width
+    if (typeof window === 'undefined') {
+        // Default to a common size when not in browser (SSR or testing)
+        const [width, height] = findClosestAllowedDimension(1280, 720, 'player');
+        return {
+            width: width.toString(),
+            height: height.toString(),
+            quality: 85,
+        };
+    }
+    
+    const screenWidth = window.innerWidth || screen.width;
+    // Get pixel ratio for high-DPI displays (Retina, etc.)
+    const pixelRatio = window.devicePixelRatio || 1;
 
-    // Find the closest standard size
-    let closest = standardSizes[0];
-    let minDiff = Math.abs(dimension - standardSizes[0]);
+    let baseWidth, baseHeight, quality;
 
-    for (let i = 1; i < standardSizes.length; i++) {
-        const diff = Math.abs(dimension - standardSizes[i]);
-        if (diff < minDiff) {
-            minDiff = diff;
-            closest = standardSizes[i];
-        } else {
-            // If differences start increasing, we've passed the closest value
-            break;
-        }
+    if (screenWidth <= 480) {
+        // Mobile: smaller thumbnails
+        baseWidth = 426; // Use allowed dimension
+        baseHeight = 240;
+        quality = 75; // Use allowed quality
+    } else if (screenWidth <= 768) {
+        // Tablet: medium thumbnails
+        baseWidth = 640; // Use allowed dimension
+        baseHeight = 360;
+        quality = 75; // Use allowed quality
+    } else if (screenWidth <= 1024) {
+        // Small desktop: standard thumbnails
+        baseWidth = 854; // Use allowed dimension
+        baseHeight = 480;
+        quality = 85; // Use allowed quality
+    } else {
+        // Large desktop: larger thumbnails
+        baseWidth = 1280; // Use allowed dimension for player
+        baseHeight = 720;
+        quality = 85; // Use allowed quality
     }
 
-    // If the calculated dimension is significantly larger than the closest standard size,
-    // round up to the next standard size to avoid under-sizing
-    if (
-        dimension > closest &&
-        dimension - closest > closest - (standardSizes[standardSizes.indexOf(closest) - 1] || 0)
-    ) {
-        const nextIndex = standardSizes.indexOf(closest) + 1;
-        if (nextIndex < standardSizes.length) {
-            return standardSizes[nextIndex];
-        }
-    }
+    // Scale dimensions by pixel ratio for high-DPI displays but ensure they're allowed
+    const scaledWidth = Math.round(baseWidth * pixelRatio);
+    const scaledHeight = Math.round(baseHeight * pixelRatio);
 
-    return closest;
+    // Find closest allowed dimension for player type
+    const [finalWidth, finalHeight] = findClosestAllowedDimension(scaledWidth, scaledHeight, 'player');
+
+    return {
+        width: finalWidth.toString(),
+        height: finalHeight.toString(),
+        quality: quality,
+    };
 }
+
+/**
+ * Gets appropriate dimensions and quality based on screen size, device characteristics, and pixel density
+ * @param {string} type - Type of image ('general' for search/sidebar or 'player' for video player), defaults to 'general'
+ * @returns {Object} width, height, and quality suitable for the device (constrained to allowed values)
+ */
+export function getOptimalThumbnailSettings(type = 'general') {
+    if (type === 'player') {
+        return getPlayerThumbnailSettings();
+    } else {
+        return getGeneralThumbnailSettings();
+    }
+}
+
+
 
 /**
  * Generates a thumbnail URL optimally sized for the current device
  * @param {string} originalThumbnailUrl - Original thumbnail URL
  * @param {Object} additionalOptions - Additional options to override
+ * @param {string} additionalOptions.format - Image format (avif, webp, jpeg) with browser priority
+ * @param {string} additionalOptions.type - Type of image ('general' for search/sidebar or 'player' for video player), defaults to 'general'
  * @returns {string} Optimally sized CDN thumbnail URL
  */
 export function getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions = {}) {
-    const settings = getOptimalThumbnailSettings();
-    const options = { ...settings, ...additionalOptions };
+    const type = additionalOptions.type || 'general';
+    const settings = getOptimalThumbnailSettings(type);
+    // Include format in the options with browser priority
+    const options = { 
+        ...settings, 
+        ...additionalOptions 
+    };
     return transformThumbnailUrl(originalThumbnailUrl, options);
 }

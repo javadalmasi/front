@@ -91,6 +91,8 @@
 import "shaka-player/dist/controls.css";
 import { replaceWithCdnUrl } from "@/utils/CdnUtils.js";
 import { parseTimeParam } from "@/utils/Misc.js";
+import { getOptimalThumbnailUrl, transformThumbnailUrl } from "@/utils/ThumbnailUtils.js";
+import { findClosestAllowedDimension } from "@/utils/ImageResizer.js";
 import ModalComponent from "./ModalComponent.vue";
 
 const shaka = import("shaka-player/dist/shaka-player.ui.js");
@@ -382,73 +384,35 @@ export default {
             }
         },
         getOptimalThumbnailUrlForPlayer(originalThumbnailUrl) {
-            // Get the CDN base URL from environment variable
-            const cdnBaseUrl =
-                import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL ||
-                "https://impx.global.ssl.fastly.net/fragrant-fire-439a.laagaw.workers.dev/vi/";
-
-            // Extract video ID from the original URL (common YouTube format)
-            let videoId = null;
-            if (originalThumbnailUrl) {
-                // Extract video ID from YouTube thumbnail URL patterns
-                const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
-                if (videoIdMatch && videoIdMatch[1]) {
-                    videoId = videoIdMatch[1];
-                } else {
-                    // If YouTube pattern doesn't match, try other common patterns
-                    const idMatch = originalThumbnailUrl.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-                    if (idMatch && idMatch[1]) {
-                        videoId = idMatch[1];
-                    } else {
-                        console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
-                        return originalThumbnailUrl;
-                    }
-                }
-            }
-
-            // Determine optimal dimensions with 16:9 aspect ratio suitable for displays
-            // Check actual container size if available, otherwise use screen size
-            let containerWidth;
-            if (this.$refs.container) {
-                containerWidth = this.$refs.container.clientWidth || window.innerWidth;
+            // For the video player, we want to determine the container size
+            // to provide an appropriately sized thumbnail
+            this.$nextTick(() => {
+                // We could update the poster after initial render if needed
+            });
+            
+            let containerWidth = 1280; // Default width for video player
+            let containerHeight = 720; // Default height for video player
+            
+            // Try to get actual container size
+            if (this.$refs.container && this.$refs.container.clientWidth) {
+                containerWidth = this.$refs.container.clientWidth;
+                // Calculate height based on 16:9 aspect ratio
+                containerHeight = Math.round((containerWidth * 9) / 16);
             } else {
-                containerWidth = window.innerWidth || screen.width;
+                // Fallback to window dimensions at call time
+                containerWidth = window.innerWidth || screen.width || 1280;
+                containerHeight = Math.round((containerWidth * 9) / 16);
             }
-
-            const pixelRatio = window.devicePixelRatio || 1;
-
-            // Determine base dimensions based on container size
-            let baseWidth;
-            if (containerWidth <= 480) {
-                // Mobile: smaller thumbnail
-                baseWidth = 480; // Higher resolution for mobile displays which are often high DPI
-            } else if (containerWidth <= 768) {
-                // Tablet: medium thumbnail
-                baseWidth = 640; // Medium size for tablets
-            } else if (containerWidth <= 1024) {
-                // Small desktop: standard thumbnail
-                baseWidth = 854; // Standard size for desktop (16:9 ratio of 480p)
-            } else if (containerWidth <= 1440) {
-                // Medium desktop: higher resolution thumbnail
-                baseWidth = 1280; // 720p equivalent 16:9 ratio
-            } else {
-                // Large desktop: highest resolution thumbnail
-                baseWidth = 1920; // 1080p equivalent 16:9 ratio
-            }
-
-            // Scale dimensions by pixel ratio for high-DPI displays
-            const scaledWidth = Math.round(baseWidth * pixelRatio);
-
-            // Calculate height to maintain 16:9 aspect ratio
-            const scaledHeight = Math.round((scaledWidth * 9) / 16);
-
-            // Build the CDN URL with 16:9 aspect ratio
-            let cdnUrl = `${cdnBaseUrl}${videoId}?resize=${scaledWidth},${scaledHeight}`;
-
-            // Add quality parameter for better image quality on covers
-            cdnUrl += `&quality=90`;
-
-            return cdnUrl;
+            
+            // Use the closest allowed player dimension based on actual container size
+            const [width, height] = findClosestAllowedDimension(containerWidth, containerHeight, 'player');
+            
+            // Use transformThumbnailUrl with the determined optimal size
+            return transformThumbnailUrl(originalThumbnailUrl, { 
+                width: width, 
+                height: height, 
+                type: 'player' 
+            });
         },
         async loadVideo() {
             this.updateSponsors();

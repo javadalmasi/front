@@ -85,7 +85,8 @@
     </div>
 </template>
 <script>
-import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
+import { getOptimalThumbnailUrl, transformThumbnailUrl } from "../utils/ThumbnailUtils";
+import { findClosestAllowedDimension } from "../utils/ImageResizer";
 
 export default {
     props: {
@@ -126,9 +127,31 @@ export default {
                     // Extract video ID from the URL and use it for the CDN transformation
                     const videoIdMatch = this.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
                     if (videoIdMatch && videoIdMatch[1]) {
-                        // Use transformThumbnailUrl with the extracted video ID for more reliable processing
-                        // getOptimalThumbnailUrl will automatically determine size based on device characteristics
-                        return getOptimalThumbnailUrl(this.thumbnail);
+                        // For VideoThumbnail, we need to determine optimal size based on actual container size
+                        // Instead of using screen size, we should use the expected container size or aspect ratio
+                        // Since we can't access the rendered element in computed property, we'll use contextual hints
+                        
+                        // For different contexts, use different base sizes:
+                        // - Small thumbnails (likely in smaller containers): use smaller dimensions
+                        // - Regular thumbnails: use medium dimensions
+                        let baseWidth, baseHeight;
+                        
+                        // Use contextual sizing based on props or item characteristics
+                        if (this.small) {
+                            // For small thumbnails, use smallest allowed dimension
+                            [baseWidth, baseHeight] = findClosestAllowedDimension(200, 110, 'general');
+                        } else {
+                            // For regular thumbnails (like in search results), we can estimate 
+                            // For a 384x216 container, the closest would be 426x240
+                            [baseWidth, baseHeight] = findClosestAllowedDimension(384, 216, 'general');
+                        }
+                        
+                        // Use transformThumbnailUrl with the determined optimal size
+                        return transformThumbnailUrl(this.thumbnail, { 
+                            width: baseWidth, 
+                            height: baseHeight, 
+                            type: 'general' 
+                        });
                     } else {
                         // If we can't extract the video ID, use the original URL
                         return this.thumbnail;
