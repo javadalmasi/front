@@ -84,6 +84,36 @@ const routes = [
         component: () => import("../components/DislikesPage.vue"),
     },
     {
+        path: "/user/gust",
+        name: "UserDashboard",
+        component: () => import("../components/UserDashboard.vue"),
+    },
+    {
+        path: "/user/gust/subscriptions",
+        name: "UserSubscriptions",
+        component: () => import("../components/UserSubscriptions.vue"),
+    },
+    {
+        path: "/user/gust/history",
+        name: "UserHistory",
+        component: () => import("../components/UserHistory.vue"),
+    },
+    {
+        path: "/user/gust/likes",
+        name: "UserLikes",
+        component: () => import("../components/UserLikes.vue"),
+    },
+    {
+        path: "/user/gust/dislikes",
+        name: "UserDislikes",
+        component: () => import("../components/UserDislikes.vue"),
+    },
+    {
+        path: "/user/gust/preferences",
+        name: "UserPreferences",
+        component: () => import("../components/UserPreferences.vue"),
+    },
+    {
         path: "/:pathMatch(.*)*",
         name: "Page Not Found",
         component: () => import("../components/PageNotFound.vue"),
