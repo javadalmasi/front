@@ -208,9 +208,27 @@
             </p>
           </div>
         </div>
+
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div class="flex items-center">
+            <input
+              id="chkLogUserActivity"
+              v-model="logUserActivity"
+              type="checkbox"
+              class="checkbox ml-2"
+              @change="onChange"
+            />
+            <label class="pref font-semibold" for="chkLogUserActivity" v-t="'actions.log_user_activity'">ثبت فعالیت‌های کاربر</label>
+          </div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.log_user_activity_description'">
+              ثبت فعالیت‌های شما در مرورگر برای نمایش در داشبورد کاربر
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-    
+
     <!-- Advanced Settings -->
     <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
       <h2 class="text-xl font-bold mb-4" v-t="'titles.advanced'">پیشرفته</h2>
@@ -314,6 +332,7 @@ export default {
       searchHistory: false,
       hideWatched: false,
       minimizeComments: false,
+      logUserActivity: true, // Default to true as requested
       autoplay: true,
       defaultQuality: "0",
       defaultSpeed: "1.0",
@@ -339,8 +358,11 @@ export default {
     // Get codecs from preferences or default to vp9,avc
     let codecString = this.getPreferenceString("enabledCodecs", "vp9,avc");
     this.enabledCodecs = codecString.split(",").filter(c => c);
-    
+
     this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
+
+    // Load log user activity preference
+    this.logUserActivity = this.getPreferenceBoolean("logUserActivity", true);
   },
   computed: {
     isWatchHistoryStorageDisabled() {
@@ -369,7 +391,8 @@ export default {
       this.setPreference("defaultSpeed", this.defaultSpeed);
       this.setPreference("enabledCodecs", this.enabledCodecs.join(","));
       this.setPreference("mobileChapterLayout", this.mobileChapterLayout);
-      
+      this.setPreference("logUserActivity", this.logUserActivity);
+
       // Handle disabling search history
       if (!this.searchHistory) {
         localStorage.removeItem("search_history");

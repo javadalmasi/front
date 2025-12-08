@@ -100,8 +100,7 @@
             <!-- Tooltip with detailed information -->
             <div
               v-if="showTooltip === index"
-              class="absolute z-10 left-0 mt-2 w-64 bg-white dark:bg-dark-600 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-dark-400"
-              style="transform: translateX(-100%); top: 100%;"
+              class="absolute z-10 -left-64 sm:-left-48 mt-2 w-64 sm:w-56 bg-white dark:bg-dark-600 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-dark-400"
               @mouseenter="showTooltip = index"
               @mouseleave="showTooltip = null"
             >
@@ -523,136 +522,30 @@ export default {
       }, 3000);
     },
     async loadActivityLogs() {
-      // In a real implementation, we would fetch activity logs from wherever they are stored
-      // For now, we'll simulate with some sample data
+      // Load activity logs from localStorage where they're stored by the App component
+      try {
+        const logs = JSON.parse(localStorage.getItem('userActivityLogs') || '[]');
 
-      // Sample activity logs - in reality this would come from localStorage or IndexedDB
-      this.activityLogs = [
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 3600000).toLocaleString(),
-          details: "تماشای ویدیو: چگونه یک وب‌سایت بسازیم",
-          url: "/watch?v=dQw4w9WgXcQ",
-          title: "چگونه یک وب‌سایت بسازیم",
-          duration: "15:42",
-          pageUrl: window.location.origin + "/watch?v=dQw4w9WgXcQ",
-          timeSpent: "3 min 24 sec"
-        },
-        {
-          action: "پسندیدن ویدیو",
-          timestamp: new Date(Date.now() - 7200000).toLocaleString(),
-          details: "ویدیو: آموزش Vue.js",
-          url: "/watch?v=1234567890A",
-          title: "آموزش Vue.js",
-          duration: "22:18",
-          pageUrl: window.location.origin + "/watch?v=1234567890A",
-          timeSpent: "1 min 5 sec"
-        },
-        {
-          action: "اشتراک در کانال",
-          timestamp: new Date(Date.now() - 10800000).toLocaleString(),
-          details: "کانال: Tech Tutorials",
-          url: "/channel/UC1234567890",
-          title: "Tech Tutorials",
-          duration: null,
-          pageUrl: window.location.origin + "/channel/UC1234567890",
-          timeSpent: "2 min 10 sec"
-        },
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 14400000).toLocaleString(),
-          details: "تماشای ویدیو: معرفی Piped",
-          url: "/watch?v=abcdefg1234",
-          title: "معرفی Piped",
-          duration: "8:31",
-          pageUrl: window.location.origin + "/watch?v=abcdefg1234",
-          timeSpent: "5 min 42 sec"
-        },
-        {
-          action: "لغو پسندیدن",
-          timestamp: new Date(Date.now() - 18000000).toLocaleString(),
-          details: "ویدیو: چرا نباید از یوتیوب استفاده کرد",
-          url: "/watch?v=hijklm56789",
-          title: "چرا نباید از یوتیوب استفاده کرد",
-          duration: "12:45",
-          pageUrl: window.location.origin + "/watch?v=hijklm56789",
-          timeSpent: "45 sec"
-        },
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 21600000).toLocaleString(),
-          details: "تماشای ویدیو: سیاست حفظ حریم خصوصی",
-          url: "/watch?v=nopqrs90123",
-          title: "سیاست حفظ حریم خصوصی",
-          duration: "18:22",
-          pageUrl: window.location.origin + "/watch?v=nopqrs90123",
-          timeSpent: "8 min 12 sec"
-        },
-        {
-          action: "نپسندیدن ویدیو",
-          timestamp: new Date(Date.now() - 25200000).toLocaleString(),
-          details: "ویدیو: تبلیغات نامناسب",
-          url: "/watch?v=tuvwx456789",
-          title: "تبلیغات نامناسب",
-          duration: "5:17",
-          pageUrl: window.location.origin + "/watch?v=tuvwx456789",
-          timeSpent: "2 min 3 sec"
-        },
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 28800000).toLocaleString(),
-          details: "تماشای ویدیو: فناوری‌های آزاد",
-          url: "/watch?v=yz123456789",
-          title: "فناوری‌های آزاد",
-          duration: "25:11",
-          pageUrl: window.location.origin + "/watch?v=yz123456789",
-          timeSpent: "10 min 5 sec"
-        },
-        {
-          action: "پسندیدن ویدیو",
-          timestamp: new Date(Date.now() - 32400000).toLocaleString(),
-          details: "ویدیو: معرفی پروژه Open Source",
-          url: "/watch?v=ab567890123",
-          title: "معرفی پروژه Open Source",
-          duration: "14:33",
-          pageUrl: window.location.origin + "/watch?v=ab567890123",
-          timeSpent: "6 min 18 sec"
-        },
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 36000000).toLocaleString(),
-          details: "تماشای ویدیو: چگونه امنیت خود را افزایش دهیم",
-          url: "/watch?v=cd901234567",
-          title: "چگونه امنیت خود را افزایش دهیم",
-          duration: "19:47",
-          pageUrl: window.location.origin + "/watch?v=cd901234567",
-          timeSpent: "7 min 11 sec"
-        },
-        {
-          action: "لغو اشتراک",
-          timestamp: new Date(Date.now() - 39600000).toLocaleString(),
-          details: "کانال: Tech News",
-          url: "/channel/UC987654321",
-          title: "Tech News",
-          duration: null,
-          pageUrl: window.location.origin + "/channel/UC987654321",
-          timeSpent: "30 sec"
-        },
-        {
-          action: "مشاهده ویدیو",
-          timestamp: new Date(Date.now() - 43200000).toLocaleString(),
-          details: "تماشای ویدیو: اینترنت آزاد",
-          url: "/watch?v=ef123456789",
-          title: "اینترنت آزاد",
-          duration: "21:05",
-          pageUrl: window.location.origin + "/watch?v=ef123456789",
-          timeSpent: "9 min 3 sec"
-        },
-      ];
+        // Process logs to ensure they have consistent structure
+        this.activityLogs = logs.map(log => ({
+          action: log.action || "بازدید صفحه",
+          timestamp: log.timestamp || new Date().toLocaleString(),
+          details: log.details || `Viewed: ${log.title || 'صفحه ناشناس'}`,
+          url: log.url || '',
+          title: log.title || 'صفحه ناشناس',
+          pageUrl: log.pageUrl || window.location.origin + log.url,
+          timeSpent: log.timeSpent || null
+        }));
 
-      // Initial display - show first 10 logs
-      this.displayedLogs = this.activityLogs.slice(0, this.logsPerPage);
-      this.currentPage = 1;
+        // Initial display - show first 10 logs
+        this.displayedLogs = this.activityLogs.slice(0, this.logsPerPage);
+        this.currentPage = 1;
+      } catch (error) {
+        console.error("Error loading activity logs:", error);
+        // Fallback to empty array if there's an error
+        this.activityLogs = [];
+        this.displayedLogs = [];
+      }
     },
     async getRecentActivity() {
       // Get recent history items from IndexedDB

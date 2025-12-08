@@ -29,9 +29,9 @@
       >
         <router-link :to="'/watch?v=' + video.videoId">
           <div class="relative">
-            <img 
-              :src="video.thumbnail" 
-              :alt="video.title" 
+            <img
+              :src="getCDNThumbnailUrl(video.thumbnail)"
+              :alt="video.title"
               class="w-full aspect-video object-cover rounded-lg"
               @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
             />
@@ -71,6 +71,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserDislikes",
@@ -88,6 +89,16 @@ export default {
     await this.fetchDislikes();
   },
   methods: {
+    getCDNThumbnailUrl(thumbnail) {
+      if (!thumbnail) return thumbnail; // Return as is if null/undefined
+
+      // Check if thumbnail is already a full URL
+      if (thumbnail.startsWith('http')) {
+        return getOptimalThumbnailUrl(thumbnail, { type: 'general' });
+      }
+      // If it's a relative path, return as is
+      return thumbnail;
+    },
     async fetchDislikes() {
       try {
         const dislikes = JSON.parse(localStorage.getItem("dislikes") || "[]");

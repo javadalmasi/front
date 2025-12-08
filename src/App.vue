@@ -113,6 +113,9 @@ export default {
             this.sidebarState = "open";
         }
 
+        // Initialize activity logging if enabled
+        this.setupActivityLogging();
+
         if ("indexedDB" in window) {
             const request = indexedDB.open("piped-db", 6);
             request.onupgradeneeded = ev => {
@@ -241,6 +244,191 @@ export default {
                 }
             }
         },
+    },
+    methods: {
+        checkIsMobile() {
+            this.isMobile = window.innerWidth < 768;
+            if (this.isMobile) {
+                this.sidebarState = this.sidebarState === "closed" ? "open" : "closed";
+            }
+        },
+        toggleSidebar() {
+            if (this.isMobile || this.isWatchPage) {
+                this.sidebarState = this.sidebarState === "closed" ? "open" : "closed";
+            } else {
+                const states = ["open", "semi-open", "closed"];
+                const currentIndex = states.indexOf(this.sidebarState);
+                this.sidebarState = states[(currentIndex + 1) % states.length];
+
+                // Update previous state when toggling on non-watch pages
+                if (!this.isWatchPage && this.sidebarState !== "closed") {
+                    this.previousSidebarState = this.sidebarState;
+                }
+            }
+        },
+        updateSidebarState(event) {
+            this.sidebarState = event.detail.state;
+        },
+        toggleTheme() {
+            const newTheme = this.theme === "dark" ? "light" : "dark";
+            localStorage.setItem("theme", newTheme);
+            this.setTheme();
+        },
+        setTheme() {
+            // Default to 'dark' if no theme is saved in localStorage
+            this.theme = localStorage.getItem("theme") || "dark";
+
+            if (this.theme === "dark") {
+                document.documentElement.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+            }
+            this.changeTitleBarColor();
+            this.updateFavicon();
+        },
+        changeTitleBarColor() {
+            const currentColor = { dark: "#0F0F0F", light: "#FFF" };
+            const themeColor = document.querySelector("meta[name='theme-color']");
+            if (themeColor) {
+                themeColor.setAttribute("content", currentColor[this.theme]);
+            }
+        },
+        updateFavicon() {
+            // Get the current favicon link element
+            const favicon = document.querySelector("link[rel='icon']");
+            if (favicon) {
+                // Update the favicon based on current theme
+                if (this.theme === "dark") {
+                    favicon.href = "/img/icons/dark-logo-32x32.png"; // Use dark logo for dark theme
+                } else {
+                    favicon.href = "/img/icons/light-logo-32x32.png"; // Use light logo for light theme
+                }
+            }
+        },
+        setupActivityLogging() {
+            // Set up a watcher for route changes to log user activity
+            this.$watch('$route', (to, from) => {
+                // Get user preference for logging activity
+                let shouldLogActivity = true;
+                const prefValue = localStorage.getItem("pref_logUserActivity");
+                if (prefValue !== null) {
+                    shouldLogActivity = (prefValue === "true");
+                }
+
+                if (!shouldLogActivity) {
+                    return; // Don't log activity if user has disabled it
+                }
+
+                // Get the current page title
+                let pageTitle = document.title;
+                if (!pageTitle || pageTitle === this.getSiteName()) {
+                    // Get it from the h1 element or route name
+                    const h1Element = document.querySelector('h1');
+                    if (h1Element) {
+                        pageTitle = h1Element.textContent.trim();
+                    } else {
+                        // Remove localization prefixes and format the route name
+                        pageTitle = this.getRouteDisplayName(to.name || to.path);
+                    }
+                }
+
+                // Create the activity log entry
+                const activityEntry = {
+                    action: this.getActionBasedOnRoute(to.name || ''),
+                    timestamp: new Date().toLocaleString(),
+                    details: `Viewed: ${pageTitle}`,
+                    url: to.path,
+                    title: pageTitle,
+                    pageUrl: window.location.origin + to.fullPath,
+                    timeSpent: null // This would require timing which is more complex
+                };
+
+                // Store the activity log in localStorage
+                this.logActivity(activityEntry);
+            }, { immediate: true });
+        },
+        getActionBasedOnRoute(routeName) {
+            // Determine the action based on the route name
+            if (routeName === 'WatchVideo') {
+                return 'تماشای ویدیو';
+            } else if (routeName === 'SearchResults') {
+                return 'جست و جو';
+            } else if (routeName === 'UserDashboard') {
+                return 'بازدید داشبورد';
+            } else if (routeName === 'UserPreferences') {
+                return 'تغییر تنظیمات';
+            } else if (routeName && routeName.includes('History')) {
+                return 'مشاهده تاریخچه';
+            } else if (routeName && routeName.includes('Likes')) {
+                return 'مشاهده پسندیده‌ها';
+            } else if (routeName && routeName.includes('Dislikes')) {
+                return 'مشاهده نپسندیده‌ها';
+            } else {
+                return 'بازدید صفحه';
+            }
+        },
+        getRouteDisplayName(pathOrName) {
+            // Convert route name to a readable display name
+            const displayNameMap = {
+                'Home': 'صفحه اصلی',
+                'Trending': 'پرطرفدار',
+                'Feed': 'فید',
+                'SearchResults': 'نتایج جستجو',
+                'WatchVideo': 'تماشای ویدیو',
+                'Channel': 'کانال',
+                'UserDashboard': 'داشبورد کاربر',
+                'UserPreferences': 'تنظیمات',
+                'UserHistory': 'تاریخچه تماشا',
+                'UserLikes': 'ویدیوهای پسندیده شده',
+                'UserDislikes': 'ویدیوهای نپسندیده شده',
+                'UserSubscriptions': 'اشتراک‌ها',
+                'Import': 'درون‌ریزی',
+                'Subscriptions': 'فهرست اشتراک',
+                'HistoryPage': 'تاریخچه',
+                'PreferencesPage': 'تنظیمات',
+                'LikesPage': 'پسندیده‌ها',
+                'DislikesPage': 'نپسندیده‌ها',
+                'FeedPage': 'فید',
+                'TrendingPage': 'پرطرفدار',
+                'SubscriptionPage': 'اشتراک',
+            };
+
+            // First check if it's in the map
+            if (displayNameMap[pathOrName]) {
+                return displayNameMap[pathOrName];
+            }
+
+            // If not in map, try to format it (convert kebab-case to readable text)
+            if (pathOrName) {
+                return pathOrName.replace(/([A-Z])/g, ' $1')
+                           .replace(/-/g, ' ')
+                           .trim();
+            }
+
+            return 'صفحه ناشناس';
+        },
+        logActivity(activityEntry) {
+            try {
+                // Get existing logs from localStorage
+                let logs = JSON.parse(localStorage.getItem('userActivityLogs') || '[]');
+
+                // Add new activity at the beginning of the array
+                logs.unshift(activityEntry);
+
+                // Keep only the last 100 logs to prevent storage overflow
+                if (logs.length > 100) {
+                    logs = logs.slice(0, 100);
+                }
+
+                // Save back to localStorage
+                localStorage.setItem('userActivityLogs', JSON.stringify(logs));
+            } catch (error) {
+                console.error("Error logging activity:", error);
+            }
+        },
+        getSiteName() {
+            return import.meta.env.VITE_SITE_NAME || "Piped";
+        }
     },
 };
 </script>

@@ -48,7 +48,7 @@
         <router-link :to="'/watch?v=' + video.videoId">
           <div class="relative">
             <img
-              :src="video.thumbnail"
+              :src="getCDNThumbnailUrl(video.thumbnail)"
               :alt="video.title"
               class="w-full aspect-video object-cover rounded-lg"
               @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
@@ -113,6 +113,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserHistory",
@@ -133,34 +134,59 @@ export default {
     this.autoDeleteHistory = this.getPreferenceBoolean("autoDeleteWatchHistory", false);
     this.autoDeleteDelayHours = this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24");
 
+    // Initialize to empty array to prevent any undefined issues
+    this.videos = [];
+
     // Use local IndexedDB history
     if (window.db && this.getPreferenceBoolean("watchHistory", true)) {
-      const tx = window.db.transaction("watch_history", "readonly");
-      const store = tx.objectStore("watch_history");
-      const index = store.index("watchedAt");
+      try {
+        const tx = window.db.transaction("watch_history", "readonly");
+        const store = tx.objectStore("watch_history");
+        const index = store.index("watchedAt");
 
-      const videos = [];
-      index.openCursor(null, "prev").onsuccess = e => {
-        const cursor = e.target.result;
-        if (cursor) {
-          const video = cursor.value;
-          if (!video.error) {
-            videos.push({
-              videoId: video.videoId,
-              title: video.title,
-              channelName: video.channelName,
-              thumbnail: video.thumbnail,
-              watchedAt: video.watchedAt
-            });
+        const request = index.openCursor(null, "prev");
+
+        request.onsuccess = e => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const video = cursor.value;
+            if (!video.error) {
+              videos.push({
+                videoId: video.videoId,
+                title: video.title,
+                channelName: video.channelName,
+                thumbnail: video.thumbnail,
+                watchedAt: video.watchedAt
+              });
+            }
+            cursor.continue();
+          } else {
+            this.videos = videos;
           }
-          cursor.continue();
-        } else {
-          this.videos = videos;
-        }
-      };
+        };
+
+        // Add error handler for proper debugging
+        request.onerror = e => {
+          console.error("Error accessing history from IndexedDB:", e.target.error);
+          this.videos = []; // Ensure it's reset even if there's an error
+        };
+      } catch (error) {
+        console.error("Error accessing IndexedDB:", error);
+        this.videos = [];
+      }
     }
   },
   methods: {
+    getCDNThumbnailUrl(thumbnail) {
+      if (!thumbnail) return thumbnail; // Return as is if null/undefined
+
+      // Check if thumbnail is already a full URL
+      if (thumbnail.startsWith('http')) {
+        return getOptimalThumbnailUrl(thumbnail, { type: 'general' });
+      }
+      // If it's a relative path, return as is
+      return thumbnail;
+    },
     removeFromHistory(videoId) {
       if (window.db) {
         const tx = window.db.transaction("watch_history", "readwrite");
