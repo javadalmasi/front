@@ -280,7 +280,17 @@ export default {
         try {
           const tx = window.db.transaction("watch_history", "readonly");
           const store = tx.objectStore("watch_history");
-          this.historyCount = await store.count();
+          const countRequest = store.count();
+
+          // Return a promise that resolves with the count
+          this.historyCount = await new Promise((resolve, reject) => {
+            countRequest.onsuccess = () => {
+              resolve(countRequest.result);
+            };
+            countRequest.onerror = () => {
+              reject(countRequest.error);
+            };
+          });
         } catch (e) {
           console.error("Error getting history count:", e);
           this.historyCount = 0;
@@ -314,7 +324,7 @@ export default {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `piped_backup_${this.getTimestamp()}.json`;
+        a.download = `backup_${this.getTimestamp()}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -463,7 +473,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `piped_subscriptions_${this.getTimestamp()}.json`;
+      a.download = `subscriptions_${this.getTimestamp()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -479,7 +489,7 @@ export default {
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `piped_history_${this.getTimestamp()}.json`;
+          a.download = `history_${this.getTimestamp()}.json`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -501,7 +511,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `piped_likes_${this.getTimestamp()}.json`;
+      a.download = `likes_${this.getTimestamp()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -516,7 +526,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `piped_dislikes_${this.getTimestamp()}.json`;
+      a.download = `dislikes_${this.getTimestamp()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -531,7 +541,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `piped_preferences_${this.getTimestamp()}.json`;
+      a.download = `preferences_${this.getTimestamp()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

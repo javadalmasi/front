@@ -107,7 +107,7 @@ export default {
                     return obj;
                 }),
             };
-            this.download(JSON.stringify(json), `piped_history_${dateStr}.json`, "application/json");
+            this.download(JSON.stringify(json), `history_${dateStr}.json`, "application/json");
         },
         formatField(field) {
             // camelCase to Title Case

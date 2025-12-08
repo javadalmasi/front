@@ -76,60 +76,36 @@
       </p>
 
       <div v-if="activityLogs.length > 0">
-        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-center mb-2 pb-2 border-b border-gray-300 dark:border-dark-300 relative">
-          <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3"></i>
+        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-start mb-2 pb-2 border-b border-gray-300 dark:border-dark-300">
+          <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3 mt-1"></i>
           <div class="flex-1">
             <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
             <p v-if="showAllLogs" class="text-xs text-gray-500 dark:text-gray-500">{{ log.details }}</p>
-          </div>
 
-          <!-- More indicator that shows details on hover -->
-          <div class="relative">
-            <button
-              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors"
-              @mouseenter="showTooltip = index"
-              @mouseleave="showTooltip = null"
-              @focus="showTooltip = index"
-              @blur="showTooltip = null"
-              aria-label="اطلاعات بیشتر"
-              title="اطلاعات بیشتر"
-            >
-              <i class="i-fa6-solid:ellipsis text-xs"></i>
-            </button>
-
-            <!-- Tooltip with detailed information -->
-            <div
-              v-if="showTooltip === index"
-              class="absolute z-10 -left-64 sm:-left-48 mt-2 w-64 sm:w-56 bg-white dark:bg-dark-600 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-dark-400"
-              @mouseenter="showTooltip = index"
-              @mouseleave="showTooltip = null"
-            >
-              <div class="text-sm">
-                <div class="font-semibold mb-1 truncate" :title="log.title">{{ log.title }}</div>
-                <div v-if="log.duration" class="text-gray-600 dark:text-gray-300 text-xs mb-1">
-                  <i class="i-fa6-solid:clock mr-1"></i>
-                  مدت ویدیو: {{ log.duration }}
-                </div>
-                <div class="text-gray-600 dark:text-gray-300 text-xs mb-1">
-                  <i class="i-fa6-solid:hourglass-half mr-1"></i>
-                  زمان اقامت: {{ log.timeSpent }}
-                </div>
-                <div class="text-gray-600 dark:text-gray-300 text-xs mb-2 break-all">
-                  <i class="i-fa6-solid:link mr-1"></i>
-                  <a :href="log.pageUrl" target="_blank" class="text-blue-500 hover:underline break-all text-xs">
-                    {{ log.pageUrl }}
-                  </a>
-                </div>
-
+            <!-- Expandable JSON data section -->
+            <div v-if="expandedLogIndex === index" class="mt-2 bg-gray-100 dark:bg-dark-500 p-3 rounded-lg">
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="font-semibold text-sm">اطلاعات JSON:</h4>
                 <button
-                  @click="goToUrl(log.pageUrl)"
-                  class="w-full mt-2 text-center text-xs bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded"
+                  @click="expandedLogIndex = null"
+                  class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
                 >
-                  بازدید مجدد
+                  <i class="i-fa6-solid:times"></i>
                 </button>
               </div>
+              <pre class="text-xs bg-gray-800 text-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto">{{ formatJson(log) }}</pre>
             </div>
           </div>
+
+          <!-- More button that shows JSON details on click -->
+          <button
+            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors flex-shrink-0"
+            @click="toggleLogDetails(index)"
+            aria-label="نمایش جزئیات بیشتر"
+            title="نمایش جزئیات بیشتر"
+          >
+            <i class="i-fa6-solid:ellipsis text-xs"></i>
+          </button>
         </div>
 
         <div v-if="activityLogs.length > 10" class="mt-4 text-center">
@@ -187,6 +163,7 @@ export default {
       displayedLogs: [],
       currentPage: 0,
       showTooltip: null,
+      expandedLogIndex: null,
     };
   },
   async mounted() {
@@ -206,7 +183,17 @@ export default {
         try {
           const tx = window.db.transaction("watch_history", "readonly");
           const store = tx.objectStore("watch_history");
-          this.historyCount = await store.count();
+          const countRequest = store.count();
+
+          // Return a promise that resolves with the count
+          this.historyCount = await new Promise((resolve, reject) => {
+            countRequest.onsuccess = () => {
+              resolve(countRequest.result);
+            };
+            countRequest.onerror = () => {
+              reject(countRequest.error);
+            };
+          });
         } catch (e) {
           console.error("Error getting history count:", e);
           this.historyCount = 0;
@@ -257,7 +244,7 @@ export default {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `piped_${type}_backup_${timestamp}.json`;
+        a.download = `${type}_backup_${timestamp}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -617,6 +604,14 @@ export default {
     getLocalSubscriptions() {
       const subscriptions = localStorage.getItem("localSubscriptions");
       return subscriptions ? JSON.parse(subscriptions) : [];
+    },
+    toggleLogDetails(index) {
+      // If clicking the same log, close it; otherwise, expand the new one
+      this.expandedLogIndex = this.expandedLogIndex === index ? null : index;
+    },
+    formatJson(obj) {
+      // Format the JSON object for better readability per line
+      return JSON.stringify(obj, null, 2);
     }
   }
 };

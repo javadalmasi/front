@@ -158,7 +158,7 @@ export default {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `piped_subscriptions_backup_${timestamp}.json`;
+        a.download = `subscriptions_backup_${timestamp}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
