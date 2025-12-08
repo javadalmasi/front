@@ -1,95 +1,128 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <h1 class="text-2xl font-bold mb-6 text-center" v-t="'titles.user_dashboard'">داشبورد کاربر</h1>
-    
-    <!-- Dashboard Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-2" v-t="'titles.subscriptions'">اشتراک‌ها</h2>
-        <p class="text-3xl font-bold" v-text="subscriptionCount"></p>
-        <router-link to="/user/gust/subscriptions" class="text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block">
-          {{ $t('actions.view_details') || 'مشاهده جزئیات' }}
-        </router-link>
-      </div>
 
-      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-2" v-t="'titles.history'">تاریخچه</h2>
-        <p class="text-3xl font-bold" v-text="historyCount"></p>
-        <router-link to="/user/gust/history" class="text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block">
-          {{ $t('actions.view_details') || 'مشاهده جزئیات' }}
-        </router-link>
-      </div>
+    <!-- Quick Access Shortcuts -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+      <router-link
+        to="/user/gust/subscriptions"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:rss text-2xl block text-blue-500 mb-2"></i>
+        <span class="block" v-t="'titles.subscriptions'">اشتراک‌ها</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ subscriptionCount }}</span>
+      </router-link>
 
-      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-2" v-t="'actions.likes'">پسند شده‌ها</h2>
-        <p class="text-3xl font-bold" v-text="likesCount"></p>
-        <router-link to="/user/gust/likes" class="text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block">
-          {{ $t('actions.view_details') || 'مشاهده جزئیات' }}
-        </router-link>
-      </div>
+      <router-link
+        to="/user/gust/history"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:clock-rotate-left text-2xl block text-green-500 mb-2"></i>
+        <span class="block" v-t="'titles.history'">تاریخچه</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ historyCount }}</span>
+      </router-link>
 
-      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-2" v-t="'actions.dislikes'">پسند نشده‌ها</h2>
-        <p class="text-3xl font-bold" v-text="dislikesCount"></p>
-        <router-link to="/user/gust/dislikes" class="text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block">
-          {{ $t('actions.view_details') || 'مشاهده جزئیات' }}
-        </router-link>
-      </div>
-    </div>
+      <router-link
+        to="/user/gust/likes"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:thumbs-up text-2xl block text-indigo-500 mb-2"></i>
+        <span class="block" v-t="'actions.likes'">پسندیده‌ها</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ likesCount }}</span>
+      </router-link>
 
-    <!-- Import/Export Section -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-8">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.data_management'">مدیریت داده‌ها</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <h3 class="text-lg font-semibold mb-2" v-t="'titles.backup_data'">پشتیبان‌گیری داده‌ها</h3>
-          <div class="flex flex-wrap gap-2">
-            <button class="btn btn-secondary" @click="backupData('all')" v-t="'actions.backup_all'">پشتیبان گیری همه</button>
-            <button class="btn btn-secondary" @click="backupData('subscriptions')" v-t="'actions.backup_subscriptions'">اشتراک‌ها</button>
-            <button class="btn btn-secondary" @click="backupData('history')" v-t="'actions.backup_history'">تاریخچه</button>
-            <button class="btn btn-secondary" @click="backupData('likes')" v-t="'actions.backup_likes'">پسند شده‌ها</button>
-            <button class="btn btn-secondary" @click="backupData('dislikes')" v-t="'actions.backup_dislikes'">پسند نشده‌ها</button>
-            <button class="btn btn-secondary" @click="backupData('preferences')" v-t="'actions.backup_preferences'">تنظیمات</button>
-          </div>
-        </div>
-        
-        <div>
-          <h3 class="text-lg font-semibold mb-2" v-t="'titles.import_data'">وارد کردن داده‌ها</h3>
-          <div class="flex flex-wrap gap-2">
-            <button class="btn btn-info" @click="importData('all')" v-t="'actions.import_all'">وارد کردن همه</button>
-            <button class="btn btn-info" @click="importData('subscriptions')" v-t="'actions.import_subscriptions'">اشتراک‌ها</button>
-            <button class="btn btn-info" @click="importData('history')" v-t="'actions.import_history'">تاریخچه</button>
-            <button class="btn btn-info" @click="importData('likes')" v-t="'actions.import_likes'">پسند شده‌ها</button>
-            <button class="btn btn-info" @click="importData('dislikes')" v-t="'actions.import_dislikes'">پسند نشده‌ها</button>
-            <button class="btn btn-info" @click="importData('preferences')" v-t="'actions.import_preferences'">تنظیمات</button>
-          </div>
-        </div>
-      </div>
-    </div>
+      <router-link
+        to="/user/gust/dislikes"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:thumbs-down text-2xl block text-red-500 mb-2"></i>
+        <span class="block" v-t="'actions.dislikes'">نپسندیده‌ها</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ dislikesCount }}</span>
+      </router-link>
 
-    <!-- Preferences Link -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-8">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.preferences'">تنظیمات</h2>
-      <router-link to="/user/gust/preferences" class="btn btn-primary">
-        {{ $t('actions.manage_preferences') || 'مدیریت تنظیمات' }}
+      <router-link
+        to="/user/gust/preferences"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:gear text-2xl block text-yellow-500 mb-2"></i>
+        <span class="block" v-t="'titles.preferences'">تنظیمات</span>
+      </router-link>
+
+      <router-link
+        to="/user/gust/backup"
+        class="bg-gray-200 dark:bg-dark-400 p-4 rounded-xl text-center hover:bg-gray-300 dark:hover:bg-dark-300 transition-colors shadow"
+      >
+        <i class="i-fa6-solid:download text-2xl block text-purple-500 mb-2"></i>
+        <span class="block" v-t="'titles.data_management'">پشتیبان</span>
       </router-link>
     </div>
 
-    <!-- Danger Zone -->
-    <DangerZone @action-confirmed="handleDangerAction" />
+
+    <!-- Recent Activity Logs -->
+    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold" v-t="'titles.last_user_logs'">آخرین فعالیت‌های کاربر</h2>
+        <button
+          class="btn btn-secondary"
+          @click="showAllLogs = !showAllLogs"
+          v-t="'info.click_to_expand'"
+        >
+          {{ showAllLogs ? ($t('actions.show_less') || 'نمایش کمتر') : ($t('actions.show_more') || 'نمایش بیشتر') }}
+        </button>
+      </div>
+
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4" v-t="'info.logs_info_text'">
+        فعالیت‌های شما در مرورگر شما ذخیره می‌شود و بر روی سرور ما نیست. می‌توانید از این داده‌ها نسخه پشتیبان تهیه کنید.
+      </p>
+
+      <div v-if="activityLogs.length > 0">
+        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-center mb-2 pb-2 border-b border-gray-300 dark:border-dark-300">
+          <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3"></i>
+          <div class="flex-1">
+            <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
+            <p v-if="showAllLogs" class="text-xs text-gray-500 dark:text-gray-500">{{ log.details }}</p>
+          </div>
+        </div>
+
+        <div v-if="activityLogs.length > 10" class="mt-4 text-center">
+          <button
+            v-if="showMoreLogs"
+            class="btn btn-secondary"
+            @click="displayMoreLogs"
+            v-t="'info.load_more'"
+          >
+            نمایش بیشتر
+          </button>
+        </div>
+      </div>
+      <div v-else class="text-center py-4 text-gray-600 dark:text-gray-400" v-t="'info.no_recent_activity'">
+        فعالیت اخیری وجود ندارد
+      </div>
+
+
+      <!-- Privacy note -->
+      <p class="mt-4 text-sm italic text-gray-600 dark:text-gray-400" v-t="'info.privacy_policy_note'">
+        توجه داشته باشید که فعالیت‌های شما فقط در مرورگر شما ذخیره می‌شود، نه در سرور ما.
+      </p>
+    </div>
+
+    <!-- Confirmation Modal for clearing logs -->
+    <ConfirmModal
+      v-if="showConfirmClearLogs"
+      :message="$t('info.confirm_clear_all_logs') || 'آیا از پاک کردن تمام گزارش‌های فعالیت اطمینان دارید؟ این عمل قابل بازگشت نیست!'"
+      @confirm="clearAllLogs"
+      @close="showConfirmClearLogs = false"
+    />
   </div>
 </template>
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
-import DangerZone from "./DangerZone.vue";
 
 export default {
   name: "UserDashboard",
   components: {
-    ConfirmModal,
-    DangerZone
+    ConfirmModal
   },
   data() {
     return {
@@ -97,11 +130,21 @@ export default {
       historyCount: 0,
       likesCount: 0,
       dislikesCount: 0,
+      recentVideos: [],  // For recent activity display
+      activityLogs: [],
+      showAllLogs: false,
+      showConfirmClearLogs: false,
+      showMoreLogs: true,
+      logsPerPage: 10,
+      displayedLogs: [],
+      currentPage: 0,
     };
   },
   async mounted() {
     document.title = this.$t("titles.user_dashboard") + " - " + this.getSiteName();
     await this.updateCounts();
+    await this.getRecentActivity();
+    await this.loadActivityLogs();
   },
   methods: {
     async updateCounts() {
@@ -424,6 +467,97 @@ export default {
       setTimeout(() => {
         document.body.removeChild(toast);
       }, 3000);
+    },
+    async loadActivityLogs() {
+      // In a real implementation, we would fetch activity logs from wherever they are stored
+      // For now, we'll simulate with some sample data
+
+      // Sample activity logs - in reality this would come from localStorage or IndexedDB
+      this.activityLogs = [
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 3600000).toLocaleString(), details: "تماشای ویدیو: چگونه یک وب‌سایت بسازیم" },
+        { action: "پسندیدن ویدیو", timestamp: new Date(Date.now() - 7200000).toLocaleString(), details: "ویدیو: آموزش Vue.js" },
+        { action: "اشتراک در کانال", timestamp: new Date(Date.now() - 10800000).toLocaleString(), details: "کانال: Tech Tutorials" },
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 14400000).toLocaleString(), details: "تماشای ویدیو: معرفی Piped" },
+        { action: "لغو پسندیدن", timestamp: new Date(Date.now() - 18000000).toLocaleString(), details: "ویدیو: چرا نباید از یوتیوب استفاده کرد" },
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 21600000).toLocaleString(), details: "تماشای ویدیو: سیاست حفظ حریم خصوصی" },
+        { action: "نپسندیدن ویدیو", timestamp: new Date(Date.now() - 25200000).toLocaleString(), details: "ویدیو: تبلیغات نامناسب" },
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 28800000).toLocaleString(), details: "تماشای ویدیو: فناوری‌های آزاد" },
+        { action: "پسندیدن ویدیو", timestamp: new Date(Date.now() - 32400000).toLocaleString(), details: "ویدیو: معرفی پروژه Open Source" },
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 36000000).toLocaleString(), details: "تماشای ویدیو: چگونه امنیت خود را افزایش دهیم" },
+        { action: "لغو اشتراک", timestamp: new Date(Date.now() - 39600000).toLocaleString(), details: "کانال: Tech News" },
+        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 43200000).toLocaleString(), details: "تماشای ویدیو: اینترنت آزاد" },
+      ];
+
+      // Initial display - show first 10 logs
+      this.displayedLogs = this.activityLogs.slice(0, this.logsPerPage);
+      this.currentPage = 1;
+    },
+    async getRecentActivity() {
+      // Get recent history items from IndexedDB
+      if (!window.db) {
+        this.recentVideos = [];
+        return;
+      }
+
+      try {
+        const tx = window.db.transaction("watch_history", "readonly");
+        const store = tx.objectStore("watch_history");
+        const index = store.index("watchedAt");
+
+        // Get last 10 most recent videos
+        const request = index.getAll(null, 10);
+
+        request.onsuccess = () => {
+          const history = request.result.reverse(); // Reverse to show newest first
+          // Convert to format for display cards
+          this.recentVideos = history.slice(0, 10).map(item => {
+            return {
+              videoId: item.videoId,
+              title: item.title,
+              channelName: item.channelName,
+              thumbnail: item.thumbnail,
+              watchedAt: item.watchedAt
+            };
+          });
+        };
+
+        request.onerror = (e) => {
+          console.error("Error getting recent activity:", e.target.error);
+          this.recentVideos = [];
+        };
+      } catch (e) {
+        console.error("Error getting recent activity:", e);
+        this.recentVideos = [];
+      }
+    },
+    displayMoreLogs() {
+      const startIndex = this.currentPage * this.logsPerPage;
+      const endIndex = Math.min(startIndex + this.logsPerPage, this.activityLogs.length);
+
+      if (startIndex < this.activityLogs.length) {
+        const newLogs = this.activityLogs.slice(startIndex, endIndex);
+        this.displayedLogs = [...this.displayedLogs, ...newLogs];
+        this.currentPage++;
+      }
+
+      // Hide the "Load More" button if we've reached the end
+      if (endIndex >= this.activityLogs.length) {
+        this.showMoreLogs = false;
+      }
+    },
+    async clearAllLogs() {
+      try {
+        // In a real implementation, this would clear activity logs from storage
+        // For now, just clear the array
+        this.activityLogs = [];
+        this.displayedLogs = [];
+
+        this.showToast(this.$t('info.logs_cleared') || 'گزارش‌ها پاک شدند');
+        this.showConfirmClearLogs = false;
+      } catch (error) {
+        console.error("Clear logs error:", error);
+        this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن');
+      }
     },
     getLocalSubscriptions() {
       const subscriptions = localStorage.getItem("localSubscriptions");
