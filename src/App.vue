@@ -108,6 +108,9 @@ export default {
         if (this.isWatchPage) {
             this.previousSidebarState = this.sidebarState; // Remember the state before switching to watch
             this.sidebarState = "closed";
+        } else if (this.$route.path.startsWith('/user/gust')) {
+            // On user dashboard routes, default to open sidebar
+            this.sidebarState = "open";
         }
 
         if ("indexedDB" in window) {

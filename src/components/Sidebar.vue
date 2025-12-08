@@ -18,36 +18,69 @@
     >
         <!-- Scrollable content area -->
         <div class="h-full overflow-y-auto pt-2">
-            <!-- Public items section -->
-            <div>
-                <div
-                    v-if="sidebarState === 'open'"
-                    class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
-                >
-                    آیتم‌های عمومی
-                </div>
-                <div
-                    v-for="item in filteredPublicItems"
-                    :key="item.name"
-                    class="mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700"
-                    @click="navigateTo(item.route)"
-                >
-                    <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="[]">
-                        <div :class="item.icon" />
+            <!-- Determine navigation based on current route -->
+            <template v-if="isUserDashboardRoute">
+                <!-- User Dashboard Items section -->
+                <div>
+                    <div
+                        v-if="sidebarState === 'open'"
+                        class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
+                    >
+                        {{ $t("actions.user_dashboard_menu") || "منوی داشبورد کاربر" }}
                     </div>
-                    <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
-                        {{ item.name }}
-                    </span>
+                    <div
+                        v-for="item in userItems"
+                        :key="item.name"
+                        :class="[
+                          'mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700',
+                          item.danger ? 'text-red-600 dark:text-red-400' : ''
+                        ]"
+                        @click="navigateTo(item.route)"
+                    >
+                        <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="item.danger ? 'text-red-500' : ''">
+                            <div :class="item.icon" />
+                        </div>
+                        <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
+                            {{ item.name }}
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </template>
+            <template v-else>
+                <!-- Public items section -->
+                <div>
+                    <div
+                        v-if="sidebarState === 'open'"
+                        class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
+                    >
+                        {{ $t("actions.public") || "آیتم‌های عمومی" }}
+                    </div>
+                    <div
+                        v-for="item in filteredPublicItems"
+                        :key="item.name"
+                        :class="[
+                          'mx-2 my-1 flex cursor-pointer items-center rounded-lg px-4 py-3 font-semibold hover:bg-gray-200 dark:hover:bg-dark-700',
+                          item.danger ? 'text-red-600 dark:text-red-400' : ''
+                        ]"
+                        @click="navigateTo(item.route)"
+                    >
+                        <div class="w-10 flex items-center justify-center text-lg leading-[1.7]" :class="item.danger ? 'text-red-500' : ''">
+                            <div :class="item.icon" />
+                        </div>
+                        <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
+                            {{ item.name }}
+                        </span>
+                    </div>
+                </div>
+            </template>
 
-            <!-- Categories section -->
-            <div v-if="sidebarState !== 'semi-open'" class="">
+            <!-- Categories section (only on public pages, not on user dashboard pages) -->
+            <div v-if="!isUserDashboardRoute && sidebarState !== 'semi-open'" class="">
                 <div
                     v-if="sidebarState === 'open'"
                     class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                 >
-                    دسته‌بندی‌ها
+                    {{ $t('actions.categories') || "دسته‌بندی‌ها" }}
                 </div>
                 <div
                     v-for="category in visibleCategories"
@@ -143,12 +176,16 @@ export default {
                 { name: "صفحه اصلی", route: "/", icon: "i-fa6-solid:house" },
                 { name: "پرطرفدار", route: "/trending", icon: "i-fa6-solid:fire" },
                 { name: "خوراک", route: "/feed", icon: "i-fa6-solid:rss" },
-                { name: "داشبورد کاربر", route: "/user/gust", icon: "i-fa6-solid:house-user" },
+                { name: "حساب کاربری", route: "/user/gust", icon: "i-fa6-solid:user" },
+            ],
+            userItems: [
+                { name: "داشبورد", route: "/user/gust", icon: "i-fa6-solid:house-user" },
                 { name: "اشتراک‌ها", route: "/user/gust/subscriptions", icon: "i-fa6-solid:bell" },
                 { name: "تاریخچه", route: "/user/gust/history", icon: "i-fa6-solid:clock-rotate-left" },
                 { name: "پسند شده‌ها", route: "/user/gust/likes", icon: "i-fa6-solid:thumbs-up" },
                 { name: "پسند نشده‌ها", route: "/user/gust/dislikes", icon: "i-fa6-solid:thumbs-down" },
                 { name: "تنظیمات", route: "/user/gust/preferences", icon: "i-fa6-solid:gear" },
+                { name: "پشتیبان‌گیری", route: "/user/gust/backup", icon: "i-fa6-solid:download" },
             ],
             categories: [
                 { name: "موسیقی" },
@@ -175,6 +212,9 @@ export default {
         };
     },
     computed: {
+        isUserDashboardRoute() {
+            return this.$route.path.startsWith('/user/gust');
+        },
 
         isRssFeedDisabled() {
             // Check if RSS feed button is disabled via environment variable
@@ -186,6 +226,10 @@ export default {
                 return this.publicItems.filter(item => item.route !== "/feed");
             }
             return this.publicItems;
+        },
+        filteredUserItems() {
+            // Filter user dashboard items if needed
+            return this.userItems;
         },
         visibleCategories() {
             if (this.showMoreCategories || this.sidebarState === "semi-open") {

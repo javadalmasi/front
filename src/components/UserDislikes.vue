@@ -9,12 +9,6 @@
     
     <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
       <div class="flex flex-wrap gap-4 mb-4">
-        <button class="btn btn-secondary" @click="backupDislikes" v-t="'actions.export_dislikes'">
-          صدور پسند نشده‌ها
-        </button>
-        <button class="btn btn-info" @click="importDislikes" v-t="'actions.import_dislikes'">
-          وارد کردن پسند نشده‌ها
-        </button>
         <button class="btn btn-danger" @click="showConfirmClearDialog = true" v-t="'actions.clear_dislikes'">
           پاک کردن همه
         </button>

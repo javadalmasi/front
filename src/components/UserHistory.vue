@@ -9,12 +9,6 @@
 
     <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
       <div class="flex flex-wrap gap-4 mb-4">
-        <button class="btn btn-secondary" @click="backupHistory" v-t="'actions.export_history'">
-          صدور تاریخچه
-        </button>
-        <button class="btn btn-info" @click="importHistory" v-t="'actions.import_history'">
-          وارد کردن تاریخچه
-        </button>
         <button class="btn btn-danger" @click="showConfirmClearDialog = true" v-t="'actions.clear_history'">
           پاک کردن همه
         </button>

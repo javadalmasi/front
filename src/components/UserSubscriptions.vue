@@ -9,12 +9,6 @@
     
     <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
       <div class="flex flex-wrap gap-4 mb-4">
-        <button class="btn btn-secondary" @click="backupSubscriptions" v-t="'actions.export_subscriptions'">
-          صدور اشتراک‌ها
-        </button>
-        <button class="btn btn-info" @click="importSubscriptions" v-t="'actions.import_subscriptions'">
-          وارد کردن اشتراک‌ها
-        </button>
         <button class="btn btn-danger" @click="showConfirmClearDialog = true" v-t="'actions.clear_subscriptions'">
           پاک کردن همه
         </button>

@@ -114,6 +114,16 @@ const routes = [
         component: () => import("../components/UserPreferences.vue"),
     },
     {
+        path: "/user/gust/backup",
+        name: "DataManagement",
+        component: () => import("../components/DataManagement.vue"),
+    },
+    {
+        path: "/user/gust/danger",
+        name: "DangerZone",
+        component: () => import("../components/DangerZonePage.vue"),
+    },
+    {
         path: "/:pathMatch(.*)*",
         name: "Page Not Found",
         component: () => import("../components/PageNotFound.vue"),
