@@ -76,11 +76,60 @@
       </p>
 
       <div v-if="activityLogs.length > 0">
-        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-center mb-2 pb-2 border-b border-gray-300 dark:border-dark-300">
+        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-center mb-2 pb-2 border-b border-gray-300 dark:border-dark-300 relative">
           <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3"></i>
           <div class="flex-1">
             <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
             <p v-if="showAllLogs" class="text-xs text-gray-500 dark:text-gray-500">{{ log.details }}</p>
+          </div>
+
+          <!-- More indicator that shows details on hover -->
+          <div class="relative">
+            <button
+              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors"
+              @mouseenter="showTooltip = index"
+              @mouseleave="showTooltip = null"
+              @focus="showTooltip = index"
+              @blur="showTooltip = null"
+              aria-label="اطلاعات بیشتر"
+              title="اطلاعات بیشتر"
+            >
+              <i class="i-fa6-solid:ellipsis text-xs"></i>
+            </button>
+
+            <!-- Tooltip with detailed information -->
+            <div
+              v-if="showTooltip === index"
+              class="absolute z-10 left-0 mt-2 w-64 bg-white dark:bg-dark-600 shadow-lg rounded-lg p-3 border border-gray-200 dark:border-dark-400"
+              style="transform: translateX(-100%); top: 100%;"
+              @mouseenter="showTooltip = index"
+              @mouseleave="showTooltip = null"
+            >
+              <div class="text-sm">
+                <div class="font-semibold mb-1 truncate" :title="log.title">{{ log.title }}</div>
+                <div v-if="log.duration" class="text-gray-600 dark:text-gray-300 text-xs mb-1">
+                  <i class="i-fa6-solid:clock mr-1"></i>
+                  مدت ویدیو: {{ log.duration }}
+                </div>
+                <div class="text-gray-600 dark:text-gray-300 text-xs mb-1">
+                  <i class="i-fa6-solid:hourglass-half mr-1"></i>
+                  زمان اقامت: {{ log.timeSpent }}
+                </div>
+                <div class="text-gray-600 dark:text-gray-300 text-xs mb-2 break-all">
+                  <i class="i-fa6-solid:link mr-1"></i>
+                  <a :href="log.pageUrl" target="_blank" class="text-blue-500 hover:underline break-all text-xs">
+                    {{ log.pageUrl }}
+                  </a>
+                </div>
+
+                <button
+                  @click="goToUrl(log.pageUrl)"
+                  class="w-full mt-2 text-center text-xs bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded"
+                >
+                  بازدید مجدد
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -138,6 +187,7 @@ export default {
       logsPerPage: 10,
       displayedLogs: [],
       currentPage: 0,
+      showTooltip: null,
     };
   },
   async mounted() {
@@ -453,6 +503,10 @@ export default {
     getSiteName() {
       return process.env.VITE_SITE_NAME || "Piped";
     },
+    goToUrl(url) {
+      // Navigate to the URL
+      this.$router.push(url);
+    },
     showToast(message) {
       // Using the same toast mechanism as in other components
       const toast = document.createElement("div");
@@ -474,18 +528,126 @@ export default {
 
       // Sample activity logs - in reality this would come from localStorage or IndexedDB
       this.activityLogs = [
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 3600000).toLocaleString(), details: "تماشای ویدیو: چگونه یک وب‌سایت بسازیم" },
-        { action: "پسندیدن ویدیو", timestamp: new Date(Date.now() - 7200000).toLocaleString(), details: "ویدیو: آموزش Vue.js" },
-        { action: "اشتراک در کانال", timestamp: new Date(Date.now() - 10800000).toLocaleString(), details: "کانال: Tech Tutorials" },
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 14400000).toLocaleString(), details: "تماشای ویدیو: معرفی Piped" },
-        { action: "لغو پسندیدن", timestamp: new Date(Date.now() - 18000000).toLocaleString(), details: "ویدیو: چرا نباید از یوتیوب استفاده کرد" },
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 21600000).toLocaleString(), details: "تماشای ویدیو: سیاست حفظ حریم خصوصی" },
-        { action: "نپسندیدن ویدیو", timestamp: new Date(Date.now() - 25200000).toLocaleString(), details: "ویدیو: تبلیغات نامناسب" },
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 28800000).toLocaleString(), details: "تماشای ویدیو: فناوری‌های آزاد" },
-        { action: "پسندیدن ویدیو", timestamp: new Date(Date.now() - 32400000).toLocaleString(), details: "ویدیو: معرفی پروژه Open Source" },
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 36000000).toLocaleString(), details: "تماشای ویدیو: چگونه امنیت خود را افزایش دهیم" },
-        { action: "لغو اشتراک", timestamp: new Date(Date.now() - 39600000).toLocaleString(), details: "کانال: Tech News" },
-        { action: "مشاهده ویدیو", timestamp: new Date(Date.now() - 43200000).toLocaleString(), details: "تماشای ویدیو: اینترنت آزاد" },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 3600000).toLocaleString(),
+          details: "تماشای ویدیو: چگونه یک وب‌سایت بسازیم",
+          url: "/watch?v=dQw4w9WgXcQ",
+          title: "چگونه یک وب‌سایت بسازیم",
+          duration: "15:42",
+          pageUrl: window.location.origin + "/watch?v=dQw4w9WgXcQ",
+          timeSpent: "3 min 24 sec"
+        },
+        {
+          action: "پسندیدن ویدیو",
+          timestamp: new Date(Date.now() - 7200000).toLocaleString(),
+          details: "ویدیو: آموزش Vue.js",
+          url: "/watch?v=1234567890A",
+          title: "آموزش Vue.js",
+          duration: "22:18",
+          pageUrl: window.location.origin + "/watch?v=1234567890A",
+          timeSpent: "1 min 5 sec"
+        },
+        {
+          action: "اشتراک در کانال",
+          timestamp: new Date(Date.now() - 10800000).toLocaleString(),
+          details: "کانال: Tech Tutorials",
+          url: "/channel/UC1234567890",
+          title: "Tech Tutorials",
+          duration: null,
+          pageUrl: window.location.origin + "/channel/UC1234567890",
+          timeSpent: "2 min 10 sec"
+        },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 14400000).toLocaleString(),
+          details: "تماشای ویدیو: معرفی Piped",
+          url: "/watch?v=abcdefg1234",
+          title: "معرفی Piped",
+          duration: "8:31",
+          pageUrl: window.location.origin + "/watch?v=abcdefg1234",
+          timeSpent: "5 min 42 sec"
+        },
+        {
+          action: "لغو پسندیدن",
+          timestamp: new Date(Date.now() - 18000000).toLocaleString(),
+          details: "ویدیو: چرا نباید از یوتیوب استفاده کرد",
+          url: "/watch?v=hijklm56789",
+          title: "چرا نباید از یوتیوب استفاده کرد",
+          duration: "12:45",
+          pageUrl: window.location.origin + "/watch?v=hijklm56789",
+          timeSpent: "45 sec"
+        },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 21600000).toLocaleString(),
+          details: "تماشای ویدیو: سیاست حفظ حریم خصوصی",
+          url: "/watch?v=nopqrs90123",
+          title: "سیاست حفظ حریم خصوصی",
+          duration: "18:22",
+          pageUrl: window.location.origin + "/watch?v=nopqrs90123",
+          timeSpent: "8 min 12 sec"
+        },
+        {
+          action: "نپسندیدن ویدیو",
+          timestamp: new Date(Date.now() - 25200000).toLocaleString(),
+          details: "ویدیو: تبلیغات نامناسب",
+          url: "/watch?v=tuvwx456789",
+          title: "تبلیغات نامناسب",
+          duration: "5:17",
+          pageUrl: window.location.origin + "/watch?v=tuvwx456789",
+          timeSpent: "2 min 3 sec"
+        },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 28800000).toLocaleString(),
+          details: "تماشای ویدیو: فناوری‌های آزاد",
+          url: "/watch?v=yz123456789",
+          title: "فناوری‌های آزاد",
+          duration: "25:11",
+          pageUrl: window.location.origin + "/watch?v=yz123456789",
+          timeSpent: "10 min 5 sec"
+        },
+        {
+          action: "پسندیدن ویدیو",
+          timestamp: new Date(Date.now() - 32400000).toLocaleString(),
+          details: "ویدیو: معرفی پروژه Open Source",
+          url: "/watch?v=ab567890123",
+          title: "معرفی پروژه Open Source",
+          duration: "14:33",
+          pageUrl: window.location.origin + "/watch?v=ab567890123",
+          timeSpent: "6 min 18 sec"
+        },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 36000000).toLocaleString(),
+          details: "تماشای ویدیو: چگونه امنیت خود را افزایش دهیم",
+          url: "/watch?v=cd901234567",
+          title: "چگونه امنیت خود را افزایش دهیم",
+          duration: "19:47",
+          pageUrl: window.location.origin + "/watch?v=cd901234567",
+          timeSpent: "7 min 11 sec"
+        },
+        {
+          action: "لغو اشتراک",
+          timestamp: new Date(Date.now() - 39600000).toLocaleString(),
+          details: "کانال: Tech News",
+          url: "/channel/UC987654321",
+          title: "Tech News",
+          duration: null,
+          pageUrl: window.location.origin + "/channel/UC987654321",
+          timeSpent: "30 sec"
+        },
+        {
+          action: "مشاهده ویدیو",
+          timestamp: new Date(Date.now() - 43200000).toLocaleString(),
+          details: "تماشای ویدیو: اینترنت آزاد",
+          url: "/watch?v=ef123456789",
+          title: "اینترنت آزاد",
+          duration: "21:05",
+          pageUrl: window.location.origin + "/watch?v=ef123456789",
+          timeSpent: "9 min 3 sec"
+        },
       ];
 
       // Initial display - show first 10 logs
