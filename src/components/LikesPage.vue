@@ -242,17 +242,33 @@ export default {
         }
     },
     methods: {
+        getLikedVideos() {
+            try {
+                const likedData = localStorage.getItem("likes");
+                return likedData ? JSON.parse(likedData) : [];
+            } catch {
+                return [];
+            }
+        },
         loadLikedVideos() {
             this.likedVideos = this.getLikedVideos();
         },
         deleteItem(videoId) {
-            this.removeLike(videoId);
+            // Remove from likes using the global method from mixin
+            if (this.$root && this.$root.removeLike) {
+                this.$root.removeLike(videoId);
+            } else {
+                // Fallback: remove directly from localStorage
+                let likes = this.getLikedVideos();
+                likes = likes.filter(video => video.videoId !== videoId);
+                localStorage.setItem("likes", JSON.stringify(likes));
+            }
             this.loadLikedVideos(); // Reload the list
             this.showToast(this.$t("info.item_removed"));
         },
         deleteAll() {
             if (confirm(this.$t("info.confirm_delete_all_likes"))) {
-                localStorage.removeItem("likedVideos");
+                localStorage.removeItem("likes");
                 this.likedVideos = [];
                 this.showToast(this.$t("info.all_likes_removed"));
             }
@@ -267,7 +283,7 @@ export default {
                 </div>
             `;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
@@ -279,7 +295,7 @@ export default {
             }
 
             let data, mimeType, filename;
-            
+
             if (format === 'json') {
                 data = JSON.stringify(this.likedVideos, null, 2);
                 mimeType = 'application/json';
@@ -287,9 +303,9 @@ export default {
             } else if (format === 'csv') {
                 // Create CSV content
                 const headers = [
-                    this.$t('info.video_id'), 
-                    this.$t('info.title'), 
-                    this.$t('info.uploader'), 
+                    this.$t('info.video_id'),
+                    this.$t('info.title'),
+                    this.$t('info.uploader'),
                     this.$t('info.thumbnail_url')
                 ];
                 const rows = this.likedVideos.map(video => [
@@ -298,12 +314,12 @@ export default {
                     `"${video.uploaderName.replace(/"/g, '""')}"`,
                     video.thumbnail
                 ]);
-                
+
                 data = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
                 mimeType = 'text/csv';
                 filename = 'liked_videos.csv';
             }
-            
+
             const blob = new Blob([data], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -311,7 +327,7 @@ export default {
             a.download = filename;
             a.click();
             URL.revokeObjectURL(url);
-            
+
             this.showToast(this.$t("info.exported_successfully"));
         },
         importData() {
@@ -321,13 +337,13 @@ export default {
             input.onchange = (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
-                
+
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
                         let importedData = [];
                         const content = event.target.result;
-                        
+
                         if (file.name.endsWith('.json')) {
                             importedData = JSON.parse(content);
                         } else if (file.name.endsWith('.csv')) {
@@ -336,10 +352,10 @@ export default {
                             if (lines.length < 2) {
                                 throw new Error("Invalid CSV file: no data rows");
                             }
-                            
+
                             // Get headers and normalize them to English equivalents
                             const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase());
-                            
+
                             // Create a mapping to identify the column positions
                             const columnMap = {};
                             headers.forEach((header, index) => {
@@ -354,16 +370,16 @@ export default {
                                     columnMap.thumbnail = index;
                                 }
                             });
-                            
+
                             // Check if required columns are present
                             if (columnMap.videoId === undefined) {
                                 throw new Error("CSV file must contain a 'Video ID' column");
                             }
-                            
+
                             importedData = lines.slice(1).filter(line => line.trim()).map(line => {
                                 // Handle CSV parsing with proper quote handling
                                 const values = this.parseCSVLine(line);
-                                
+
                                 return {
                                     videoId: columnMap.videoId !== undefined ? values[columnMap.videoId] : '',
                                     title: columnMap.title !== undefined ? values[columnMap.title] : '',
@@ -372,17 +388,17 @@ export default {
                                 };
                             }).filter(video => video.videoId); // Only include videos with a valid ID
                         }
-                        
+
                         if (Array.isArray(importedData)) {
                             // Merge with existing data, avoiding duplicates
                             const existingIds = new Set(this.likedVideos.map(video => video.videoId));
-                            const newVideos = importedData.filter(video => 
+                            const newVideos = importedData.filter(video =>
                                 video.videoId && !existingIds.has(video.videoId)
                             );
-                            
+
                             this.likedVideos = [...this.likedVideos, ...newVideos];
-                            localStorage.setItem("likedVideos", JSON.stringify(this.likedVideos));
-                            
+                            localStorage.setItem("likes", JSON.stringify(this.likedVideos));
+
                             this.loadLikedVideos();
                             this.showToast(this.$t("info.imported_successfully"));
                         } else {
@@ -402,10 +418,10 @@ export default {
             const values = [];
             let current = '';
             let inQuotes = false;
-            
+
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
-                
+
                 if (char === '"') {
                     if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
                         // Double quotes inside quoted field
@@ -422,7 +438,7 @@ export default {
                     current += char;
                 }
             }
-            
+
             values.push(current.trim());
             return values;
         }

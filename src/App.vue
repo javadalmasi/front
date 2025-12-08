@@ -175,6 +175,13 @@ export default {
                 window.i18n.global.locale.value = locale;
             }
         })();
+
+        // Migrate old storage keys to new ones to ensure data consistency
+        if (this.migrateOldStorageKeys) {
+            this.migrateOldStorageKeys();
+        } else if (window.appMixin && window.appMixin.methods && window.appMixin.methods.migrateOldStorageKeys) {
+            window.appMixin.methods.migrateOldStorageKeys.call(this);
+        }
     },
     beforeUnmount() {
         window.removeEventListener("sidebarStateChanged", this.updateSidebarState);

@@ -402,30 +402,30 @@ const mixin = {
         // Methods for managing like/dislike data
         getLikedVideos() {
             try {
-                const likedData = localStorage.getItem("likedVideos");
+                const likedData = localStorage.getItem("likes");  // Changed key to match components
                 return likedData ? JSON.parse(likedData) : [];
             } catch {
                 return [];
             }
         },
-        
+
         getDislikedVideos() {
             try {
-                const dislikedData = localStorage.getItem("dislikedVideos");
+                const dislikedData = localStorage.getItem("dislikes");  // Changed key to match components
                 return dislikedData ? JSON.parse(dislikedData) : [];
             } catch {
                 return [];
             }
         },
-        
+
         // Add video to likes, removing from dislikes if present
         likeVideo(video) {
             // Remove from dislikes if present
             this.unlikeVideo(video.videoId);
-            
+
             // Get current liked videos
             const likedVideos = this.getLikedVideos();
-            
+
             // Check if already liked
             const existingIndex = likedVideos.findIndex(v => v.videoId === video.videoId);
             if (existingIndex === -1) {
@@ -437,20 +437,20 @@ const mixin = {
                     duration: video.duration
                 };
                 likedVideos.push(videoData);
-                localStorage.setItem("likedVideos", JSON.stringify(likedVideos));
+                localStorage.setItem("likes", JSON.stringify(likedVideos));  // Changed key to match components
                 return true;
             }
             return false; // Already liked
         },
-        
+
         // Add video to dislikes, removing from likes if present
         dislikeVideo(video) {
             // Remove from likes if present
             this.removeLike(video.videoId);
-            
+
             // Get current disliked videos
             const dislikedVideos = this.getDislikedVideos();
-            
+
             // Check if already disliked
             const existingIndex = dislikedVideos.findIndex(v => v.videoId === video.videoId);
             if (existingIndex === -1) {
@@ -462,29 +462,29 @@ const mixin = {
                     duration: video.duration
                 };
                 dislikedVideos.push(videoData);
-                localStorage.setItem("dislikedVideos", JSON.stringify(dislikedVideos));
+                localStorage.setItem("dislikes", JSON.stringify(dislikedVideos));  // Changed key to match components
                 return true;
             }
             return false; // Already disliked
         },
-        
+
         // Remove video from likes
         removeLike(videoId) {
             const likedVideos = this.getLikedVideos();
             const filtered = likedVideos.filter(v => v.videoId !== videoId);
             if (filtered.length !== likedVideos.length) {
-                localStorage.setItem("likedVideos", JSON.stringify(filtered));
+                localStorage.setItem("likes", JSON.stringify(filtered));  // Changed key to match components
                 return true;
             }
             return false;
         },
-        
+
         // Remove video from dislikes
         unlikeVideo(videoId) {
             const dislikedVideos = this.getDislikedVideos();
             const filtered = dislikedVideos.filter(v => v.videoId !== videoId);
             if (filtered.length !== dislikedVideos.length) {
-                localStorage.setItem("dislikedVideos", JSON.stringify(filtered));
+                localStorage.setItem("dislikes", JSON.stringify(filtered));  // Changed key to match components
                 return true;
             }
             return false;
@@ -495,13 +495,13 @@ const mixin = {
             const likedVideos = this.getLikedVideos();
             return likedVideos.some(v => v.videoId === videoId);
         },
-        
+
         // Check if video is disliked
         isVideoDisliked(videoId) {
             const dislikedVideos = this.getDislikedVideos();
             return dislikedVideos.some(v => v.videoId === videoId);
         },
-        
+
         // Toggle like status
         toggleLike(video) {
             if (this.isVideoLiked(video.videoId)) {
@@ -511,7 +511,7 @@ const mixin = {
                 return this.likeVideo(video); // Added like
             }
         },
-        
+
         // Toggle dislike status
         toggleDislike(video) {
             if (this.isVideoDisliked(video.videoId)) {
@@ -519,6 +519,23 @@ const mixin = {
                 return false; // Removed dislike
             } else {
                 return this.dislikeVideo(video); // Added dislike
+            }
+        },
+
+        // Migration function to update old storage keys to new ones
+        migrateOldStorageKeys() {
+            // Migrate old "likedVideos" to "likes"
+            const oldLikedData = localStorage.getItem("likedVideos");
+            if (oldLikedData) {
+                localStorage.setItem("likes", oldLikedData);
+                localStorage.removeItem("likedVideos");
+            }
+
+            // Migrate old "dislikedVideos" to "dislikes"
+            const oldDislikedData = localStorage.getItem("dislikedVideos");
+            if (oldDislikedData) {
+                localStorage.setItem("dislikes", oldDislikedData);
+                localStorage.removeItem("dislikedVideos");
             }
         },
         getCustomInstances() {
