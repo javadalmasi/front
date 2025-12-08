@@ -70,12 +70,11 @@
 </template>
 
 <script>
-import ToastComponent from "./ToastComponent.vue";
 import ContentItem from "./ContentItem.vue";
 
 export default {
     name: "DislikesPage",
-    components: { ToastComponent, ContentItem },
+    components: { ContentItem },
     data() {
         return {
             dislikedVideos: []
