@@ -97,7 +97,6 @@
         class="btn btn-primary"
         v-t="'actions.enable_watch_history'"
       >
-        فعال کردن تاریخچه تماشا
       </router-link>
     </div>
 

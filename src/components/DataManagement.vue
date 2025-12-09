@@ -18,15 +18,13 @@
               <i class="i-fa6-solid:download text-blue-500 ml-2"></i>
               <span v-t="'actions.backup_all'">پشتیبان گیری همه</span>
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" v-t="'info.backup_all_description'">
-              شامل اشتراک‌ها، تاریخچه، پسندیده‌ها، نپسندیده‌ها و تنظیمات
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" v-t="'actions.backup_all_description'">
             </p>
-            <button 
-              class="btn btn-secondary w-full" 
+            <button
+              class="btn btn-secondary w-full"
               @click="backupAllData"
               v-t="'actions.create_backup'"
             >
-              ایجاد نسخه پشتیبان
             </button>
           </div>
           
@@ -149,10 +147,8 @@
                 @click="showConfirmResetPreferences = true"
                 v-t="'actions.restore_preferences'"
               >
-                بازگرداندن تنظیمات به حالت پیش
               </button>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2" v-t="'info.reset_preferences_description'">
-                تمام تنظیمات شخصی‌سازی شده را به مقادیر پیش‌فرض بازنشانی می‌کند.
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2" v-t="'actions.restore_preferences_description'">
               </p>
             </div>
           </div>
@@ -169,8 +165,7 @@
               <i class="i-fa6-solid:upload text-blue-500 ml-2"></i>
               <span v-t="'actions.restore_all'">بازیابی همه</span>
             </h3>
-            <p class="text-sm text-blue-800 dark:text-blue-200 mb-3" v-t="'info.restore_warning'">
-              این کار تمام داده‌های فعلی شما را با داده‌های پشتیبان جایگزین می‌کند.
+            <p class="text-sm text-blue-800 dark:text-blue-200 mb-3" v-t="'actions.restore_warning'">
             </p>
             <button 
               class="btn btn-info w-full" 

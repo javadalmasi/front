@@ -6,41 +6,35 @@
     </p>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('resetAllData')"
         v-t="'actions.reset_all_data'">
-        بازنشانی همه داده‌ها
       </button>
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('clearSubscriptions')"
         v-t="'actions.clear_subscriptions'">
-        پاک کردن اشتراک‌ها
       </button>
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('clearHistory')"
         v-t="'actions.clear_history'">
-        پاک کردن تاریخچه
       </button>
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('clearLikes')"
         v-t="'actions.clear_likes'">
-        پاک کردن پسند شده‌ها
       </button>
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('clearDislikes')"
         v-t="'actions.clear_dislikes'">
-        پاک کردن پسند نشده‌ها
       </button>
-      <button 
-        class="btn btn-danger" 
+      <button
+        class="btn btn-danger"
         @click="confirmAction('resetPreferences')"
         v-t="'actions.reset_preferences'">
-        بازنشانی تنظیمات
       </button>
     </div>
     

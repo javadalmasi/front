@@ -24,7 +24,7 @@
           v-if="sidebarState === 'open'"
           class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
         >
-          بخش‌های داشبورد
+          {{ $t("actions.dashboard_sections") || "بخش‌های داشبورد" }}
         </div>
         <div
           v-for="item in dashboardItems"
@@ -50,7 +50,7 @@
           v-if="sidebarState === 'open'"
           class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
         >
-          مدیریت داده‌ها
+          {{ $t("actions.data_management") || "مدیریت داده‌ها" }}
         </div>
         <div
           :class="{
@@ -63,7 +63,7 @@
             <div class="i-fa6-solid:download" />
           </div>
           <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
-            نسخه پشتیبان و ورود داده
+            {{ $t("actions.backup_import_data") || "نسخه پشتیبان و ورود داده" }}
           </span>
         </div>
       </div>
@@ -74,7 +74,7 @@
           v-if="sidebarState === 'open'"
           class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
         >
-          منطقه خطر
+          {{ $t("actions.danger_zone") || "منطقه خطر" }}
         </div>
         <div
           :class="{
@@ -87,7 +87,7 @@
             <div class="i-fa6-solid:exclamation-triangle" />
           </div>
           <span v-if="sidebarState === 'open'" class="mr-4 text-base leading-[1.65]">
-            تنظیمات خطرناک
+            {{ $t("actions.dangerous_settings") || "تنظیمات خطرناک" }}
           </span>
         </div>
       </div>
@@ -120,35 +120,35 @@ export default {
   data() {
     return {
       dashboardItems: [
-        { 
-          name: "داشبورد", 
-          route: "/user/gust", 
-          icon: "i-fa6-solid:house-user" 
+        {
+          name: this.$t("actions.user_dashboard"),
+          route: "/user/gust",
+          icon: "i-fa6-solid:house-user"
         },
-        { 
-          name: "اشتراک‌ها", 
-          route: "/user/gust/subscriptions", 
-          icon: "i-fa6-solid:bell" 
+        {
+          name: this.$t("actions.user_subscriptions"),
+          route: "/user/gust/subscriptions",
+          icon: "i-fa6-solid:bell"
         },
-        { 
-          name: "تاریخچه", 
-          route: "/user/gust/history", 
-          icon: "i-fa6-solid:clock-rotate-left" 
+        {
+          name: this.$t("actions.user_history"),
+          route: "/user/gust/history",
+          icon: "i-fa6-solid:clock-rotate-left"
         },
-        { 
-          name: "پسندیده‌ها", 
-          route: "/user/gust/likes", 
-          icon: "i-fa6-solid:thumbs-up" 
+        {
+          name: this.$t("actions.user_likes"),
+          route: "/user/gust/likes",
+          icon: "i-fa6-solid:thumbs-up"
         },
-        { 
-          name: "نپسندیده‌ها", 
-          route: "/user/gust/dislikes", 
-          icon: "i-fa6-solid:thumbs-down" 
+        {
+          name: this.$t("actions.user_dislikes"),
+          route: "/user/gust/dislikes",
+          icon: "i-fa6-solid:thumbs-down"
         },
-        { 
-          name: "تنظیمات", 
-          route: "/user/gust/preferences", 
-          icon: "i-fa6-solid:gear" 
+        {
+          name: this.$t("actions.user_preferences"),
+          route: "/user/gust/preferences",
+          icon: "i-fa6-solid:gear"
         },
       ],
     };
