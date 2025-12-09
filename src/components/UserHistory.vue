@@ -145,6 +145,7 @@ export default {
         const index = store.index("watchedAt");
 
         const request = index.openCursor(null, "prev");
+        const videos = []; // Local temporary array to collect videos
 
         request.onsuccess = e => {
           const cursor = e.target.result;
@@ -154,13 +155,14 @@ export default {
               videos.push({
                 videoId: video.videoId,
                 title: video.title,
-                channelName: video.channelName,
+                channelName: video.uploaderName,
                 thumbnail: video.thumbnail,
                 watchedAt: video.watchedAt
               });
             }
             cursor.continue();
           } else {
+            // Assign collected videos to component's data
             this.videos = videos;
           }
         };
@@ -288,7 +290,7 @@ export default {
                 this.videos = historyData.map(video => ({
                   videoId: video.videoId,
                   title: video.title,
-                  channelName: video.channelName,
+                  channelName: video.uploaderName,
                   thumbnail: video.thumbnail,
                   watchedAt: video.watchedAt
                 }));
