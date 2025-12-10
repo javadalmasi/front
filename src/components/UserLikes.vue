@@ -29,14 +29,11 @@
       >
         <router-link :to="'/watch?v=' + video.videoId">
           <div class="relative">
-            <ImagePlaceholder
+            <img
               :src="getCDNThumbnailUrl(video.thumbnail)"
               :alt="video.title"
-              width="100%"
-              height="auto"
-              image-class="w-full aspect-video object-cover rounded-lg"
-              :background-color="'#e0e0e0'"
-              :fallback-src="'/img/placeholder-video-thumbnail.webp'"
+              class="w-full aspect-video object-cover rounded-lg"
+              @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
             />
           </div>
           <div class="mt-2">
@@ -74,14 +71,12 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
-import ImagePlaceholder from "./ImagePlaceholder.vue";
 import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserLikes",
   components: {
-    ConfirmModal,
-    ImagePlaceholder
+    ConfirmModal
   },
   data() {
     return {
