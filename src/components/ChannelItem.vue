@@ -8,8 +8,9 @@
                         :src="item.thumbnail"
                         :class="{ 'border-2 border-blue-700': item.verified, 'rounded-full': true }"
                         class="aspect-square h-auto w-24"
-                        width="68"
-                        height="68"
+                        width="96"
+                        height="96"
+                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="item.verified"
@@ -58,6 +59,7 @@
     </div>
 </template>
 <script>
+
 export default {
     props: {
         item: {

@@ -47,11 +47,14 @@
       >
         <router-link :to="'/watch?v=' + video.videoId">
           <div class="relative">
-            <img
+            <ImagePlaceholder
               :src="getCDNThumbnailUrl(video.thumbnail)"
               :alt="video.title"
-              class="w-full aspect-video object-cover rounded-lg"
-              @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
+              width="100%"
+              height="auto"
+              image-class="w-full aspect-video object-cover rounded-lg"
+              :background-color="'#e0e0e0'"
+              :fallback-src="'/img/placeholder-video-thumbnail.webp'"
             />
             <div
               v-if="video.watchedAt"
@@ -112,12 +115,14 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import ImagePlaceholder from "./ImagePlaceholder.vue";
 import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserHistory",
   components: {
-    ConfirmModal
+    ConfirmModal,
+    ImagePlaceholder
   },
   data() {
     return {

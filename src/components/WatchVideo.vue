@@ -117,13 +117,11 @@
                                     <img
                                         loading="lazy"
                                         :src="video.uploaderAvatar"
-                                        :class="{
-                                            'border-2 border-blue-700': video.uploaderVerified,
-                                            'rounded-full': true,
-                                        }"
+                                        :class="{ 'border-2 border-blue-700': video.uploaderVerified, 'rounded-full': true }"
                                         class="h-48px w-48px"
                                         width="48"
                                         height="48"
+                                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                                     />
                                     <div
                                         v-if="video.uploaderVerified"

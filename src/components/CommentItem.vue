@@ -8,6 +8,7 @@
                 class="comment-avatar h-12 w-12"
                 width="48"
                 height="48"
+                @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
             />
             <div
                 v-if="comment.verified"
@@ -45,8 +46,11 @@
                 <img
                     v-if="comment.creatorReplied"
                     :src="uploaderAvatarUrl"
+                    :alt="$t('actions.creator_replied')"
                     class="h-5 w-5 rounded-full"
-                    :title="$t('actions.creator_replied')"
+                    width="20"
+                    height="20"
+                    @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                 />
             </div>
             <template v-if="comment.repliesPage && (!loadingReplies || !showingReplies) && !commentsDisabled">

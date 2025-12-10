@@ -31,8 +31,9 @@
                         :src="getOptimalThumbnailUrl(item.uploaderAvatar, { width: '68', height: '68', quality: 85 })"
                         :class="{ 'border-2 border-blue-700': item.uploaderVerified, 'rounded-full': true }"
                         class="h-32px w-32px"
-                        width="68"
-                        height="68"
+                        width="32"
+                        height="32"
+                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="item.uploaderVerified && item.uploaderAvatar"
@@ -158,10 +159,47 @@ export default {
     },
     computed: {
         title() {
-            return this.item.dearrow?.titles[0]?.title ?? this.item.title;
+            return this.item?.dearrow?.titles?.[0]?.title ?? this.item?.title ?? '';
         },
         thumbnail() {
-            return this.item.dearrow?.thumbnails[0]?.thumbnail ?? this.item.thumbnail;
+            // Safety check for item object
+            if (!this.item) return null;
+
+            // Try various possible thumbnail field names that might exist in the API response
+            // This handles different response structures for videos vs shorts
+            let thumbnail = this.item.dearrow?.thumbnails?.[0]?.thumbnail ??
+                           this.item.thumbnail ??
+                           this.item.thumbnailUrl ??
+                           this.item.previewThumbnail ??
+                           this.item.avatar ??
+                           (Array.isArray(this.item.thumbnails) && this.item.thumbnails.length > 0 ? this.item.thumbnails[0].url : null) ??
+                           (Array.isArray(this.item.thumbnail) && this.item.thumbnail.length > 0 ? this.item.thumbnail[0].url : null) ??
+                           this.item.bestThumbnail?.url ??
+                           this.item.maxres?.url ??
+                           this.item.standard?.url ??
+                           this.item.high?.url ??
+                           this.item.medium?.url ??
+                           this.item.default?.url ??
+                           this.item.videoThumbnails?.[0]?.url ??
+                           this.item.preview?.url ??
+                           this.item.image ??
+                           this.item.img ??
+                           (Array.isArray(this.item.images) && this.item.images.length > 0 ? this.item.images[0] : null) ??
+                           (Array.isArray(this.item.image) && this.item.image.length > 0 ? this.item.image[0] : null) ??
+                           null;
+
+            // If no thumbnail found but we have a video URL, try to generate a thumbnail URL
+            if (!thumbnail && this.item.url) {
+                // Extract video ID from URL (should be in format /watch?v=xxxxxxxxxxx)
+                const videoIdMatch = this.item.url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+                if (videoIdMatch && videoIdMatch[1]) {
+                    const videoId = videoIdMatch[1];
+                    // Generate YouTube thumbnail URL
+                    thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                }
+            }
+
+            return thumbnail;
         },
         lineClampStyle() {
             // Apply line clamping only if the prop is true

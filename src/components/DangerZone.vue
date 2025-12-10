@@ -1,40 +1,40 @@
 <template>
-  <div class="bg-red-100 dark:bg-red-900/20 p-6 rounded-xl shadow border border-red-300 dark:border-red-700">
-    <h2 class="text-xl font-bold mb-4 text-red-700 dark:text-red-300" v-t="'titles.danger_zone'">منطقه خطر</h2>
-    <p class="mb-4 text-red-600 dark:text-red-400" v-t="'info.danger_zone_warning'">
+  <div class="bg-red-100 dark:bg-red-900/20 p-6 rounded-xl border border-red-300 dark:border-red-700 shadow">
+    <h2 v-t="'titles.danger_zone'" class="text-xl font-bold text-red-700 dark:text-red-300 mb-4">منطقه خطر</h2>
+    <p v-t="'info.danger_zone_warning'" class="text-red-600 dark:text-red-400 mb-4">
       این اقدامات مخرب هستند و قابل بازگشت نیستند. مراقب باشید!
     </p>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       <button
         class="btn btn-danger"
-        @click="confirmAction('resetAllData')"
-        v-t="'actions.reset_all_data'">
+        v-t="'actions.reset_all_data'"
+        @click="confirmAction('resetAllData')">
       </button>
       <button
         class="btn btn-danger"
-        @click="confirmAction('clearSubscriptions')"
-        v-t="'actions.clear_subscriptions'">
+        v-t="'actions.clear_subscriptions'"
+        @click="confirmAction('clearSubscriptions')">
       </button>
       <button
         class="btn btn-danger"
-        @click="confirmAction('clearHistory')"
-        v-t="'actions.clear_history'">
+        v-t="'actions.clear_history'"
+        @click="confirmAction('clearHistory')">
       </button>
       <button
         class="btn btn-danger"
-        @click="confirmAction('clearLikes')"
-        v-t="'actions.clear_likes'">
+        v-t="'actions.clear_likes'"
+        @click="confirmAction('clearLikes')">
       </button>
       <button
         class="btn btn-danger"
-        @click="confirmAction('clearDislikes')"
-        v-t="'actions.clear_dislikes'">
+        v-t="'actions.clear_dislikes'"
+        @click="confirmAction('clearDislikes')">
       </button>
       <button
         class="btn btn-danger"
-        @click="confirmAction('resetPreferences')"
-        v-t="'actions.reset_preferences'">
+        v-t="'actions.reset_preferences'"
+        @click="confirmAction('resetPreferences')">
       </button>
     </div>
     

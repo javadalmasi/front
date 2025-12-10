@@ -22,15 +22,17 @@
     </div>
 
     <div v-if="subscriptions.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div 
-        v-for="subscription in subscriptions" 
-        :key="subscription.url || subscription.id" 
+      <div
+        v-for="subscription in subscriptions"
+        :key="subscription.url || subscription.id"
         class="bg-gray-200 dark:bg-dark-400 rounded-xl shadow p-4 flex items-center"
       >
-        <img 
-          :src="subscription.avatar" 
-          :alt="subscription.name" 
+        <img
+          :src="subscription.avatar"
+          :alt="subscription.name"
           class="w-12 h-12 rounded-full object-contain ml-3"
+          width="48"
+          height="48"
           @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
         />
         <div class="flex-1 min-w-0">
@@ -41,8 +43,8 @@
             {{ subscription.subscriberCountText }}
           </div>
         </div>
-        <button 
-          class="btn btn-danger btn-sm" 
+        <button
+          class="btn btn-danger btn-sm"
           @click="unsubscribe(subscription.id)"
           v-t="'actions.unsubscribe'"
         >
@@ -215,6 +217,7 @@ export default {
     toggleSubscriptionState(channelId, isSubscribed, channelData) {
       // This would typically handle the subscription toggle logic
       // For now, we'll just update the UI and local storage
+      console.log('Toggle subscription for channelId:', channelId, 'isSubscribed:', isSubscribed, 'channelData:', channelData);
     },
     async fetchSubscriptionStatus(channelId) {
       // This would check if the user is subscribed to a specific channel

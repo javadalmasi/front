@@ -6,7 +6,7 @@
             v-if="channel.bannerUrl"
             loading="lazy"
             :src="channel.bannerUrl"
-            class="h-30 w-full object-cover py-1.5 md:h-50"
+            class="w-full object-cover py-1.5 md:h-50"
         />
         <div class="flex flex-col items-center justify-between md:flex-row">
             <div class="flex place-items-center gap-3">
@@ -18,6 +18,7 @@
                         class="h-48px w-48px"
                         width="48"
                         height="48"
+                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="channel.verified"
@@ -102,6 +103,7 @@ import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import CollapsableText from "./CollapsableText.vue";
 import AddToGroupModal from "./AddToGroupModal.vue";
+import ImagePlaceholder from "./ImagePlaceholder.vue";
 
 export default {
     components: {

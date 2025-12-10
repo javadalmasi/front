@@ -21,8 +21,8 @@
               class="select w-full"
               @change="onChange"
             >
-              <option value="dark" v-t="'actions.dark_theme'">تیره</option>
-              <option value="light" v-t="'actions.light_theme'">روشن</option>
+              <option value="dark" v-t="'titles.dark_theme'">تیره</option>
+              <option value="light" v-t="'titles.light_theme'">روشن</option>
             </select>
           </div>
           <div class="flex-1">
@@ -88,7 +88,7 @@
         
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectSpeed" v-t="'actions.default_speed'">سرعت پیش‌فرض</label>
+            <label class="pref block font-semibold" for="selectSpeed" v-t="'titles.default_speed'">سرعت پیش‌فرض</label>
             <select 
               id="selectSpeed"
               v-model="defaultSpeed" 
@@ -265,8 +265,8 @@
               class="select w-full"
               @change="onChange"
             >
-              <option value="Horizontal" v-t="'actions.horizontal'">افقی</option>
-              <option value="Vertical" v-t="'actions.vertical'">عمودی</option>
+              <option value="Horizontal" v-t="'video.chapters_horizontal'">افقی</option>
+              <option value="Vertical" v-t="'video.chapters_vertical'">عمودی</option>
             </select>
           </div>
           <div class="flex-1">
@@ -301,7 +301,7 @@
       <p class="mb-4 text-blue-600 dark:text-blue-400" v-t="'info.data_management_description'">
         برای پشتیبان‌گیری و بازیابی تمام داده‌های کاربر، به بخش "پشتیبان‌گیری" بروید.
       </p>
-      <router-link to="/user/gust/backup" class="btn btn-info w-full md:w-auto" v-t="'actions.go_to_backup'">
+      <router-link to="/user/gust/backup" class="btn btn-info w-full md:w-auto" v-t="'info.go_to_backup'">
         رفتن به پشتیبان‌گیری
       </router-link>
     </div>

@@ -121,32 +121,32 @@ export default {
     return {
       dashboardItems: [
         {
-          name: this.$t("actions.user_dashboard"),
+          name: this.$t("titles.user_dashboard"),
           route: "/user/gust",
           icon: "i-fa6-solid:house-user"
         },
         {
-          name: this.$t("actions.user_subscriptions"),
+          name: this.$t("titles.user_subscriptions"),
           route: "/user/gust/subscriptions",
           icon: "i-fa6-solid:bell"
         },
         {
-          name: this.$t("actions.user_history"),
+          name: this.$t("titles.user_history"),
           route: "/user/gust/history",
           icon: "i-fa6-solid:clock-rotate-left"
         },
         {
-          name: this.$t("actions.user_likes"),
+          name: this.$t("titles.user_likes"),
           route: "/user/gust/likes",
           icon: "i-fa6-solid:thumbs-up"
         },
         {
-          name: this.$t("actions.user_dislikes"),
+          name: this.$t("titles.user_dislikes"),
           route: "/user/gust/dislikes",
           icon: "i-fa6-solid:thumbs-down"
         },
         {
-          name: this.$t("actions.user_preferences"),
+          name: this.$t("titles.user_preferences"),
           route: "/user/gust/preferences",
           icon: "i-fa6-solid:gear"
         },

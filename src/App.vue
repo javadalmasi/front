@@ -251,67 +251,6 @@ export default {
                 }
             }
         },
-    },
-    methods: {
-        checkIsMobile() {
-            this.isMobile = window.innerWidth < 768;
-            if (this.isMobile) {
-                this.sidebarState = this.sidebarState === "closed" ? "open" : "closed";
-            }
-        },
-        toggleSidebar() {
-            if (this.isMobile || this.isWatchPage) {
-                this.sidebarState = this.sidebarState === "closed" ? "open" : "closed";
-            } else {
-                const states = ["open", "semi-open", "closed"];
-                const currentIndex = states.indexOf(this.sidebarState);
-                this.sidebarState = states[(currentIndex + 1) % states.length];
-
-                // Update previous state when toggling on non-watch pages
-                if (!this.isWatchPage && this.sidebarState !== "closed") {
-                    this.previousSidebarState = this.sidebarState;
-                }
-            }
-        },
-        updateSidebarState(event) {
-            this.sidebarState = event.detail.state;
-        },
-        toggleTheme() {
-            const newTheme = this.theme === "dark" ? "light" : "dark";
-            localStorage.setItem("theme", newTheme);
-            this.setTheme();
-        },
-        setTheme() {
-            // Default to 'dark' if no theme is saved in localStorage
-            this.theme = localStorage.getItem("theme") || "dark";
-
-            if (this.theme === "dark") {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-            }
-            this.changeTitleBarColor();
-            this.updateFavicon();
-        },
-        changeTitleBarColor() {
-            const currentColor = { dark: "#0F0F0F", light: "#FFF" };
-            const themeColor = document.querySelector("meta[name='theme-color']");
-            if (themeColor) {
-                themeColor.setAttribute("content", currentColor[this.theme]);
-            }
-        },
-        updateFavicon() {
-            // Get the current favicon link element
-            const favicon = document.querySelector("link[rel='icon']");
-            if (favicon) {
-                // Update the favicon based on current theme
-                if (this.theme === "dark") {
-                    favicon.href = "/img/icons/dark-logo-32x32.png"; // Use dark logo for dark theme
-                } else {
-                    favicon.href = "/img/icons/light-logo-32x32.png"; // Use light logo for light theme
-                }
-            }
-        },
         setupActivityLogging() {
             // Set up a watcher for route changes to log user activity
             this.$watch('$route', (to, from) => {
@@ -347,7 +286,8 @@ export default {
                     url: to.path,
                     title: pageTitle,
                     pageUrl: window.location.origin + to.fullPath,
-                    timeSpent: null // This would require timing which is more complex
+                    timeSpent: null, // This would require timing which is more complex
+                    fromRoute: from ? from.fullPath : null // Using the 'from' parameter
                 };
 
                 // Store the activity log in localStorage

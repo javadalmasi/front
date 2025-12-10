@@ -18,7 +18,7 @@
               <i class="i-fa6-solid:download text-blue-500 ml-2"></i>
               <span v-t="'actions.backup_all'">پشتیبان گیری همه</span>
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" v-t="'actions.backup_all_description'">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-3" v-t="'info.backup_all_description'">
             </p>
             <button
               class="btn btn-secondary w-full"
@@ -148,7 +148,7 @@
                 v-t="'actions.restore_preferences'"
               >
               </button>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2" v-t="'actions.restore_preferences_description'">
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2" v-t="'info.restore_preferences_description'">
               </p>
             </div>
           </div>
@@ -165,12 +165,12 @@
               <i class="i-fa6-solid:upload text-blue-500 ml-2"></i>
               <span v-t="'actions.restore_all'">بازیابی همه</span>
             </h3>
-            <p class="text-sm text-blue-800 dark:text-blue-200 mb-3" v-t="'actions.restore_warning'">
+            <p class="text-sm text-blue-800 dark:text-blue-200 mb-3" v-t="'info.restore_warning'">
             </p>
             <button 
               class="btn btn-info w-full" 
               @click="restoreAllData"
-              v-t="'actions.restore_data'"
+              v-t="'titles.restore_data'"
             >
               بازیابی همه داده‌ها
             </button>

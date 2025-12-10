@@ -150,6 +150,8 @@
         "enable_watch_history": "Enable Watch History",
         "log_user_activity": "Log User Activity",
         "remove": "Remove",
+        "like": "Like",
+        "dislike": "Dislike",
         "likes": "Likes",
         "dislikes": "Dislikes",
         "delete_all": "Delete All",

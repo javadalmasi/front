@@ -26,7 +26,7 @@
                         v-if="sidebarState === 'open'"
                         class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                     >
-                        {{ $t("actions.user_dashboard_menu") || "منوی داشبورد کاربر" }}
+                        {{ $t("info.user_dashboard_menu") || "منوی داشبورد کاربر" }}
                     </div>
                     <div
                         v-for="item in filteredUserItems"
@@ -53,7 +53,7 @@
                         v-if="sidebarState === 'open'"
                         class="px-4 py-2 text-sm text-gray-500 leading-[1.65] dark:text-gray-400"
                     >
-                        {{ $t("actions.public") || "آیتم‌های عمومی" }}
+                        {{ $t("info.public") || "آیتم‌های عمومی" }}
                     </div>
                     <div
                         v-for="item in filteredPublicItems"
@@ -179,13 +179,13 @@ export default {
                 { name: "حساب کاربری", route: "/user/gust", icon: "i-fa6-solid:user" },
             ],
             rawUserItems: [
-                { key: "actions.user_dashboard", route: "/user/gust", icon: "i-fa6-solid:house-user" },
-                { key: "actions.user_subscriptions", route: "/user/gust/subscriptions", icon: "i-fa6-solid:bell" },
-                { key: "actions.user_history", route: "/user/gust/history", icon: "i-fa6-solid:clock-rotate-left" },
-                { key: "actions.user_likes", route: "/user/gust/likes", icon: "i-fa6-solid:thumbs-up" },
-                { key: "actions.user_dislikes", route: "/user/gust/dislikes", icon: "i-fa6-solid:thumbs-down" },
-                { key: "actions.user_preferences", route: "/user/gust/preferences", icon: "i-fa6-solid:gear" },
-                { key: "actions.user_backup", route: "/user/gust/backup", icon: "i-fa6-solid:download" },
+                { key: "titles.user_dashboard", route: "/user/gust", icon: "i-fa6-solid:house-user" },
+                { key: "titles.user_subscriptions", route: "/user/gust/subscriptions", icon: "i-fa6-solid:bell" },
+                { key: "titles.user_history", route: "/user/gust/history", icon: "i-fa6-solid:clock-rotate-left" },
+                { key: "titles.user_likes", route: "/user/gust/likes", icon: "i-fa6-solid:thumbs-up" },
+                { key: "titles.user_dislikes", route: "/user/gust/dislikes", icon: "i-fa6-solid:thumbs-down" },
+                { key: "titles.user_preferences", route: "/user/gust/preferences", icon: "i-fa6-solid:gear" },
+                { key: "titles.user_backup", route: "/user/gust/backup", icon: "i-fa6-solid:download" },
             ],
             categories: [
                 { name: "موسیقی" },

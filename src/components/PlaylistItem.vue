@@ -2,7 +2,14 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="videoUrl" class="link inline-block">
             <div class="relative">
-                <img loading="lazy" class="aspect-video w-full rounded-lg object-cover" :src="optimizedThumbnail" />
+                <ImagePlaceholder
+                    :src="optimizedThumbnail"
+                    alt="Playlist thumbnail"
+                    width="100%"
+                    height="auto"
+                    image-class="aspect-video w-full rounded-lg object-cover"
+                    :background-color="'#e0e0e0'"
+                />
                 <div
                     class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white leading-[1.6]"
                 >
@@ -38,6 +45,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
+import ImagePlaceholder from "./ImagePlaceholder.vue";
 
 const props = defineProps({
     item: {
@@ -64,8 +72,13 @@ const optimizedThumbnail = computed(() => {
             // Extract video ID from the URL and use it for the CDN transformation
             const videoIdMatch = props.item.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
             if (videoIdMatch && videoIdMatch[1]) {
-                // Use getOptimalThumbnailUrl to automatically determine size based on device characteristics
-                return getOptimalThumbnailUrl(props.item.thumbnail);
+                // For playlist items, use smaller dimensions similar to other tabs (426x240)
+                // instead of letting getOptimalThumbnailUrl choose based on screen size
+                return getOptimalThumbnailUrl(props.item.thumbnail, {
+                    width: 426,
+                    height: 240,
+                    type: 'general'
+                });
             } else {
                 // If we can't extract the video ID, use the original URL
                 return props.item.thumbnail;
