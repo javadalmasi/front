@@ -103,7 +103,6 @@ import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import CollapsableText from "./CollapsableText.vue";
 import AddToGroupModal from "./AddToGroupModal.vue";
-import ImagePlaceholder from "./ImagePlaceholder.vue";
 
 export default {
     components: {

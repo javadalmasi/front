@@ -2,15 +2,15 @@
     <footer
         class="z-30 mt-10 w-full border-t border-gray-200 bg-gray-50 py-4 text-center children:(mx-3) dark:border-dark-100 dark:bg-dark-800"
     >
-        <a aria-label="GitHub" href="https://github.com/TeamPiped/Piped" target="_blank">
+        <a aria-label="GitHub" href="https://github.com/vidioo" target="_blank">
             <i class="i-fa6-brands:github text-lg leading-[1.7]" />
             <span v-t="'actions.source_code'" class="mr-2 hover:underline" />
         </a>
-        <a href="https://docs.piped.video/" target="_blank">
+        <a href="https://docs.vidioo.ir/" target="_blank">
             <i class="i-fa6-solid:book text-lg leading-[1.7]" />
             <span v-t="'actions.documentation'" class="mr-2 hover:underline" />
         </a>
-        <a href="https://github.com/TeamPiped/Piped#donations" target="_blank">
+        <a href="https://github.com/vidioo#donations" target="_blank">
             <i class="i-fa6-brands:bitcoin text-lg leading-[1.7]" />
             <span v-t="'actions.donations'" class="mr-2 hover:underline" />
         </a>

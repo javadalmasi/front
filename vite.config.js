@@ -47,8 +47,8 @@ export default defineConfig({
                 ],
             },
             manifest: {
-                name: process.env.VITE_SITE_NAME || "Piped",
-                short_name: process.env.VITE_SITE_NAME || "Piped",
+                name: process.env.VITE_SITE_NAME || "vidioo",
+                short_name: process.env.VITE_SITE_NAME || "vidioo",
                 background_color: "#000000",
                 theme_color: "#fa4b4b",
                 icons: [

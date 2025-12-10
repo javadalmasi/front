@@ -2,13 +2,12 @@
     <div class="flex flex-col flex-justify-between">
         <router-link :to="videoUrl" class="link inline-block">
             <div class="relative">
-                <ImagePlaceholder
+                <img
+                    loading="lazy"
                     :src="optimizedThumbnail"
                     alt="Playlist thumbnail"
-                    width="100%"
-                    height="auto"
-                    image-class="aspect-video w-full rounded-lg object-cover"
-                    :background-color="'#e0e0e0'"
+                    class="aspect-video w-full rounded-lg object-cover"
+                    @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
                 />
                 <div
                     class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white leading-[1.6]"
@@ -45,7 +44,6 @@
 <script setup>
 import { computed, ref } from "vue";
 import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
-import ImagePlaceholder from "./ImagePlaceholder.vue";
 
 const props = defineProps({
     item: {

@@ -80,7 +80,7 @@
             class="col m-2 border border-gray-500 rounded-lg p-1"
         >
             <router-link :to="subscription.url" class="text-4x4 flex p-2 font-bold">
-                <img :src="subscription.avatar" class="h-[fit-content] rounded-full" width="48" height="48" @error="$event.target.src = '/img/placeholder-channel-avatar.webp'" />
+                <img loading="lazy" :src="subscription.avatar" class="h-[fit-content] rounded-full" width="48" height="48" @error="$event.target.src = '/img/placeholder-channel-avatar.webp'" />
                 <span class="mx-2 self-center" v-text="subscription.name" />
             </router-link>
             <!-- subscribe / unsubscribe btn -->
@@ -111,7 +111,7 @@
             <div v-for="subscription in subscriptions" :key="subscription.name">
                 <div class="mr-3 flex items-center justify-between">
                     <a :href="subscription.url" target="_blank" class="flex items-center overflow-hidden">
-                        <img :src="subscription.avatar" class="h-8 w-8 rounded-full" width="32" height="32" @error="$event.target.src = '/img/placeholder-channel-avatar.webp'" />
+                        <img loading="lazy" :src="subscription.avatar" class="h-8 w-8 rounded-full" width="32" height="32" @error="$event.target.src = '/img/placeholder-channel-avatar.webp'" />
                         <span class="mr-2">{{ subscription.name }}</span>
                     </a>
                     <input

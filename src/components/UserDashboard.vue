@@ -60,14 +60,13 @@
 
     <!-- Recent Activity Logs -->
     <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
         <h2 class="text-xl font-bold" v-t="'titles.last_user_logs'">آخرین فعالیت‌های کاربر</h2>
         <button
           class="btn btn-secondary"
-          @click="showAllLogs = !showAllLogs"
-          v-t="'info.click_to_expand'"
+          @click="toggleAllJsonDetails"
         >
-          {{ showAllLogs ? ($t('actions.show_less') || 'نمایش کمتر') : ($t('actions.show_more') || 'نمایش بیشتر') }}
+          {{ allJsonExpanded ? 'بستن همه' : 'نمایش همه JSON' }}
         </button>
       </div>
 
@@ -80,31 +79,50 @@
           <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3 mt-1"></i>
           <div class="flex-1">
             <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
-            <p v-if="showAllLogs" class="text-xs text-gray-500 dark:text-gray-500">{{ log.details }}</p>
 
             <!-- Expandable JSON data section -->
-            <div v-if="expandedLogIndex === index" class="mt-2 bg-gray-100 dark:bg-dark-500 p-3 rounded-lg">
+            <div v-if="expandedLogIndex === index || expandedLogIndex === 'all'" class="mt-2 bg-gray-100 dark:bg-dark-500 p-3 rounded-lg">
               <div class="flex justify-between items-center mb-2">
                 <h4 class="font-semibold text-sm">اطلاعات JSON:</h4>
-                <button
-                  @click="expandedLogIndex = null"
-                  class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
-                >
-                  <i class="i-fa6-solid:times"></i>
-                </button>
+                <div class="flex space-x-2">
+                  <button
+                    @click="copyJsonData(log)"
+                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                    title="کپی اطلاعات"
+                  >
+                    <i class="i-fa6-solid:copy"></i>
+                  </button>
+                  <button
+                    v-if="expandedLogIndex !== 'all'"
+                    @click="expandedLogIndex = null"
+                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                  >
+                    <i class="i-fa6-solid:times"></i>
+                  </button>
+                  <button
+                    v-else
+                    @click="allJsonExpanded = false; expandedLogIndex = null"
+                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                  >
+                    <i class="i-fa6-solid:times"></i>
+                  </button>
+                </div>
               </div>
-              <pre class="text-xs bg-gray-800 text-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto">{{ formatJson(log) }}</pre>
+              <pre class="text-xs bg-gray-800 text-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto" v-html="formatJsonWithLinks(log)"></pre>
             </div>
           </div>
 
-          <!-- More button that shows JSON details on click -->
+          <!-- Expand/Collapse button that shows JSON details on click -->
           <button
             class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors flex-shrink-0"
             @click="toggleLogDetails(index)"
             aria-label="نمایش جزئیات بیشتر"
             title="نمایش جزئیات بیشتر"
           >
-            <i class="i-fa6-solid:ellipsis text-xs"></i>
+            <i
+              :class="expandedLogIndex === index ? 'i-fa6-solid:minus' : 'i-fa6-solid:expand'"
+              class="text-xs"
+            ></i>
           </button>
         </div>
 
@@ -164,10 +182,14 @@ export default {
       currentPage: 0,
       showTooltip: null,
       expandedLogIndex: null,
+      allJsonExpanded: false,
     };
   },
   async mounted() {
     document.title = this.$t("titles.user_dashboard") + " - " + this.getSiteName();
+
+    // Wait for database to be ready before updating counts
+    await this.waitForDatabase();
     await this.updateCounts();
     await this.getRecentActivity();
     await this.loadActivityLogs();
@@ -175,12 +197,17 @@ export default {
   methods: {
     async updateCounts() {
       // Get subscription count
-      const subscriptions = this.getLocalSubscriptions() || [];
-      this.subscriptionCount = Array.isArray(subscriptions) ? subscriptions.length : 0;
+      try {
+        const subscriptions = this.getLocalSubscriptions() || [];
+        this.subscriptionCount = Array.isArray(subscriptions) ? subscriptions.length : 0;
+      } catch (e) {
+        console.error("Error getting subscription count:", e);
+        this.subscriptionCount = 0;
+      }
 
       // Get history count
-      if (window.db) {
-        try {
+      try {
+        if (window.db) {
           const tx = window.db.transaction("watch_history", "readonly");
           const store = tx.objectStore("watch_history");
           const countRequest = store.count();
@@ -190,23 +217,39 @@ export default {
             countRequest.onsuccess = () => {
               resolve(countRequest.result);
             };
-            countRequest.onerror = () => {
-              reject(countRequest.error);
+            countRequest.onerror = (event) => {
+              console.error("Error counting watch history:", event.target.error);
+              reject(event.target.error);
             };
           });
-        } catch (e) {
-          console.error("Error getting history count:", e);
+        } else {
+          console.warn("Database not available for history count");
           this.historyCount = 0;
         }
+      } catch (e) {
+        console.error("Error getting history count:", e);
+        this.historyCount = 0;
       }
 
       // Get likes count
-      const likes = JSON.parse(localStorage.getItem("likes") || "[]");
-      this.likesCount = Array.isArray(likes) ? likes.length : 0;
+      try {
+        const likesRaw = localStorage.getItem("likes");
+        const likes = likesRaw ? JSON.parse(likesRaw) : [];
+        this.likesCount = Array.isArray(likes) ? likes.length : 0;
+      } catch (e) {
+        console.error("Error getting likes count:", e);
+        this.likesCount = 0;
+      }
 
       // Get dislikes count
-      const dislikes = JSON.parse(localStorage.getItem("dislikes") || "[]");
-      this.dislikesCount = Array.isArray(dislikes) ? dislikes.length : 0;
+      try {
+        const dislikesRaw = localStorage.getItem("dislikes");
+        const dislikes = dislikesRaw ? JSON.parse(dislikesRaw) : [];
+        this.dislikesCount = Array.isArray(dislikes) ? dislikes.length : 0;
+      } catch (e) {
+        console.error("Error getting dislikes count:", e);
+        this.dislikesCount = 0;
+      }
     },
     async backupData(type) {
       try {
@@ -487,7 +530,7 @@ export default {
       this.showToast(this.$t('info.preferences_reset') || 'تنظیمات بازنشانی شدند');
     },
     getSiteName() {
-      return process.env.VITE_SITE_NAME || "Piped";
+      return import.meta.env.VITE_SITE_NAME || "vidioo";
     },
     goToUrl(url) {
       // Navigate to the URL
@@ -606,12 +649,107 @@ export default {
       return subscriptions ? JSON.parse(subscriptions) : [];
     },
     toggleLogDetails(index) {
-      // If clicking the same log, close it; otherwise, expand the new one
-      this.expandedLogIndex = this.expandedLogIndex === index ? null : index;
+      // If all JSON details are expanded, individual toggle should collapse all first
+      if (this.expandedLogIndex === 'all') {
+        this.expandedLogIndex = index;
+        this.allJsonExpanded = false;
+      } else {
+        // If clicking the same log, close it; otherwise, expand the new one
+        this.expandedLogIndex = this.expandedLogIndex === index ? null : index;
+        // When individual log is toggled, make sure allJsonExpanded is false
+        if (this.expandedLogIndex !== null) {
+          this.allJsonExpanded = false;
+        }
+      }
+    },
+    toggleAllJsonDetails() {
+      // Show all logs when toggling JSON details
+      this.showAllLogs = true;
+
+      // Toggle all JSON details at once
+      this.allJsonExpanded = !this.allJsonExpanded;
+      if (this.allJsonExpanded) {
+        // Expand all JSON details
+        this.expandedLogIndex = 'all'; // Special value to indicate all are expanded
+      } else {
+        // Close all JSON details
+        this.expandedLogIndex = null;
+      }
     },
     formatJson(obj) {
       // Format the JSON object for better readability per line
       return JSON.stringify(obj, null, 2);
+    },
+    formatJsonWithLinks(obj) {
+      // Create a deep clone to avoid modifying original object
+      const clonedObj = JSON.parse(JSON.stringify(obj));
+
+      // Process the object to replace url and pageUrl with HTML links
+      if (clonedObj.url && typeof clonedObj.url === 'string' && clonedObj.url.startsWith('http')) {
+        clonedObj.url = `__LINK_START__${clonedObj.url}__LINK_END__`;
+      }
+      if (clonedObj.pageUrl && typeof clonedObj.pageUrl === 'string' && clonedObj.pageUrl.startsWith('http')) {
+        clonedObj.pageUrl = `__LINK_START__${clonedObj.pageUrl}__LINK_END__`;
+      }
+
+      // Format the JSON string
+      let jsonString = JSON.stringify(clonedObj, null, 2);
+
+      // Escape HTML in the JSON string to prevent XSS
+      jsonString = jsonString
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+      // Now replace our placeholders with actual HTML links (this is safe since we already escaped other content)
+      jsonString = jsonString
+        .replace(/__LINK_START__([^""]+)__LINK_END__/g, (match, url) => {
+          return `<a href="${url}" target="_blank" class="text-blue-400 hover:underline break-all">${url}</a>`;
+        });
+
+      return jsonString;
+    },
+    async copyJsonData(obj) {
+      try {
+        const jsonStr = JSON.stringify(obj, null, 2);
+        await navigator.clipboard.writeText(jsonStr);
+        this.showToast(this.$t('info.copied') || 'کپی شد');
+      } catch (err) {
+        console.error('Failed to copy JSON data:', err);
+        this.showToast(this.$t('info.cannot_copy') || 'نمی‌توان کپی کرد');
+      }
+    },
+    async waitForDatabase() {
+      // Wait for the database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          return;
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        return new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, continuing with limited functionality");
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
     }
   }
 };

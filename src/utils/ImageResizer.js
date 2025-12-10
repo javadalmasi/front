@@ -191,26 +191,6 @@ function resizeImage(imageUrl, options = {}) {
     return url.toString();
 }
 
-/**
- * Gets the best supported format from a provided list, considering browser support
- * @param {string[]} formatList - List of formats to choose from
- * @returns {string} - The best supported format from the list
- */
-function getBestSupportedFormatFromList(formatList) {
-    for (const format of formatList) {
-        if (format === 'avif' && isFormatSupported('image/avif')) {
-            return 'avif';
-        }
-        if (format === 'webp' && isFormatSupported('image/webp')) {
-            return 'webp';
-        }
-        if (format === 'jpeg') {
-            return 'jpeg';
-        }
-    }
-    // Fallback to jpeg if none of the requested formats are supported
-    return 'jpeg';
-}
 
 /**
  * Gets general allowed dimensions (for search results, sidebar, etc.)
@@ -245,6 +225,47 @@ function getAllowedQualityValues() {
 }
 
 /**
+ * Checks if the browser supports a specific image format
+ * @param {string} format - Image format to check (e.g., 'avif', 'webp', 'jpeg')
+ * @returns {boolean} - True if the format is supported, false otherwise
+ */
+function isFormatSupported(format) {
+    if (typeof document === 'undefined') {
+        // Server-side rendering - assume support
+        return true;
+    }
+
+    // Create a test element to check format support
+    const testCanvas = document.createElement('canvas');
+    if (!testCanvas.getContext) {
+        return false;
+    }
+
+    // Map format to MIME type
+    const mimeTypes = {
+        'avif': 'image/avif',
+        'webp': 'image/webp',
+        'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif'
+    };
+
+    const mimeType = mimeTypes[format.toLowerCase()];
+    if (!mimeType) {
+        return false;
+    }
+
+    // Test the canvas.toDataURL method with the MIME type
+    try {
+        return testCanvas.toDataURL(mimeType).startsWith(`data:${mimeType}`);
+    } catch (e) {
+        // If an error occurs, the format is not supported
+        return false;
+    }
+}
+
+/**
  * Gets supported formats in priority order
  * @returns {Array<string>} - Array of supported formats in priority order
  */
@@ -258,6 +279,7 @@ export {
     isAllowedDimension,
     isAllowedQuality,
     determineFormat,
+    isFormatSupported,
     getAllowedDimensions,
     getGeneralAllowedDimensions,
     getPlayerAllowedDimensions,

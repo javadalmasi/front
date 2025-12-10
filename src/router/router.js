@@ -12,11 +12,6 @@ const routes = [
         component: () => import("../components/TrendingPage.vue"),
     },
     {
-        path: "/preferences",
-        name: "Preferences",
-        component: () => import("../components/PreferencesPage.vue"),
-    },
-    {
         path: "/results",
         name: "SearchResults",
         component: () => import("../components/SearchResults.vue"),

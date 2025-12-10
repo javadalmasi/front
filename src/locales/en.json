@@ -77,7 +77,7 @@
         "confirm_reset_preferences": "Are you sure you want to reset your preferences?",
         "reply_count": "{count} replies",
         "restore_preferences": "Restore preferences to defaults",
-        "piped_link": "Piped Link",
+        "piped_link": "vidioo Link",
         "import_from_json_csv": "Import from JSON/CSV",
         "cancel": "Cancel",
         "enable_dearrow": "Enable DeArrow",
@@ -123,7 +123,7 @@
         "no_valid_playlists": "No valid playlists inside the file!",
         "clone_playlist": "Clone Playlist",
         "playlist_bookmarked": "Bookmarked",
-        "instances_not_shown": "This build of Piped only works with our personal instance and there is no option to select other instances.",
+        "instances_not_shown": "This build of vidioo only works with our personal instance and there is no option to select other instances.",
         "bookmark_playlist": "Bookmark",
         "concurrent_prefetch_limit": "Concurrent Stream Prefetch Limit",
         "creator_replied": "Creator replied",
@@ -211,7 +211,14 @@
         "backup_all_description": "Includes subscriptions, history, likes, dislikes, and preferences",
         "dangerous_settings": "Dangerous Settings",
         "go_to_danger_zone": "Go to Delete Data",
-        "go_to_backup": "Go to Backup"
+        "go_to_backup": "Go to Backup",
+        "proxy_switcher": "Proxy Switcher",
+        "custom_proxy": "Custom",
+        "set_proxy": "Set Proxy",
+        "enter_proxy_url": "Enter proxy URL",
+        "proxy_switched_to": "Proxy switched to",
+        "main_source": "Main Source",
+        "main": "Main"
     },
     "tooltips": {
         "theme": "Select dark, light, or auto theme for the UI",
@@ -255,7 +262,8 @@
         "logout": "Log out of your account on this device",
         "invalidate_session": "Log out of your account on all devices",
         "hide_disliked_videos": "Hide videos you have disliked",
-        "show_alert_on_disliked_videos": "Show an alert when you watch a video you disliked"
+        "show_alert_on_disliked_videos": "Show an alert when you watch a video you disliked",
+        "proxy_setting": "Select the proxy server to route video traffic through"
     },
     "titles": {
         "history": "History",
@@ -376,7 +384,7 @@
         "months": "{amount} months",
         "page_not_found": "Page Not Found",
         "weeks": "{amount} weeks",
-        "register_note": "Create an account on this Piped instance. This will allow you to sync subscriptions and playlists with your account on the instance. You can use the service without an account, but all data will be stored in your browser's local storage. Please make sure not to use an email as your username, and to choose a secure password that you don't use elsewhere.",
+        "register_note": "Create an account on this vidioo instance. This will allow you to sync subscriptions and playlists with your account on the instance. You can use the service without an account, but all data will be stored in your browser's local storage. Please make sure not to use an email as your username, and to choose a secure password that you don't use elsewhere.",
         "register_no_email_note": "Using an email instead of a username is discouraged. Continue?",
         "days": "{amount} days",
         "copied": "Copied!",
@@ -468,7 +476,7 @@
         "backup_logs": "Backup logs",
         "clear_all_logs": "Clear all logs",
         "activity_count": "Activity {0}",
-        "click_to_expand": "Click to expand",
+        "click_to_expand": "Show details",
         "load_more": "Load more",
         "last_100_items": "Last 100 items",
         "privacy_policy_note": "Note that your activity is stored only in your browser, not on our server",
@@ -489,7 +497,9 @@
         "backup_instructions_1": "1. Click the backup button to create a backup",
         "backup_instructions_2": "2. Click the import button to restore data and select your backup file",
         "backup_instructions_3": "3. Data is stored locally in your browser",
-        "backup_instructions_4": "4. Data will be in JSON format"
+        "backup_instructions_4": "4. Data will be in JSON format",
+        "half_traffic": "Half Traffic",
+        "full_traffic": "Full Traffic"
     },
     "comment": {
         "pinned_by": "Pinned by {author}",
@@ -516,5 +526,14 @@
     },
     "subscriptions": {
         "subscribed_channels_count": "Subscribed: {0}"
+    },
+    "proxy": {
+        "proxy_switcher": "Proxy Switcher",
+        "custom_proxy": "Custom Proxy",
+        "enter_proxy_url": "Enter proxy URL",
+        "set_proxy": "Set Proxy",
+        "half_traffic": "Half Traffic",
+        "full_traffic": "Full Traffic",
+        "proxy_switched_to": "Proxy switched to"
     }
 }

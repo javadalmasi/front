@@ -91,7 +91,7 @@
 import "shaka-player/dist/controls.css";
 import { replaceWithCdnUrl } from "@/utils/CdnUtils.js";
 import { parseTimeParam } from "@/utils/Misc.js";
-import { getOptimalThumbnailUrl, transformThumbnailUrl } from "@/utils/ThumbnailUtils.js";
+import { transformThumbnailUrl } from "@/utils/ThumbnailUtils.js";
 import { findClosestAllowedDimension } from "@/utils/ImageResizer.js";
 import ModalComponent from "./ModalComponent.vue";
 
@@ -173,6 +173,16 @@ export default {
         },
         selectedAutoPlay() {
             this.updateAutoPlayButton();
+        },
+        async 'video.proxyUrl'() {
+            // Reload the video when proxy URL changes
+            if (this.$player) {
+                await this.destroy(false); // Destroy current player without unbinding hotkeys
+            }
+            // Use nextTick to ensure proper cleanup before reloading
+            this.$nextTick(() => {
+                this.loadVideo();
+            });
         },
     },
     mounted() {
@@ -468,7 +478,7 @@ export default {
                 mime = "application/dash+xml";
             } else if (lbry) {
                 uri = lbry.url;
-                if (this.getPreferenceBoolean("proxyLBRY", false)) {
+                if (this.getPreferenceBoolean("proxyLBRY", false) && this.video.proxyUrl) {
                     const url = new URL(uri);
                     const proxyURL = new URL(this.video.proxyUrl);
                     let proxyPath = proxyURL.pathname;
@@ -507,39 +517,54 @@ export default {
 
                     const localPlayer = new this.$shaka.Player();
                     await localPlayer.attach(videoEl);
-                    const proxyURL = new URL(component.video.proxyUrl);
-                    let proxyPath = proxyURL.pathname;
-                    if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
-                        proxyPath = proxyPath.substring(0, proxyPath.length - 1);
+
+                    // Only create proxy URL if one is provided
+                    let proxyURL, proxyPath;
+                    if (component.video.proxyUrl) {
+                        proxyURL = new URL(component.video.proxyUrl);
+                        proxyPath = proxyURL.pathname;
+                        if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
+                            proxyPath = proxyPath.substring(0, proxyPath.length - 1);
+                        }
                     }
 
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
                         const uri = request.uris[0];
                         var url = new URL(uri);
                         const headers = request.headers;
-                        if (
-                            url.host.endsWith(".googlevideo.com") ||
-                            (url.host.endsWith(".lbryplayer.xyz") &&
-                                (component.getPreferenceBoolean("proxyLBRY", false) || headers.Range))
-                        ) {
-                            url.searchParams.set("host", url.host);
-                            url.protocol = proxyURL.protocol;
-                            url.host = proxyURL.host;
-                            url.pathname = proxyPath + url.pathname;
-                            request.uris[0] = url.toString();
-                        }
-                        if (url.pathname === proxyPath + "/videoplayback") {
-                            if (headers.Range) {
-                                url.searchParams.set("range", headers.Range.split("=")[1]);
-                                request.headers = {};
+
+                        // Only apply proxy transformations if a proxy URL is specified
+                        if (component.video.proxyUrl && proxyURL && proxyPath) {
+                            if (
+                                url.host.endsWith(".googlevideo.com") ||
+                                (url.host.endsWith(".lbryplayer.xyz") &&
+                                    (component.getPreferenceBoolean("proxyLBRY", false) || headers.Range))
+                            ) {
+                                url.searchParams.set("host", url.host);
+                                url.protocol = proxyURL.protocol;
+                                url.host = proxyURL.host;
+                                url.pathname = proxyPath + url.pathname;
                                 request.uris[0] = url.toString();
+                            }
+                            if (url.pathname === proxyPath + "/videoplayback") {
+                                if (headers.Range) {
+                                    url.searchParams.set("range", headers.Range.split("=")[1]);
+                                    request.headers = {};
+                                    request.uris[0] = url.toString();
+                                }
                             }
                         }
 
                         // Apply CDN replacement if enabled
                         if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true") {
                             const cdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
-                            const processedUrl = replaceWithCdnUrl(request.uris[0], proxyURL.toString(), cdnUrl);
+                            let processedUrl;
+                            if (component.video.proxyUrl && proxyURL) {
+                                processedUrl = replaceWithCdnUrl(request.uris[0], proxyURL.toString(), cdnUrl);
+                            } else {
+                                // When no proxy is specified, apply CDN replacement without proxy reference
+                                processedUrl = replaceWithCdnUrl(request.uris[0], "", cdnUrl);
+                            }
                             request.uris[0] = processedUrl;
                         }
                     });
@@ -818,11 +843,15 @@ export default {
 
             const player = this.$ui.getControls().getPlayer();
 
-            this.$nextTick(() => {
-                this.setupSeekbarPreview();
-            });
-
             this.$player = player;
+
+            // Delay calling DOM-dependent functions until the UI is fully rendered
+            this.$nextTick(() => {
+                // Ensure the player and UI have been fully initialized before setting up DOM features
+                if (this.$player && this.$ui) {
+                    this.setupSeekbarPreview();
+                }
+            });
 
             const disableVideo = this.getPreferenceBoolean("listen", false) && !this.video.livestream;
 
@@ -1010,6 +1039,10 @@ export default {
                 this.$ui.getControls().toggleFullScreen();
 
             const seekbar = this.$refs.container.querySelector(".shaka-seek-bar");
+            if (!seekbar) {
+                console.warn("Seek bar not found in DOM when updating markers");
+                return;
+            }
             const array = ["to right"];
             for (const chapter of this.video.chapters) {
                 const start = (chapter.start / this.video.duration) * 100;
@@ -1119,17 +1152,29 @@ export default {
         },
         setupSeekbarPreview() {
             if (!this.video.previewFrames) return;
-            let seekBar = document.querySelector(".shaka-seek-bar");
-            // load the thumbnail preview when the user moves over the seekbar
-            seekBar.addEventListener("mousemove", e => {
-                this.isHoveringTimebar = true;
-                const position = (e.offsetX / e.target.offsetWidth) * this.video.duration;
-                this.showSeekbarPreview(position * 1000);
-            });
-            // hide the preview when the user stops hovering the seekbar
-            seekBar.addEventListener("mouseout", () => {
-                this.isHoveringTimebar = false;
-                this.$refs.previewContainer.style.display = "none";
+
+            // Use nextTick to ensure DOM is fully rendered before accessing elements
+            this.$nextTick(() => {
+                let seekBar = document.querySelector(".shaka-seek-bar");
+                // Check if seekBar exists before trying to add event listeners
+                if (!seekBar) {
+                    console.warn("Seek bar not found in DOM when setting up preview");
+                    return;
+                }
+
+                // Check if preview container exists before trying to access it
+                if (!this.$refs.previewContainer) {
+                    console.warn("$refs.previewContainer not found when setting up preview");
+                    return;
+                }
+
+                // Remove any existing event listeners to prevent duplicates
+                seekBar.removeEventListener("mousemove", this.handleSeekbarMouseMove);
+                seekBar.removeEventListener("mouseout", this.handleSeekbarMouseOut);
+
+                // Add event listeners with bound methods
+                seekBar.addEventListener("mousemove", this.handleSeekbarMouseMove);
+                seekBar.addEventListener("mouseout", this.handleSeekbarMouseOut);
             });
         },
         async showSeekbarPreview(position) {
@@ -1139,6 +1184,16 @@ export default {
             if (!this.isHoveringTimebar) return;
 
             const seekBar = document.querySelector(".shaka-seek-bar");
+            if (!seekBar) {
+                console.warn("Seek bar not found in DOM when showing preview");
+                return;
+            }
+
+            if (!this.$refs.previewContainer || !this.$refs.preview) {
+                console.warn("$refs not found when showing preview");
+                return;
+            }
+
             const container = this.$refs.previewContainer;
             const canvas = this.$refs.preview;
             const ctx = canvas.getContext("2d");
@@ -1171,6 +1226,17 @@ export default {
 
             container.style.left = `max(${this.seekbarPadding}%, min(${left}%, ${maxLeft}%))`;
             container.style.display = "flex";
+        },
+        handleSeekbarMouseMove(e) {
+            this.isHoveringTimebar = true;
+            const position = (e.offsetX / e.target.offsetWidth) * this.video.duration;
+            this.showSeekbarPreview(position * 1000);
+        },
+        handleSeekbarMouseOut() {
+            this.isHoveringTimebar = false;
+            if (this.$refs.previewContainer) {
+                this.$refs.previewContainer.style.display = "none";
+            }
         },
         // algorithm to find the thumbnail corresponding to the currently hovered position in the video
         getFrame(position) {
@@ -1211,18 +1277,45 @@ export default {
                 i.src = url;
             });
         },
-        destroy(hotkeys) {
-            if (this.$ui && !document.pictureInPictureElement) {
-                this.$ui.destroy();
+        async destroy(hotkeys) {
+            try {
+                // Remove event listeners first to prevent errors during destruction
+                if (this.$refs.container) {
+                    const seekBar = this.$refs.container.querySelector(".shaka-seek-bar");
+                    if (seekBar && this.handleSeekbarMouseMove && this.handleSeekbarMouseOut) {
+                        seekBar.removeEventListener("mousemove", this.handleSeekbarMouseMove);
+                        seekBar.removeEventListener("mouseout", this.handleSeekbarMouseOut);
+                    }
+                }
+
+                if (this.$ui && !document.pictureInPictureElement) {
+                    await this.$ui.destroy();
+                    this.$ui = undefined;
+                }
+
+                if (this.$player) {
+                    await this.$player.destroy();
+                    this.$player = undefined;
+                }
+
+                if (hotkeys) this.$hotkeys?.unbind();
+
+                // Safely remove child nodes only if they are actually children
+                if (this.$refs.container) {
+                    const childDivs = this.$refs.container.querySelectorAll("div");
+                    for (let i = childDivs.length - 1; i >= 0; i--) {
+                        const div = childDivs[i];
+                        if (div.parentNode === this.$refs.container) {
+                            div.remove();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn("Error during player destruction:", error);
+                // Set to undefined anyway to prevent further issues
                 this.$ui = undefined;
                 this.$player = undefined;
             }
-            if (this.$player) {
-                this.$player.destroy();
-                if (!document.pictureInPictureElement) this.$player = undefined;
-            }
-            if (hotkeys) this.$hotkeys?.unbind();
-            this.$refs.container?.querySelectorAll("div").forEach(node => node.remove());
         },
     },
 };

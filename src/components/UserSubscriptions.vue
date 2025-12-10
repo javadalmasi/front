@@ -197,7 +197,7 @@ export default {
       input.click();
     },
     getSiteName() {
-      return process.env.VITE_SITE_NAME || "Piped";
+      return process.env.VITE_SITE_NAME || "vidioo";
     },
     showToast(message) {
       // Using the same toast mechanism as in other components

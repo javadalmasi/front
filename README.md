@@ -1,4 +1,4 @@
-# Piped
+# vidioo
 
 [![AGPL v3](https://shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpr-3.0.en.html)
 [![Matrix](https://img.shields.io/matrix/piped:matrix.org)](https://matrix.to/#/#piped:matrix.org)
@@ -17,7 +17,7 @@ A list of public instances can be found at the documentation [here](https://gith
 
 YouTube has an extremely invasive privacy policy which relies on using user data in unethical ways. You give them a lot of data - ranging from ideas, music taste, content, political opinions, and much more than you think.
 
-By using Piped, you can freely watch and listen to content without the fear of prying eyes watching everything you are doing.
+By using vidioo, you can freely watch and listen to content without the fear of prying eyes watching everything you are doing.
 
 ## Features:
 
@@ -55,7 +55,7 @@ By using Piped, you can freely watch and listen to content without the fear of p
 
 ## Having trouble?
 
-If you have any general questions regarding how Piped works or trouble setting up your own instance, please consult the following public chat rooms and documentation for help. Please use these platforms exclusively for such cases and do NOT open an issue.
+If you have any general questions regarding how vidioo works or trouble setting up your own instance, please consult the following public chat rooms and documentation for help. Please use these platforms exclusively for such cases and do NOT open an issue.
 
 ### Public Chat Rooms/Communities
 
@@ -76,7 +76,7 @@ The API specification is located at https://github.com/TeamPiped/OpenAPI.
 
 ## Extensions
 
-To redirect all YouTube links to Piped, you are highly recommended to use either [Piped-Redirects](https://github.com/TeamPiped/Piped-Redirects), [Libredirect](https://github.com/libredirect/libredirect) or [Predirect](https://github.com/libreom/predirect).
+To redirect all YouTube links to vidioo, you are highly recommended to use either [Piped-Redirects](https://github.com/TeamPiped/Piped-Redirects), [Libredirect](https://github.com/libredirect/libredirect) or [Predirect](https://github.com/libreom/predirect).
 
 ## Contributing
 
@@ -166,7 +166,7 @@ Contributions in any other form are also welcomed.
 
 ![](https://www.yourkit.com/images/yklogo.png)
 
-YourKit has given an open source license for their profiler, greatly simplifying the profiling of Piped's performance.
+YourKit has given an open source license for their profiler, greatly simplifying the profiling of vidioo's performance.
 
 YourKit supports open source projects with its full-featured Java Profiler.
 YourKit, LLC is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/)

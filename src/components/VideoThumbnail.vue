@@ -85,7 +85,7 @@
     </div>
 </template>
 <script>
-import { getOptimalThumbnailUrl, transformThumbnailUrl } from "../utils/ThumbnailUtils";
+import { transformThumbnailUrl } from "../utils/ThumbnailUtils";
 import { findClosestAllowedDimension } from "../utils/ImageResizer";
 
 export default {

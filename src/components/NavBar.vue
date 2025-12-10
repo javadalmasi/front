@@ -76,7 +76,6 @@
 
 <script>
 import SearchForm from "./SearchForm.vue";
-import ImagePlaceholder from "./ImagePlaceholder.vue";
 import hotkeys from "hotkeys-js";
 export default {
     components: {

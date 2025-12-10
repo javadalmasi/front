@@ -2,7 +2,7 @@
  * Utility functions for handling thumbnail URLs
  */
 
-import { resizeImage, findClosestAllowedDimension, determineFormat } from './ImageResizer.js';
+import { findClosestAllowedDimension, determineFormat } from './ImageResizer.js';
 
 /**
  * Transforms a YouTube thumbnail URL to the new CDN format

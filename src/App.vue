@@ -117,7 +117,7 @@ export default {
         this.setupActivityLogging();
 
         if ("indexedDB" in window) {
-            const request = indexedDB.open("piped-db", 6);
+            const request = indexedDB.open("vidioo-db", 6);
             request.onupgradeneeded = ev => {
                 const db = request.result;
                 console.log("Upgrading object store.");
@@ -181,6 +181,11 @@ export default {
             this.migrateOldStorageKeys();
         } else if (window.appMixin && window.appMixin.methods && window.appMixin.methods.migrateOldStorageKeys) {
             window.appMixin.methods.migrateOldStorageKeys.call(this);
+        }
+
+        // Ensure the migration function is available in the component instance
+        if (!this.migrateOldStorageKeys && window.appMixin && window.appMixin.methods) {
+            this.migrateOldStorageKeys = window.appMixin.methods.migrateOldStorageKeys.bind(this);
         }
     },
     beforeUnmount() {
@@ -374,7 +379,7 @@ export default {
             }
         },
         getSiteName() {
-            return import.meta.env.VITE_SITE_NAME || "Piped";
+            return import.meta.env.VITE_SITE_NAME || "vidioo";
         }
     },
 };

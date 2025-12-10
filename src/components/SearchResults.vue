@@ -60,7 +60,7 @@ export default {
     },
     updated() {
         if (this.$route.query.search_query !== undefined) {
-            document.title = this.$route.query.search_query + " - Piped";
+            document.title = this.$route.query.search_query + " - " + this.getSiteName();
         }
     },
     activated() {
@@ -74,6 +74,9 @@ export default {
         window.removeEventListener("scroll", this.handleScroll);
     },
     methods: {
+        getSiteName() {
+            return import.meta.env.VITE_SITE_NAME || "vidioo";
+        },
         async fetchResults() {
             return await this.fetchJson(this.apiUrl() + "/search", {
                 q: this.$route.query.search_query,
@@ -82,7 +85,7 @@ export default {
         },
         async updateResults() {
             if (!this.$route.query.search_query) return;
-            document.title = this.$route.query.search_query + " - Piped";
+            document.title = this.$route.query.search_query + " - " + this.getSiteName();
             this.results = await this.fetchResults();
             this.updateWatched(this.results.items);
         },

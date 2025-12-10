@@ -144,6 +144,7 @@
                             :playlist-index="index"
                             @close="showShareModal = !showShareModal"
                         />
+                        <!-- Proxy Switcher Modal -->
                         <!-- Buttons on the right -->
                         <div class="flex items-center flex-wrap gap-1">
                             <!-- Download Frame Button -->
@@ -434,6 +435,7 @@ import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
 import PageNotFound from "./PageNotFound.vue";
 import CollapsableText from "./CollapsableText.vue";
+import ProxySwitcherModal from "./ProxySwitcherModal.vue";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
 import { parseTimeParam } from "@/utils/Misc.js";
 
@@ -884,8 +886,8 @@ export default {
                                         // If URL parsing fails, treat as external link for safety
                                         elem.setAttribute('rel', 'nofollow noopener noindex');
                                         elem.setAttribute('target', '_blank');
-                                        // Add referrer policy for vidioo.ir
-                                        if (url.hostname.includes('vidioo.ir')) {
+                                        // Add referrer policy for vidioo.ir if href includes vidioo.ir
+                                        if (href && href.includes('vidioo.ir')) {
                                             elem.setAttribute('referrerpolicy', 'origin');
                                         }
                                     }
@@ -941,8 +943,8 @@ export default {
                                     // If URL parsing fails, treat as external link for safety
                                     elem.setAttribute('rel', 'nofollow noopener noindex');
                                     elem.setAttribute('target', '_blank');
-                                    // Add referrer policy for vidioo.ir
-                                    if (url.hostname.includes('vidioo.ir')) {
+                                    // Add referrer policy for vidioo.ir if href includes vidioo.ir
+                                    if (href && href.includes('vidioo.ir')) {
                                         elem.setAttribute('referrerpolicy', 'origin');
                                     }
                                 }
@@ -1230,11 +1232,12 @@ export default {
                 </div>
             `;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.remove();
             }, 3000);
         },
+
     },
 };
 </script>

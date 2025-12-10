@@ -1,39 +1,39 @@
 <template>
-  <div class="bg-red-100 dark:bg-red-900/20 p-6 rounded-xl border border-red-300 dark:border-red-700 shadow">
-    <h2 v-t="'titles.danger_zone'" class="text-xl font-bold text-red-700 dark:text-red-300 mb-4">منطقه خطر</h2>
-    <p v-t="'info.danger_zone_warning'" class="text-red-600 dark:text-red-400 mb-4">
+  <div class="p-6 border border-red-300 dark:border-red-700 rounded-xl bg-red-100 dark:bg-red-900/20 shadow">
+    <h2 v-t="'titles.danger_zone'" class="mb-4 text-xl font-bold text-red-700 dark:text-red-300">منطقه خطر</h2>
+    <p v-t="'info.danger_zone_warning'" class="mb-4 text-red-600 dark:text-red-400">
       این اقدامات مخرب هستند و قابل بازگشت نیستند. مراقب باشید!
     </p>
     
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       <button
-        class="btn btn-danger"
         v-t="'actions.reset_all_data'"
+        class="btn btn-danger"
         @click="confirmAction('resetAllData')">
       </button>
       <button
-        class="btn btn-danger"
         v-t="'actions.clear_subscriptions'"
+        class="btn btn-danger"
         @click="confirmAction('clearSubscriptions')">
       </button>
       <button
-        class="btn btn-danger"
         v-t="'actions.clear_history'"
+        class="btn btn-danger"
         @click="confirmAction('clearHistory')">
       </button>
       <button
-        class="btn btn-danger"
         v-t="'actions.clear_likes'"
+        class="btn btn-danger"
         @click="confirmAction('clearLikes')">
       </button>
       <button
-        class="btn btn-danger"
         v-t="'actions.clear_dislikes'"
+        class="btn btn-danger"
         @click="confirmAction('clearDislikes')">
       </button>
       <button
-        class="btn btn-danger"
         v-t="'actions.reset_preferences'"
+        class="btn btn-danger"
         @click="confirmAction('resetPreferences')">
       </button>
     </div>

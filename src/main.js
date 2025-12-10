@@ -553,7 +553,7 @@ const mixin = {
             window.localStorage.setItem("customInstances", JSON.stringify(customInstances));
         },
         getSiteName() {
-            return import.meta.env.VITE_SITE_NAME || "Piped";
+            return import.meta.env.VITE_SITE_NAME || "vidioo";
         },
     },
     computed: {
