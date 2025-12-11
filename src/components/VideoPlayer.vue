@@ -174,16 +174,6 @@ export default {
         selectedAutoPlay() {
             this.updateAutoPlayButton();
         },
-        async 'video.proxyUrl'() {
-            // Reload the video when proxy URL changes
-            if (this.$player) {
-                await this.destroy(false); // Destroy current player without unbinding hotkeys
-            }
-            // Use nextTick to ensure proper cleanup before reloading
-            this.$nextTick(() => {
-                this.loadVideo();
-            });
-        },
     },
     mounted() {
         if (!this.$shaka) this.shakaPromise = shaka.then(shaka => shaka.default).then(shaka => (this.$shaka = shaka));
@@ -458,14 +448,9 @@ export default {
                 !this.getPreferenceBoolean("preferHls", false)
             ) {
                 if (!this.video.dash) {
-                    // Add proxyUrl to each stream format for CDN replacement
-                    const streamsWithProxy = streams.map(stream => ({
-                        ...stream,
-                        proxyUrl: this.video.proxyUrl,
-                    }));
 
                     const dash = (await import("../utils/DashUtils.js")).generate_dash_file_from_formats(
-                        streamsWithProxy,
+                        streams,
                         this.video.duration,
                     );
 
@@ -478,20 +463,6 @@ export default {
                 mime = "application/dash+xml";
             } else if (lbry) {
                 uri = lbry.url;
-                if (this.getPreferenceBoolean("proxyLBRY", false) && this.video.proxyUrl) {
-                    const url = new URL(uri);
-                    const proxyURL = new URL(this.video.proxyUrl);
-                    let proxyPath = proxyURL.pathname;
-                    if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
-                        proxyPath = proxyPath.substring(0, proxyPath.length - 1);
-                    }
-
-                    url.searchParams.set("host", url.host);
-                    url.protocol = proxyURL.protocol;
-                    url.host = proxyURL.host;
-                    url.pathname = proxyPath + url.pathname;
-                    uri = url.toString();
-                }
                 const contentType = await fetch(uri, {
                     method: "HEAD",
                 }).then(response => {
@@ -518,53 +489,22 @@ export default {
                     const localPlayer = new this.$shaka.Player();
                     await localPlayer.attach(videoEl);
 
-                    // Only create proxy URL if one is provided
-                    let proxyURL, proxyPath;
-                    if (component.video.proxyUrl) {
-                        proxyURL = new URL(component.video.proxyUrl);
-                        proxyPath = proxyURL.pathname;
-                        if (proxyPath.lastIndexOf("/") === proxyPath.length - 1) {
-                            proxyPath = proxyPath.substring(0, proxyPath.length - 1);
-                        }
-                    }
-
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
                         const uri = request.uris[0];
                         var url = new URL(uri);
                         const headers = request.headers;
 
-                        // Only apply proxy transformations if a proxy URL is specified
-                        if (component.video.proxyUrl && proxyURL && proxyPath) {
-                            if (
-                                url.host.endsWith(".googlevideo.com") ||
-                                (url.host.endsWith(".lbryplayer.xyz") &&
-                                    (component.getPreferenceBoolean("proxyLBRY", false) || headers.Range))
-                            ) {
-                                url.searchParams.set("host", url.host);
-                                url.protocol = proxyURL.protocol;
-                                url.host = proxyURL.host;
-                                url.pathname = proxyPath + url.pathname;
-                                request.uris[0] = url.toString();
-                            }
-                            if (url.pathname === proxyPath + "/videoplayback") {
-                                if (headers.Range) {
-                                    url.searchParams.set("range", headers.Range.split("=")[1]);
-                                    request.headers = {};
-                                    request.uris[0] = url.toString();
-                                }
-                            }
+                        // Handle range requests for googlevideo.com URLs
+                        if (url.host.endsWith(".googlevideo.com") && headers.Range) {
+                            url.searchParams.set("range", headers.Range.split("=")[1]);
+                            request.headers = {};
+                            request.uris[0] = url.toString();
                         }
 
                         // Apply CDN replacement if enabled
                         if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true") {
                             const cdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
-                            let processedUrl;
-                            if (component.video.proxyUrl && proxyURL) {
-                                processedUrl = replaceWithCdnUrl(request.uris[0], proxyURL.toString(), cdnUrl);
-                            } else {
-                                // When no proxy is specified, apply CDN replacement without proxy reference
-                                processedUrl = replaceWithCdnUrl(request.uris[0], "", cdnUrl);
-                            }
+                            const processedUrl = replaceWithCdnUrl(request.uris[0], "", cdnUrl);
                             request.uris[0] = processedUrl;
                         }
                     });

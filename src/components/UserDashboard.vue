@@ -140,12 +140,6 @@
       <div v-else class="text-center py-4 text-gray-600 dark:text-gray-400" v-t="'info.no_recent_activity'">
         فعالیت اخیری وجود ندارد
       </div>
-
-
-      <!-- Privacy note -->
-      <p class="mt-4 text-sm italic text-gray-600 dark:text-gray-400" v-t="'info.privacy_policy_note'">
-        توجه داشته باشید که فعالیت‌های شما فقط در مرورگر شما ذخیره می‌شود، نه در سرور ما.
-      </p>
     </div>
 
     <!-- Confirmation Modal for clearing logs -->

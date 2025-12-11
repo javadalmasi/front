@@ -286,7 +286,16 @@
         "proxy_setting": "تنظیمات پروکسی",
         "no_proxy": "بدون پروکسی",
         "hetzner_proxy": "هتزنر (آلمان)",
-        "asiatech_proxy": "آسیاتک (ایران)"
+        "asiatech_proxy": "آسیاتک (ایران)",
+        "titles": {
+            "default_speed": "انتخاب سرعت پیش فرض برای ویدیو"
+        },
+        "autoplay": "پخش خودکار ویدیو بعد از پایان ویدیو قبلی",
+        "minimize_comments": "کوچک کردن بخش نظرات به صورت پیش فرض",
+        "minimize_description": "کوچک کردن بخش توضیحات ویدیو به صورت پیش فرض",
+        "minimize_recommendations": "کوچک کردن بخش پیشنهادها به صورت پیش فرض",
+        "minimize_chapters": "کوچک کردن بخش فصل‌های ویدیو به صورت پیش فرض",
+        "log_user_activity": "ثبت فعالیت‌های کاربر در مرورگر برای نمایش در داشبورد کاربر"
     },
     "titles": {
         "history": "تاریخچه",
@@ -349,7 +358,9 @@
         "privacy_integrations": "حریم خصوصی و یکپارچه‌سازی‌ها",
         "sponsorblock": "SponsorBlock",
         "skip_options": "گزینه‌های پرش",
-        "dearrow": "DeArrow"
+        "dearrow": "DeArrow",
+        "video_content": "محتوای ویدیو",
+        "display": "نمایش"
     },
     "video": {
         "views": "{views} بازدید ها",

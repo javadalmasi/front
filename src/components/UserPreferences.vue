@@ -4,750 +4,757 @@
       <router-link to="/user/gust" class="btn btn-secondary ml-4">
         <i class="i-fa6-solid:arrow-left"></i>
       </router-link>
-      <h1 class="text-2xl font-bold" v-t="'titles.preferences'">تنظیمات</h1>
+      <h1 class="text-2xl font-bold">{{ $t('titles.preferences') }}</h1>
     </div>
 
-    <!-- Appearance Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.appearance'">ظاهر</h2>
+    <!-- Two-column grid layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Left Column -->
+      <div class="space-y-6">
+        <!-- Appearance Settings -->
+        <div v-if="!isThemeSelectorDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4">{{ $t('titles.appearance') }}</h2>
 
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectTheme" v-t="'actions.theme'">تم</label>
-            <select
-              id="selectTheme"
-              v-model="selectedTheme"
-              class="select w-full"
-              @change="onChange"
-              :disabled="isThemeSelectorDisabled"
-            >
-              <option value="auto" v-t="'actions.auto'">خودکار</option>
-              <option value="dark" v-t="'titles.dark_theme'">تیره</option>
-              <option value="light" v-t="'titles.light_theme'">روشن</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.theme_description'">
-              تم تاریک: مناسب محیط‌های کم نور / تم روشن: مناسب محیط‌های پر نور
-            </p>
-          </div>
-        </div>
+          <div class="grid grid-cols-1 gap-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectTheme">
+                  {{ $t('actions.theme') }}
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.theme') }}</span>
+                </label>
+                <select
+                  id="selectTheme"
+                  v-model="selectedTheme"
+                  class="select w-full"
+                  @change="onChange"
+                >
+                  <option value="auto">{{ $t('actions.auto') }}</option>
+                  <option value="dark">{{ $t('titles.dark_theme') }}</option>
+                  <option value="light">{{ $t('titles.light_theme') }}</option>
+                </select>
+              </div>
+            </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectHomepage" v-t="'actions.default_homepage'">صفحه اصلی پیش‌فرض</label>
-            <select
-              id="selectHomepage"
-              v-model="defaultHomepage"
-              class="select w-full"
-              @change="onChange"
-            >
-              <option value="trending" v-t="'titles.trending'">پرطرفدار</option>
-              <option value="feed" v-t="'titles.feed'">فید</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.homepage_description'">
-              تعیین کننده صفحه‌ای که پس از ورود به سایت به آن هدایت می‌شوید
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Player Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.player'">پخش کننده</h2>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectQuality" v-t="'actions.default_quality'">کیفیت پیش‌فرض</label>
-            <select
-              id="selectQuality"
-              v-model="defaultQuality"
-              class="select w-full"
-              @change="onChange"
-            >
-              <option value="0" v-t="'actions.auto'">خودکار</option>
-              <option value="144">144p</option>
-              <option value="240">240p</option>
-              <option value="360">360p</option>
-              <option value="480">480p</option>
-              <option value="720">720p</option>
-              <option value="1080">1080p</option>
-              <option value="1440">1440p</option>
-              <option value="2160">2160p</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.quality_description'">
-              کیفیت ویدیویی که به طور پیش‌فرض هنگام باز کردن ویدیوها انتخاب می‌شود
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectSpeed" v-t="'titles.default_speed'">سرعت پیش‌فرض</label>
-            <select
-              id="selectSpeed"
-              v-model="defaultSpeed"
-              class="select w-full"
-              @change="onChange"
-            >
-              <option value="0.25">0.25x</option>
-              <option value="0.5">0.5x</option>
-              <option value="0.75">0.75x</option>
-              <option value="1.0">1.0x</option>
-              <option value="1.25">1.25x</option>
-              <option value="1.5">1.5x</option>
-              <option value="1.75">1.75x</option>
-              <option value="2.0">2.0x</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.speed_description'">
-              سرعت پخش پیش‌فرض ویدیوها هنگام شروع
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkAutoplay"
-              v-model="autoplay"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkAutoplay" v-t="'actions.autoplay'">پخش خودکار</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.autoplay_description'">
-              پخش خودکار ویدیوی بعدی هنگام پایان یافتن ویدیو فعلی
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkAutoDisplayCaptions"
-              v-model="autoDisplayCaptions"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkAutoDisplayCaptions" v-t="'actions.auto_display_captions'">نمایش خودکار زیرنویس</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.auto_display_captions_description'">
-              به طور خودکار زیرنویس ویدیو را نمایش می‌دهد
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="txtAutoplayNextCountdown" v-t="'actions.autoplay_next_countdown'">زمان شمارش معکوس پخش خودکار بعدی</label>
-            <input
-              id="txtAutoplayNextCountdown"
-              v-model.number="autoPlayNextCountdown"
-              class="input w-full"
-              type="number"
-              min="0"
-              @change="onChange"
-            />
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.autoplay_next_countdown_description'">
-              تعداد ثانیه قبل از پخش خودکار ویدیو بعدی
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkAudioOnly"
-              v-model="listen"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkAudioOnly" v-t="'actions.audio_only'">فقط صدا</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.audio_only_description'">
-              پخش فقط صدای ویدیو بدون تصویر
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkPreferHls"
-              v-model="preferHls"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkPreferHls" v-t="'actions.prefer_hls'">اولویت HLS</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.prefer_hls_description'">
-              اولویت استفاده از جریان HLS به جای دیگر فرمت‌ها
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="txtBufferingGoal" v-t="'actions.buffering_goal'">هدف بافرگذاری</label>
-            <input
-              id="txtBufferingGoal"
-              v-model="bufferingGoal"
-              class="input w-full"
-              type="text"
-              @change="onChange"
-            />
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.buffering_goal_description'">
-              مقدار هدف بافرگذاری به ثانیه (معمولاً 10)
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkMinimizeComments"
-              v-model="minimizeComments"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkMinimizeComments" v-t="'actions.minimize_comments'">کوچک کردن دیدگاه‌ها</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.minimize_comments_description'">
-              دیدگاه‌ها را در حالت بسته به طور پیش‌فرض نشان می‌دهد
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkMinimizeDescription"
-              v-model="minimizeDescription"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkMinimizeDescription" v-t="'actions.minimize_description'">کوچک کردن توضیحات</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.minimize_description_description'">
-              توضیحات ویدیو را در حالت بسته به طور پیش‌فرض نشان می‌دهد
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkMinimizeRecommendations"
-              v-model="minimizeRecommendations"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkMinimizeRecommendations" v-t="'actions.minimize_recommendations'">کوچک کردن پیشنهادها</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.minimize_recommendations_description'">
-              لیست پیشنهادهای ویدیو را در حالت بسته به طور پیش‌فرض نشان می‌دهد
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkMinimizeChapters"
-              v-model="minimizeChapters"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkMinimizeChapters" v-t="'actions.minimize_chapters'">کوچک کردن فصل‌ها</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.minimize_chapters_description'">
-              لیست فصل‌های ویدیو را در حالت بسته به طور پیش‌فرض نشان می‌دهد
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Display Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.display'">نمایش</h2>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectChapterLayoutMobile" v-t="'actions.chapters_layout_mobile'">چیدمان فصل در موبایل</label>
-            <select
-              id="selectChapterLayoutMobile"
-              v-model="mobileChapterLayout"
-              class="select w-full"
-              @change="onChange"
-            >
-              <option value="Horizontal" v-t="'video.chapters_horizontal'">افقی</option>
-              <option value="Vertical" v-t="'video.chapters_vertical'">عمودی</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.chapter_layout_description'">
-              نحوه نمایش فصل‌های ویدیو در نسخه موبایل
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkShowWatchOnYouTube"
-              v-model="showWatchOnYouTube"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isWatchOnYouTubeDisabled"
-            />
-            <label class="pref font-semibold" for="chkShowWatchOnYouTube" v-t="'actions.show_watch_on_youtube'">نمایش دکمه تماشای روی یوتیوب</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.show_watch_on_youtube_description'">
-              نمایش دکمه برای تماشای ویدیو در یوتیوب اصلی
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkShowSearchSuggestions"
-              v-model="searchSuggestions"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isSearchSuggestionsDisabled"
-            />
-            <label class="pref font-semibold" for="chkShowSearchSuggestions" v-t="'actions.show_search_suggestions'">نمایش پیشنهادات جستجو</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.show_search_suggestions_description'">
-              نمایش پیشنهادات جستجو هنگام تایپ کردن
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkHideDislikedVideos"
-              v-model="hideDislikedVideos"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkHideDislikedVideos" v-t="'actions.hide_disliked_videos'">پنهان کردن ویدیوهای ناپسندیده شده</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.hide_disliked_videos_description'">
-              ویدیوهایی که ناپسندیده اند را در نمایش مخفی می‌کند
-            </p>
-          </div>
-        </div>
-
-        <div v-if="hideDislikedVideos" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkShowAlertOnDislikedVideos"
-              v-model="showAlertOnDislikedVideos"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkShowAlertOnDislikedVideos" v-t="'actions.show_alert_on_disliked_videos'">نمایش هشدار برای ویدیوهای ناپسندیده شده</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.show_alert_on_disliked_videos_description'">
-              نمایش هشدار هنگام مشاهده ویدیوهای ناپسندیده شده
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Storage Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.storage'">ذخیره‌سازی</h2>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkStoreWatchHistory"
-              v-model="watchHistory"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isWatchHistoryStorageDisabled"
-            />
-            <label class="pref font-semibold" for="chkStoreWatchHistory" v-t="'actions.store_watch_history'">ذخیره تاریخچه تماشا</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.watch_history_description'">
-              ویدیوهای تماشا شده توسط شما را در مرورگر ذخیره می‌کند
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkStoreSearchHistory"
-              v-model="searchHistory"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isSearchHistoryStorageDisabled"
-            />
-            <label class="pref font-semibold" for="chkStoreSearchHistory" v-t="'actions.store_search_history'">ذخیره تاریخچه جستجو</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.search_history_description'">
-              عبارات جستجوی شما را در مرورگر ذخیره می‌کند
-            </p>
-          </div>
-        </div>
-
-        <div v-if="watchHistory" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkHideWatched"
-              v-model="hideWatched"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkHideWatched" v-t="'actions.hide_watched'">پنهان کردن تماشا شده‌ها</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.hide_watched_description'">
-              ویدیوهایی که قبلاً تماشا کرده‌اید را در نمایش مخفی می‌کند
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkLogUserActivity"
-              v-model="logUserActivity"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkLogUserActivity" v-t="'actions.log_user_activity'">ثبت فعالیت‌های کاربر</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.log_user_activity_description'">
-              ثبت فعالیت‌های شما در مرورگر برای نمایش در داشبورد کاربر
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Privacy and Integration Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.privacy_integrations'">حریم خصوصی و یکپارچه‌سازی‌ها</h2>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectProxySetting" v-t="'actions.proxy_setting'">تنظیمات پروکسی</label>
-            <select
-              id="selectProxySetting"
-              v-model="proxySetting"
-              class="select w-full"
-              @change="onChange"
-            >
-              <option value="none" v-t="'actions.no_proxy'">بدون پروکسی</option>
-              <option value="hetzner" v-t="'actions.hetzner_proxy'">هتزنر</option>
-              <option value="asiatech" v-t="'actions.asiatech_proxy'">آسیاتک</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.proxy_setting_description'">
-              انتخاب نوع پروکسی برای دور زدن محدودیت‌ها
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="txtPrefetchLimit" v-t="'actions.concurrent_prefetch_limit'">محدودیت واکشی هم‌زمان</label>
-            <input
-              id="txtPrefetchLimit"
-              v-model="prefetchLimit"
-              class="input w-full"
-              type="text"
-              @change="onChange"
-              :disabled="isPrefetchLimitDisabled"
-            />
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.prefetch_limit_description'">
-              تعداد ویدیوهایی که به طور هم‌زمان واکشی می‌شوند
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkDisableLBRY"
-              v-model="disableLBRY"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isLBRYIntegrationDisabled"
-            />
-            <label class="pref font-semibold" for="chkDisableLBRY" v-t="'actions.disable_lbry'">غیرفعال کردن LBRY</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.disable_lbry_description'">
-              غیرفعال کردن یکپارچه‌سازی LBRY و اضافه کردن لینک‌های OpenDLC
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkEnableLBRYProxy"
-              v-model="proxyLBRY"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-              :disabled="isLBRYProxyDisabled"
-            />
-            <label class="pref font-semibold" for="chkEnableLBRYProxy" v-t="'actions.enable_lbry_proxy'">فعال کردن پروکسی LBRY</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.enable_lbry_proxy_description'">
-              استفاده از پروکسی برای دسترسی به API LBRY
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SponsorBlock Integration -->
-    <div v-if="!isSponsorBlockDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.sponsorblock'">SponsorBlock</h2>
-      <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        <span v-t="'actions.uses_api_from'" /> <a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
-      </p>
-
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkEnableSponsorblock"
-              v-model="sponsorBlock"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkEnableSponsorblock" v-t="'actions.enable_sponsorblock'">فعال کردن SponsorBlock</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.sponsorblock_description'">
-              عدم نمایش بخش‌های اختیاری ویژه تبلیغات، معرفی، و دیگر موارد
-            </p>
-          </div>
-        </div>
-
-        <div v-if="sponsorBlock">
-          <div class="mb-4">
-            <h3 class="text-lg font-semibold mb-3" v-t="'titles.skip_options'">گزینه‌های پرش</h3>
-            <div class="space-y-3">
-              <div v-for="[name, item] in skipOptions" :key="name" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div class="flex flex-col gap-2 w-full sm:w-64">
-                  <label class="pref block font-semibold" :for="'ddlSkip_' + name">{{ $t(item.label) }}</label>
-                  <select
-                    :id="'ddlSkip_' + name"
-                    v-model="item.value"
-                    class="select w-full"
-                    @change="onChange"
-                  >
-                    <option value="no" v-t="'actions.no'">خیر</option>
-                    <option value="button" v-t="'actions.skip_button_only'">فقط دکمه</option>
-                    <option value="auto" v-t="'actions.skip_automatically'">خودکار</option>
-                  </select>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm text-gray-600 dark:text-gray-400">{{ getTooltipByActionLabel(item.label) }}</p>
-                </div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectHomepage">
+                  <span v-t="'actions.default_homepage'">صفحه اصلی پیش‌فرض</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.default_homepage') }}</span>
+                </label>
+                <select
+                  id="selectHomepage"
+                  v-model="defaultHomepage"
+                  class="select w-full"
+                  @change="onChange"
+                >
+                  <option value="trending" v-t="'titles.trending'">پرطرفدار</option>
+                  <option value="feed" v-t="'titles.feed'">فید</option>
+                </select>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div class="flex items-center">
-              <input
-                id="chkShowMarkers"
-                v-model="showMarkers"
-                type="checkbox"
-                class="checkbox ml-2"
-                @change="onChange"
-              />
-              <label class="pref font-semibold" for="chkShowMarkers" v-t="'actions.show_markers'">نمایش نشانه‌ها</label>
+        <!-- Player Settings -->
+        <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.player'">پخش کننده</h2>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectQuality">
+                  <span v-t="'actions.default_quality'">کیفیت پیش‌فرض</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.default_quality') }}</span>
+                </label>
+                <select
+                  id="selectQuality"
+                  v-model="defaultQuality"
+                  class="select w-full"
+                  @change="onChange"
+                >
+                  <option value="0" v-t="'actions.auto'">خودکار</option>
+                  <option value="144">144p</option>
+                  <option value="240">240p</option>
+                  <option value="360">360p</option>
+                  <option value="480">480p</option>
+                  <option value="720">720p</option>
+                  <option value="1080">1080p</option>
+                  <option value="1440">1440p</option>
+                  <option value="2160">2160p</option>
+                </select>
+              </div>
             </div>
-            <div class="flex-1">
-              <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.show_markers_description'">
-                نمایش نشانه‌های زمان برای قسمت‌های تبلیغاتی در نوار پیشرفت
-              </p>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectSpeed">
+                  <span v-t="'titles.default_speed'">سرعت پیش‌فرض</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('titles.default_speed') }}</span>
+                </label>
+                <select
+                  id="selectSpeed"
+                  v-model="defaultSpeed"
+                  class="select w-full"
+                  @change="onChange"
+                >
+                  <option value="0.25">0.25x</option>
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1.0">1.0x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="1.75">1.75x</option>
+                  <option value="2.0">2.0x</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkAutoplay"
+                    v-model="autoplay"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkAutoplay">
+                  <span v-t="'actions.autoplay'">پخش خودکار</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.autoplay') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkAutoDisplayCaptions"
+                    v-model="autoDisplayCaptions"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkAutoDisplayCaptions">
+                  <span v-t="'actions.auto_display_captions'">نمایش خودکار زیرنویس</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.auto_display_captions') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="txtAutoplayNextCountdown">
+                  <span v-t="'actions.autoplay_next_countdown'">زمان شمارش معکوس پخش خودکار بعدی</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.autoplay_next_countdown') }}</span>
+                </label>
+                <input
+                  id="txtAutoplayNextCountdown"
+                  v-model.number="autoPlayNextCountdown"
+                  class="input w-full"
+                  type="number"
+                  min="0"
+                  @change="onChange"
+                />
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkAudioOnly"
+                    v-model="listen"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkAudioOnly">
+                  <span v-t="'actions.audio_only'">فقط صدا</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.audio_only') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkPreferHls"
+                    v-model="preferHls"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkPreferHls">
+                  <span v-t="'actions.prefer_hls'">اولویت HLS</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.prefer_hls') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="txtBufferingGoal">
+                  <span v-t="'actions.buffering_goal'">هدف بافرگذاری</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.buffering_goal') }}</span>
+                </label>
+                <input
+                  id="txtBufferingGoal"
+                  v-model="bufferingGoal"
+                  class="input w-full"
+                  type="text"
+                  @change="onChange"
+                />
+              </div>
+            </div>
+
+            <!-- Enabled Codecs Setting -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectCodecs">
+                  <span v-t="'actions.enabled_codecs'">کدک‌های فعال</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.enabled_codecs') }}</span>
+                </label>
+                <select
+                  id="selectCodecs"
+                  v-model="enabledCodecs"
+                  class="select w-full h-32"
+                  multiple
+                  @change="onChange"
+                >
+                  <option value="vp9">VP9</option>
+                  <option value="avc">AVC (H.264)</option>
+                  <option value="av1">AV1</option>
+                </select>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div class="flex flex-col gap-2 w-full sm:w-64">
-              <label class="pref block font-semibold" for="txtMinSegmentLength" v-t="'actions.min_segment_length'">حداقل طول قطعه</label>
-              <input
-                id="txtMinSegmentLength"
-                v-model="minSegmentLength"
-                class="input w-full"
-                type="text"
-                @change="onChange"
-              />
+        <!-- Video Content Settings -->
+        <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.video_content'">محتوای ویدیو</h2>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div v-if="!isCommentsDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkMinimizeComments"
+                    v-model="minimizeComments"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkMinimizeComments">
+                  <span v-t="'actions.minimize_comments'">کوچک کردن دیدگاه‌ها</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.minimize_comments') }}</span>
+                </label>
+              </div>
             </div>
-            <div class="flex-1">
-              <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.min_segment_length_description'">
-                حداقل طول قطعه تبلیغ برای نادیده گرفتن آن (ثانیه)
-              </p>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkMinimizeDescription"
+                    v-model="minimizeDescription"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkMinimizeDescription">
+                  <span v-t="'actions.minimize_description'">کوچک کردن توضیحات</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.minimize_description') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="!isRecommendationsToggleDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkMinimizeRecommendations"
+                    v-model="minimizeRecommendations"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkMinimizeRecommendations">
+                  <span v-t="'actions.minimize_recommendations'">کوچک کردن پیشنهادها</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.minimize_recommendations') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="!isChaptersDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkMinimizeChapters"
+                    v-model="minimizeChapters"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkMinimizeChapters">
+                  <span v-t="'actions.minimize_chapters'">کوچک کردن فصل‌ها</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.minimize_chapters') }}</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- DeArrow Integration -->
-    <div v-if="!isDeArrowIntegrationDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.dearrow'">DeArrow</h2>
-      <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        <span v-t="'actions.uses_api_from'" /> <a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
-      </p>
+      <!-- Right Column -->
+      <div class="space-y-6">
+        <!-- Display Settings -->
+        <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.display'">نمایش</h2>
 
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex items-center">
-            <input
-              id="chkEnableDeArrow"
-              v-model="dearrow"
-              type="checkbox"
-              class="checkbox ml-2"
-              @change="onChange"
-            />
-            <label class="pref font-semibold" for="chkEnableDeArrow" v-t="'actions.enable_dearrow'">فعال کردن DeArrow</label>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.dearrow_description'">
-              استفاده از عنوان‌ها و تصاویر کاور برتر که توسط جامعه تهیه شده‌اند
-            </p>
+          <div class="grid grid-cols-1 gap-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectChapterLayoutMobile">
+                  <span v-t="'actions.chapters_layout_mobile'">چیدمان فصل در موبایل</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.chapters_layout_mobile') }}</span>
+                </label>
+                <select
+                  id="selectChapterLayoutMobile"
+                  v-model="mobileChapterLayout"
+                  class="select w-full"
+                  @change="onChange"
+                  :disabled="isChaptersDisabled"
+                >
+                  <option value="Horizontal" v-t="'video.chapters_horizontal'">افقی</option>
+                  <option value="Vertical" v-t="'video.chapters_vertical'">عمودی</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-if="!isWatchOnYouTubeDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkShowWatchOnYouTube"
+                    v-model="showWatchOnYouTube"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkShowWatchOnYouTube">
+                  <span v-t="'actions.show_watch_on_youtube'">نمایش دکمه تماشای روی یوتیوب</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.show_watch_on_youtube') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="!isSearchSuggestionsDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkShowSearchSuggestions"
+                    v-model="searchSuggestions"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkShowSearchSuggestions">
+                  <span v-t="'actions.show_search_suggestions'">نمایش پیشنهادات جستجو</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.show_search_suggestions') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="!isLikesDislikesDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkHideDislikedVideos"
+                    v-model="hideDislikedVideos"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkHideDislikedVideos">
+                  <span v-t="'actions.hide_disliked_videos'">پنهان کردن ویدیوهای ناپسندیده شده</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.hide_disliked_videos') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="hideDislikedVideos" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkShowAlertOnDislikedVideos"
+                    v-model="showAlertOnDislikedVideos"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkShowAlertOnDislikedVideos">
+                  <span v-t="'actions.show_alert_on_disliked_videos'">نمایش هشدار برای ویدیوهای ناپسندیده شده</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.show_alert_on_disliked_videos') }}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- Storage Settings -->
+        <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.storage'">ذخیره‌سازی</h2>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div v-if="!isWatchHistoryStorageDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkStoreWatchHistory"
+                    v-model="watchHistory"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkStoreWatchHistory">
+                  <span v-t="'actions.store_watch_history'">ذخیره تاریخچه تماشا</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.store_watch_history') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="!isSearchHistoryStorageDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkStoreSearchHistory"
+                    v-model="searchHistory"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkStoreSearchHistory">
+                  <span v-t="'actions.store_search_history'">ذخیره تاریخچه جستجو</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.store_search_history') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div v-if="watchHistory && !isWatchHistoryStorageDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkHideWatched"
+                    v-model="hideWatched"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkHideWatched">
+                  <span v-t="'actions.hide_watched'">پنهان کردن تماشا شده‌ها</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.hide_watched') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkLogUserActivity"
+                    v-model="logUserActivity"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkLogUserActivity">
+                  <span v-t="'actions.log_user_activity'">ثبت فعالیت‌های کاربر</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.log_user_activity') }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- SponsorBlock Integration -->
+        <div v-if="!isSponsorBlockDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.sponsorblock'">SponsorBlock</h2>
+          <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <span v-t="'actions.uses_api_from'" /> <a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
+          </p>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkEnableSponsorblock"
+                    v-model="sponsorBlock"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkEnableSponsorblock">
+                  <span v-t="'actions.enable_sponsorblock'">فعال کردن SponsorBlock</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.enable_sponsorblock') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold mb-3" v-t="'titles.skip_options'">گزینه‌های پرش</h3>
+              <div class="space-y-3">
+                <div v-for="[name, item] in skipOptions" :key="name" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div class="flex flex-col gap-2 w-full sm:w-64">
+                    <label class="pref block font-semibold tooltip-container" :for="'ddlSkip_' + name">
+                      <span>{{ $t(item.label) }}</span>
+                      <span class="tooltip-text">{{ getTooltipByActionLabel(item.label) }}</span>
+                    </label>
+                    <select
+                      :id="'ddlSkip_' + name"
+                      v-model="item.value"
+                      class="select w-full"
+                      @change="onChange"
+                    >
+                      <option value="no" v-t="'actions.no'">خیر</option>
+                      <option value="button" v-t="'actions.skip_button_only'">فقط دکمه</option>
+                      <option value="auto" v-t="'actions.skip_automatically'">خودکار</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkShowMarkers"
+                    v-model="showMarkers"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkShowMarkers">
+                  <span v-t="'actions.show_markers'">نمایش نشانه‌ها</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.show_markers') }}</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="txtMinSegmentLength">
+                  <span v-t="'actions.min_segment_length'">حداقل طول قطعه</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.min_segment_length') }}</span>
+                </label>
+                <input
+                  id="txtMinSegmentLength"
+                  v-model="minSegmentLength"
+                  class="input w-full"
+                  type="text"
+                  @change="onChange"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DeArrow Integration -->
+        <div v-if="!isDeArrowIntegrationDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+          <h2 class="text-xl font-bold mb-4" v-t="'titles.dearrow'">DeArrow</h2>
+          <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <span v-t="'actions.uses_api_from'" /> <a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
+          </p>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkEnableDeArrow"
+                    v-model="dearrow"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkEnableDeArrow">
+                  <span v-t="'actions.enable_dearrow'">فعال کردن DeArrow</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.enable_dearrow') }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Advanced Settings -->
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <h2 class="text-xl font-bold mb-4" v-t="'titles.advanced'">پیشرفته</h2>
+    <!-- Additional sections below the two-column layout -->
+    <div class="mt-6 space-y-6">
+      <!-- Danger Zone & Data Management - Full Width Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Danger Zone Reference -->
+        <div class="bg-red-100 dark:bg-red-900/20 p-6 rounded-xl shadow border border-red-300 dark:border-red-700">
+          <h2 class="text-xl font-bold mb-4 text-red-700 dark:text-red-300 flex items-center">
+            <i class="i-fa6-solid:triangle-exclamation ml-2"></i>
+            <span v-t="'titles.danger_zone'">منطقه خطر</span>
+          </h2>
+          <p class="mb-4 text-red-600 dark:text-red-400" v-t="'info.danger_zone_warning'">
+            برخی تنظیمات خطرناک در بخش "منطقه خطر" قابل دسترسی است. مراقب باشید!
+          </p>
+          <router-link to="/user/gust/danger" class="btn btn-danger w-full md:w-auto">
+            {{ $t('actions.go_to_danger_zone') }}
+          </router-link>
+        </div>
 
-      <div class="grid grid-cols-1 gap-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div class="flex flex-col gap-2 w-full sm:w-64">
-            <label class="pref block font-semibold" for="selectCodecs" v-t="'actions.enabled_codecs'">کدک‌های فعال</label>
-            <select
-              id="selectCodecs"
-              v-model="enabledCodecs"
-              class="select w-full"
-              multiple
-              @change="onChange"
-            >
-              <option value="vp9">VP9</option>
-              <option value="avc">AVC (H.264)</option>
-              <option value="av1">AV1</option>
-            </select>
-          </div>
-          <div class="flex-1">
-            <p class="text-sm text-gray-600 dark:text-gray-400" v-t="'info.enabled_codecs_description'">
-              چندین گزینه را با نگه داشتن کلید Ctrl (یا Cmd در مک) و کلیک انتخاب کنید. کدک‌های فعال برای پخش ویدیو استفاده می‌شوند.
-            </p>
-          </div>
+        <!-- Data Management Reference -->
+        <div class="bg-blue-100 dark:bg-blue-900/20 p-6 rounded-xl shadow border border-blue-300 dark:border-blue-700">
+          <h2 class="text-xl font-bold mb-4 text-blue-700 dark:text-blue-300 flex items-center">
+            <i class="i-fa6-solid:database ml-2"></i>
+            <span v-t="'titles.data_management'">مدیریت داده‌ها</span>
+          </h2>
+          <p class="mb-4 text-blue-600 dark:text-blue-400" v-t="'info.data_management_description'">
+            برای پشتیبان‌گیری و بازیابی تمام داده‌های کاربر، به بخش "پشتیبان‌گیری" بروید.
+          </p>
+          <router-link to="/user/gust/backup" class="btn btn-info w-full md:w-auto" v-t="'info.go_to_backup'">
+            رفتن به پشتیبان‌گیری
+          </router-link>
         </div>
       </div>
-    </div>
 
-    <!-- Danger Zone Reference -->
-    <div class="bg-red-100 dark:bg-red-900/20 p-6 rounded-xl shadow mb-6 border border-red-300 dark:border-red-700">
-      <h2 class="text-xl font-bold mb-4 text-red-700 dark:text-red-300 flex items-center">
-        <i class="i-fa6-solid:triangle-exclamation ml-2"></i>
-        <span v-t="'titles.danger_zone'">منطقه خطر</span>
-      </h2>
-      <p class="mb-4 text-red-600 dark:text-red-400" v-t="'info.danger_zone_warning'">
-        برخی تنظیمات خطرناک در بخش "منطقه خطر" قابل دسترسی است. مراقب باشید!
-      </p>
-      <router-link to="/user/gust/danger" class="btn btn-danger w-full md:w-auto" v-t="'actions.go_to_danger_zone'">
-        رفتن به منطقه خطر
-      </router-link>
+      <!-- Confirmation Modal -->
+      <ConfirmModal
+        v-if="showConfirmResetDialog"
+        :message="$t('actions.confirm_reset_preferences')"
+        @confirm="resetPreferences"
+        @close="showConfirmResetDialog = false"
+      />
     </div>
-
-    <!-- Data Management Reference -->
-    <div class="bg-blue-100 dark:bg-blue-900/20 p-6 rounded-xl shadow mb-6 border border-blue-300 dark:border-blue-700">
-      <h2 class="text-xl font-bold mb-4 text-blue-700 dark:text-blue-300 flex items-center">
-        <i class="i-fa6-solid:database ml-2"></i>
-        <span v-t="'titles.data_management'">مدیریت داده‌ها</span>
-      </h2>
-      <p class="mb-4 text-blue-600 dark:text-blue-400" v-t="'info.data_management_description'">
-        برای پشتیبان‌گیری و بازیابی تمام داده‌های کاربر، به بخش "پشتیبان‌گیری" بروید.
-      </p>
-      <router-link to="/user/gust/backup" class="btn btn-info w-full md:w-auto" v-t="'info.go_to_backup'">
-        رفتن به پشتیبان‌گیری
-      </router-link>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <ConfirmModal
-      v-if="showConfirmResetDialog"
-      :message="$t('actions.confirm_reset_preferences')"
-      @confirm="resetPreferences"
-      @close="showConfirmResetDialog = false"
-    />
   </div>
 </template>
+
+<style scoped>
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  width: max-content;
+  max-width: 300px;
+  font-size: 0.875rem;
+  white-space: normal;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #2196F3;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Two column grid for larger screens */
+@media (min-width: 1024px) {
+  .preferences-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+</style>
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
@@ -796,13 +803,11 @@ export default {
       hideWatched: false,
       enabledCodecs: ["vp9", "avc"], // Default to vp9 and avc initially
       disableLBRY: false,
-      proxyLBRY: false,
       prefetchLimit: 2,
       password: null,
       showConfirmResetDialog: false,
       hideDislikedVideos: true, // Default to true as requested
       showAlertOnDislikedVideos: true, // Default to true for showing alerts
-      proxySetting: "none", // Default to no proxy
       // New preferences from the new structure
       logUserActivity: true, // Default to true as requested
       autoplay: true,
@@ -811,6 +816,14 @@ export default {
   },
   computed: {
     // instances are removed as we're using a fixed custom instance
+    testLocalStorage() {
+      try {
+        if (window.localStorage !== undefined) localStorage;
+        return true;
+      } catch {
+        return false;
+      }
+    },
     isThemeSelectorDisabled() {
       return import.meta.env.VITE_DISABLE_THEME_SELECTOR === "true";
     },
@@ -829,9 +842,6 @@ export default {
     isLBRYIntegrationDisabled() {
       return import.meta.env.VITE_DISABLE_LBRY_INTEGRATION === "true";
     },
-    isLBRYProxyDisabled() {
-      return import.meta.env.VITE_DISABLE_LBRY_PROXY === "true";
-    },
     isPrefetchLimitDisabled() {
       return import.meta.env.VITE_DISABLE_PREFETCH_LIMIT === "true";
     },
@@ -841,6 +851,42 @@ export default {
     isSponsorBlockDisabled() {
       return import.meta.env.VITE_DISABLE_SPONSORBLOCK === "true";
     },
+    isCommentsDisabled() {
+      return import.meta.env.VITE_DISABLE_COMMENTS === "true";
+    },
+    isLikesDislikesDisabled() {
+      return import.meta.env.VITE_DISABLE_LIKES_DISLIKES === "true";
+    },
+    isLivestreamsDisabled() {
+      return import.meta.env.VITE_DISABLE_LIVESTREAMS === "true";
+    },
+    isDownloadThumbnailDisabled() {
+      return import.meta.env.VITE_DISABLE_DOWNLOAD_THUMBNAIL === "true";
+    },
+    isRecommendationsToggleDisabled() {
+      return import.meta.env.VITE_DISABLE_RECOMMENDATIONS_TOGGLE === "true";
+    },
+    isChaptersDisabled() {
+      return import.meta.env.VITE_DISABLE_CHAPTERS === "true";
+    },
+    isVideoItemIconsDisabled() {
+      return import.meta.env.VITE_DISABLE_VIDEO_ITEM_ICONS === "true";
+    },
+    isLicenseInfoDisabled() {
+      return import.meta.env.VITE_DISABLE_LICENSE_INFO === "true";
+    },
+    isSearchFiltersDisabled() {
+      return import.meta.env.VITE_DISABLE_SEARCH_FILTERS === "true";
+    },
+    isRssFeedDisabled() {
+      return import.meta.env.VITE_DISABLE_RSS_FEED === "true";
+    },
+    isImportExportDisabled() {
+      return import.meta.env.VITE_DISABLE_IMPORT_EXPORT === "true";
+    },
+    isAddToGroupDisabled() {
+      return import.meta.env.VITE_DISABLE_ADD_TO_GROUP === "true";
+    },
   },
   async mounted() {
     document.title = this.$t("titles.preferences") + " - " + this.getSiteName();
@@ -848,7 +894,7 @@ export default {
     if (Object.keys(this.$route.query).length > 0) this.$router.replace({ query: {} });
 
     // Load preferences from localStorage using the old preference system
-    if (typeof(Storage) !== "undefined") {
+    if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
       this.sponsorBlock = this.getPreferenceBoolean("sponsorblock", true);
       var skipOptions, skipList;
       if ((skipOptions = this.getPreferenceJSON("skipOptions")) !== undefined) {
@@ -875,9 +921,9 @@ export default {
       this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
       this.autoPlayNextCountdown = this.getPreferenceNumber("autoPlayNextCountdown", 5);
       this.listen = this.getPreferenceBoolean("listen", false);
-      this.defaultQuality = Number(localStorage.getItem("quality"));
+      this.defaultQuality = this.getPreferenceNumber("quality", 0);
       this.bufferingGoal = Math.max(
-        Number(localStorage.getItem("bufferGoal")),
+        this.getPreferenceNumber("bufferGoal", import.meta.env.VITE_BUFFERING_GOAL || 10),
         import.meta.env.VITE_BUFFERING_GOAL || 10,
       );
       this.defaultHomepage = this.getPreferenceString("homepage", "trending");
@@ -901,11 +947,9 @@ export default {
         this.checkAndEnableAV1IfSupported();
       }
       this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
-      this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
       this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
       this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
       this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
-      this.proxySetting = this.getPreferenceString("proxySetting", "none");
       // Load Persian country map
       try {
         this.CountryMap = await import(`../utils/CountryMaps/fa.json`).then(val => val.default);
@@ -921,11 +965,16 @@ export default {
   },
   methods: {
     async onChange() {
-      if (typeof(Storage) !== "undefined") {
+      if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
         var shouldReload = false;
+        var themeChanged = false;
+
+        // Check if theme has changed
+        if (this.getPreferenceString("theme", "dark") !== this.selectedTheme) {
+          themeChanged = true;
+        }
 
         if (
-          this.getPreferenceString("theme", "dark") !== this.selectedTheme ||
           this.getPreferenceBoolean("watchHistory", true) != this.watchHistory ||
           this.getPreferenceString("enabledCodecs", "vp9,avc") !== this.enabledCodecs.join(",")
         )
@@ -963,21 +1012,29 @@ export default {
         if (!this.searchHistory) localStorage.removeItem("search_history");
         localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
         localStorage.setItem("disableLBRY", this.disableLBRY);
-        localStorage.setItem("proxyLBRY", this.proxyLBRY);
         localStorage.setItem("prefetchLimit", this.prefetchLimit);
         localStorage.setItem("hideWatched", this.hideWatched);
         localStorage.setItem("mobileChapterLayout", this.mobileChapterLayout);
-        localStorage.setItem("proxySetting", this.proxySetting);
 
         // Save additional preferences from new structure
         localStorage.setItem("logUserActivity", this.logUserActivity);
         localStorage.setItem("autoplay", this.autoplay);
         localStorage.setItem("defaultSpeed", this.defaultSpeed);
 
+        // Apply theme immediately if it changed
+        if (themeChanged) {
+          this.applyTheme(this.selectedTheme);
+        }
+
         if (shouldReload) window.location.reload();
       }
     },
     resetPreferences() {
+      if (!this.testLocalStorage) {
+        alert(this.$t("info.local_storage"));
+        return;
+      }
+
       this.showConfirmResetDialog = false;
       // clear the local storage
       localStorage.clear();
@@ -985,10 +1042,20 @@ export default {
       window.location = import.meta.env.BASE_URL;
     },
     backupPreferences() {
+      if (!this.testLocalStorage) {
+        alert(this.$t("info.local_storage"));
+        return;
+      }
+
       const data = JSON.stringify(localStorage);
       this.download(data, "preferences.json", "application/json");
     },
     restorePreferences() {
+      if (!this.testLocalStorage) {
+        alert(this.$t("info.local_storage"));
+        return;
+      }
+
       var file = this.$refs.fileSelector.files[0];
       file.text().then(text => {
         const data = JSON.parse(text);
@@ -1014,13 +1081,16 @@ export default {
       // Check if MediaCapabilities API is available
       if (navigator.mediaCapabilities && navigator.mediaCapabilities.encodingInfo) {
         try {
+          // For encoding capabilities, use 'record' or 'transmission' type - 'file' is not valid
           const result = await navigator.mediaCapabilities.encodingInfo({
-            type: 'coded-frame',
-            codec: 'av01.0.05M.08',
-            width: 1920,
-            height: 1080,
-            bitrate: 5000000,
-            framerate: 30
+            type: 'record', // Use 'record' for encodingInfo
+            video: {
+              contentType: 'video/webm; codecs="av01.0.05M.08"',
+              width: 1920,
+              height: 1080,
+              bitrate: 5000000,
+              framerate: 30
+            }
           });
           return result.supported;
         } catch (e) {
@@ -1028,14 +1098,11 @@ export default {
         }
       }
 
-      // Fallback: check if MediaSource is available and assume AV1 support on modern browsers
-      if (window.MediaSource) {
-        const video = document.createElement('video');
-        return video.canPlayType('video/webm; codecs="av01.0.05M.08"') !== '';
-      }
-
-      // Default to false if APIs are not available
-      return false;
+      // Alternative approach: try to detect AV1 support using canPlayType
+      const video = document.createElement('video');
+      const canPlayAV1WebM = video.canPlayType('video/webm; codecs="av01.0.05M.08"') !== '';
+      const canPlayAV1Mp4 = video.canPlayType('video/mp4; codecs="av01.0.05M.08"') !== '';
+      return canPlayAV1WebM || canPlayAV1Mp4;
     },
     async checkAndEnableAV1IfSupported() {
       const supportsAV1 = await this.browserSupportsAV1();
@@ -1046,33 +1113,65 @@ export default {
         localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
       }
     },
-    // Methods for the new preference structure
-    setPreference(key, value) {
-      localStorage.setItem(`pref_${key}`, value);
-    },
-    getPreferenceString(key, defaultValue = "") {
-      const value = localStorage.getItem(`pref_${key}`);
-      return value !== null ? value : defaultValue;
-    },
-    getPreferenceBoolean(key, defaultValue) {
-      const value = localStorage.getItem(`pref_${key}`);
-      if (value === null) return defaultValue;
-      return value === "true";
-    },
-    getPreferenceNumber(key, defaultValue) {
-      const value = localStorage.getItem(`pref_${key}`);
-      if (value === null) return defaultValue;
-      return Number(value);
-    },
-    getPreferenceJSON(key) {
-      const value = localStorage.getItem(key);
-      if (value === null) return undefined;
+    // Methods for the new preference structure - consistent with main.js
+    setPreference(key, value, disableAlert = false) {
+      if (!this.testLocalStorage) return;
+
       try {
-        return JSON.parse(value);
-      } catch (e) {
-        console.error(`Error parsing JSON for key ${key}:`, e);
-        return undefined;
+        localStorage.setItem(key, value);
+      } catch {
+        if (!disableAlert) alert(this.$t("info.local_storage"));
       }
+    },
+    getPreferenceString(key, defaultVal) {
+      var value;
+      if (
+        (value = new URLSearchParams(window.location.search).get(key)) !== null ||
+        (this.testLocalStorage && (value = localStorage.getItem(key)) !== null)
+      ) {
+        return value;
+      } else return defaultVal;
+    },
+    getPreferenceBoolean(key, defaultVal) {
+      var value;
+      if (
+        (value = new URLSearchParams(window.location.search).get(key)) !== null ||
+        (this.testLocalStorage && (value = localStorage.getItem(key)) !== null)
+      ) {
+        switch (String(value).toLowerCase()) {
+          case "true":
+          case "1":
+          case "on":
+          case "yes":
+            return true;
+          default:
+            return false;
+        }
+      } else return defaultVal;
+    },
+    getPreferenceNumber(key, defaultVal) {
+      var value;
+      if (
+        (value = new URLSearchParams(window.location.search).get(key)) !== null ||
+        (this.testLocalStorage && (value = localStorage.getItem(key)) !== null)
+      ) {
+        const num = Number(value);
+        return isNaN(num) ? defaultVal : num;
+      } else return defaultVal;
+    },
+    getPreferenceJSON(key, defaultVal) {
+      var value;
+      if (
+        (value = new URLSearchParams(window.location.search).get(key)) !== null ||
+        (this.testLocalStorage && (value = localStorage.getItem(key)) !== null)
+      ) {
+        try {
+          return JSON.parse(value);
+        } catch (e) {
+          console.error(`Error parsing JSON for key ${key}:`, e);
+          return defaultVal;
+        }
+      } else return defaultVal;
     },
     download(data, filename, type) {
       const file = new Blob([data], { type });

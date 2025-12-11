@@ -435,7 +435,6 @@ import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import ToastComponent from "./ToastComponent.vue";
 import PageNotFound from "./PageNotFound.vue";
 import CollapsableText from "./CollapsableText.vue";
-import ProxySwitcherModal from "./ProxySwitcherModal.vue";
 import { purifyHTML, rewriteDescription } from "@/utils/HtmlUtils";
 import { parseTimeParam } from "@/utils/Misc.js";
 

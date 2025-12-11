@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto px-2">
-        <h1 v-t="'titles.trending'" class="my-4 text-center font-bold" />
+        <h1 class="my-4 text-center font-bold">{{ $t('titles.trending') }}</h1>
 
         <hr />
 

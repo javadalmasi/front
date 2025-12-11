@@ -6,10 +6,10 @@ export function generate_dash_file_from_formats(VideoFormats, VideoLength) {
     // Apply CDN replacement to video format URLs if enabled
     const processedFormats = VideoFormats.map(format => {
         const processedFormat = { ...format };
-        if (format.url && format.proxyUrl) {
+        if (format.url) {
             processedFormat.url = replaceWithCdnUrl(
                 format.url,
-                format.proxyUrl,
+                "",
                 import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/",
             );
         }
