@@ -706,7 +706,7 @@ h6 {
 }
 
 .select:focus {
-    @apply outline-style: solid;
+    outline-style: solid;
     outline-width: 2px;
 }
 
@@ -735,7 +735,7 @@ h6 {
 }
 
 .dark .select:focus {
-    @apply outline-style: solid;
+    outline-style: solid;
     outline-width: 2px;
 }
 

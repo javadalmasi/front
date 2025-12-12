@@ -13,7 +13,14 @@ export default defineConfig({
         vue(),
         Unocss(),
         VueI18nPlugin({
-            include: path.resolve(__dirname, "./src/locales/**"),
+            include: [
+                path.resolve(__dirname, "./src/locales/en.json"),
+                path.resolve(__dirname, "./src/locales/fa.json")
+            ],
+            strictMessage: false,
+            runtimeOnly: false,
+            compositionOnly: false,
+            fullInstall: false,
         }),
         legacy({
             targets: ["defaults", "not IE 11"],
@@ -80,6 +87,6 @@ export default defineConfig({
     },
     build: {
         sourcemap: true,
-        cssMinify: "lightningcss",
+        cssMinify: "esbuild",
     },
 });

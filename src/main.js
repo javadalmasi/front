@@ -568,20 +568,40 @@ const mixin = {
         async defaultLanguage() {
             const languages = window.navigator.languages;
             for (let i = 0; i < languages.length; i++) {
+                // Only allow Persian and English languages
                 if (languages[i].startsWith("fa")) {
                     try {
                         await import(`./locales/${languages[i]}.json`);
-                        return languages[i];
+                        return "fa"; // Always return "fa" for any Persian variant
+                    } catch {
+                        continue;
+                    }
+                } else if (languages[i].startsWith("en")) {
+                    try {
+                        await import(`./locales/${languages[i]}.json`);
+                        return "en"; // Always return "en" for any English variant
                     } catch {
                         continue;
                     }
                 }
             }
             if (import.meta.env.VITE_DEFAULT_LANGUAGE) {
-                try {
-                    await import(`./locales/${import.meta.env.VITE_DEFAULT_LANGUAGE}.json`);
-                    return import.meta.env.VITE_DEFAULT_LANGUAGE;
-                } catch {
+                const defaultLang = import.meta.env.VITE_DEFAULT_LANGUAGE;
+                // Only allow fa or en as default
+                if (defaultLang.startsWith("fa") || defaultLang.startsWith("en")) {
+                    try {
+                        await import(`./locales/${defaultLang}.json`);
+                        return defaultLang.startsWith("fa") ? "fa" : "en";
+                    } catch {
+                        try {
+                            await import(`./locales/fa.json`);
+                            return "fa";
+                        } catch {
+                            return "en";
+                        }
+                    }
+                } else {
+                    // If default language is not fa or en, default to fa
                     try {
                         await import(`./locales/fa.json`);
                         return "fa";
