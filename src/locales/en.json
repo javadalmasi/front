@@ -498,6 +498,7 @@
         "backup_instructions_2": "2. Click the import button to restore data and select your backup file",
         "backup_instructions_3": "3. Data is stored locally in your browser",
         "backup_instructions_4": "4. Data will be in JSON format",
+        "restore_preferences_description": "Restore your preferences from a backup file",
         "half_traffic": "Half Traffic",
         "full_traffic": "Full Traffic"
     },

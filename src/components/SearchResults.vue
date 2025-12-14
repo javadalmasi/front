@@ -14,7 +14,7 @@
         </div>
 
         <LoadingIndicatorPage
-            :show-content="results != null && results.items?.length"
+            :show-content="!!results && !!results.items?.length"
             class="video-grid grid grid-cols-1 gap-4 lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-2"
         >
             <template v-for="result in results.items" :key="result.url">

@@ -25,7 +25,7 @@
         <p class="mt-4 text-xl">{{ video.message || $t("info.video_not_found") }}</p>
         <a v-t="'actions.back_to_home'" :href="homeUrl" class="btn mt-4"></a>
     </div>
-    <LoadingIndicatorPage v-else :show-content="video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
+    <LoadingIndicatorPage v-else :show-content="!!video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
         <Transition>
             <ToastComponent v-if="shouldShowToast" @dismissed="dismiss">
                 <i18n-t keypath="info.next_video_countdown">{{ counter }}</i18n-t>
