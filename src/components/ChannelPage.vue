@@ -18,7 +18,6 @@
                         class="h-48px w-48px"
                         width="48"
                         height="48"
-                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="channel.verified"

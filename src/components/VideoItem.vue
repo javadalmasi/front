@@ -33,7 +33,6 @@
                         class="h-32px w-32px"
                         width="32"
                         height="32"
-                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="item.uploaderVerified && item.uploaderAvatar"

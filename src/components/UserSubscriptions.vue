@@ -33,7 +33,6 @@
           class="w-12 h-12 rounded-full object-contain ml-3"
           width="48"
           height="48"
-          @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
         />
         <div class="flex-1 min-w-0">
           <router-link :to="'/channel/' + subscription.id" class="font-bold line-clamp-1 hover:underline">
@@ -109,7 +108,7 @@ export default {
             return {
               id: id,
               name: id, // Placeholder name
-              avatar: '/img/placeholder-channel-avatar.webp', // Default avatar
+              avatar: '', // No default avatar
               subscriberCountText: 'N/A'
             };
           }));

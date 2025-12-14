@@ -10,7 +10,6 @@
                         class="aspect-square h-auto w-24"
                         width="96"
                         height="96"
-                        @error="$event.target.src = '/img/placeholder-channel-avatar.webp'"
                     />
                     <div
                         v-if="item.verified"
