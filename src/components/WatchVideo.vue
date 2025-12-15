@@ -90,15 +90,9 @@
                         <div v-if="likesDislikesEnabled" class="flex gap-2">
                             <template v-if="video.likes >= 0">
                                 <div class="flex items-center">
-                                    <div class="i-fa6-solid:thumbs-up" />
-                                    <strong class="mr-1" v-text="addCommas(video.likes)" />
-                                </div>
-                                <div class="flex items-center">
-                                    <div class="i-fa6-solid:thumbs-down" />
-                                    <strong
-                                        class="mr-1"
-                                        v-text="video.dislikes >= 0 ? addCommas(video.dislikes) : '?'"
-                                    />
+                                    <strong class="mr-1" v-text="addCommas(video.dislikes >= 0 ? video.dislikes : '?')" />
+                                    <div class="text-gray-500 mx-1">|</div>
+                                    <strong class="ml-1" v-text="addCommas(video.likes)" />
                                 </div>
                             </template>
                             <template v-if="video.likes < 0">
@@ -152,9 +146,11 @@
                                 class="btn btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 <md:hidden"
                                 @click="downloadCurrentFrame"
                                 :title="$t('actions.download_frame')"
+                                :data-title="$t('actions.download_frame')"
                                 aria-label="Download frame"
                             >
                                 <i class="i-fa6-solid:download" />
+                                <span class="btn-text mr-1" v-t="'actions.download_frame'" />
                             </button>
 
                             <!-- Subscribe/Unsubscribe Button -->
@@ -162,31 +158,41 @@
                                 :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'}`"
                                 @click="subscribeHandler"
                                 :title="$t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe'))"
+                                :data-title="$t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe'))"
                                 aria-label="Subscribe/Unsubscribe"
                             >
                                 <i v-if="!subscribed" class="i-fa6-solid:bell" />
                                 <i v-if="subscribed" class="i-fa6-solid:bell-slash" />
+                                <span class="btn-text mr-1" v-t="'actions.' + (subscribed ? 'unsubscribe' : 'subscribe')" />
                             </button>
                             
-                            <!-- Like/Dislike Buttons -->
-                            <button
+                            <!-- Combined Like/Dislike Button (YouTube-style) -->
+                            <div
                                 v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${(isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary')}`"
-                                @click="handleLike"
-                                :title="$t('actions.like')"
-                                aria-label="Like"
+                                class="like-dislike-container flex items-center rounded-full overflow-hidden border border-gray-300 dark:border-gray-600"
                             >
-                                <i class="i-fa6-solid:thumbs-up" />
-                            </button>
-                            <button
-                                v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
-                                @click="handleDislike"
-                                :title="$t('actions.dislike')"
-                                aria-label="Dislike"
-                            >
-                                <i class="i-fa6-solid:thumbs-down" />
-                            </button>
+                                <button
+                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary'}`"
+                                    @click="handleLike"
+                                    :title="$t('actions.like')"
+                                    :data-title="$t('actions.like')"
+                                    aria-label="Like"
+                                >
+                                    <i class="i-fa6-solid:thumbs-up" />
+                                    <span class="btn-text mr-1" v-t="'actions.like'" />
+                                </button>
+                                <div class="w-px h-8 bg-gray-300 dark:bg-gray-600 self-center"></div>
+                                <button
+                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
+                                    @click="handleDislike"
+                                    :title="$t('actions.dislike')"
+                                    :data-title="$t('actions.dislike')"
+                                    aria-label="Dislike"
+                                >
+                                    <i class="i-fa6-solid:thumbs-down" />
+                                    <span class="btn-text mr-1" v-t="'actions.dislike'" />
+                                </button>
+                            </div>
                             
                             <div class="flex items-center flex-wrap gap-1">
                                 <!-- RSS Feed button -->
@@ -196,21 +202,28 @@
                                     target="_blank"
                                     class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
                                     :title="$t('actions.rss_feed')"
+                                    :data-title="$t('actions.rss_feed')"
                                     aria-label="RSS feed"
                                 >
                                     <i class="i-fa6-solid:rss" />
+                                    <span class="btn-text mr-1" v-t="'actions.rss_feed'" />
                                 </a>
                                 <!-- Share Dialog -->
                                 <button
                                     class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
                                     @click="showShareModal = !showShareModal"
                                     :title="$t('actions.share')"
+                                    :data-title="$t('actions.share')"
                                     aria-label="Share"
                                 >
                                     <i class="i-fa6-solid:share" />
+                                    <span class="btn-text mr-1" v-t="'actions.share'" />
                                 </button>
                                 <!-- YouTube -->
-                                <WatchOnButton :link="youtubeVideoHref" />
+                                <WatchOnButton
+                                    :link="youtubeVideoHref"
+                                    platform="YouTube"
+                                />
                                 <!-- Odysee -->
                                 <WatchOnButton
                                     v-if="video.lbryId"
@@ -222,11 +235,13 @@
                                     :to="toggleListenUrl"
                                     :aria-label="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                     :title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
+                                    :data-title="(isListening ? 'Watch ' : 'Listen to ') + video.title"
                                     class="btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 btn btn-secondary"
                                 >
                                     <i
                                         :class="isListening ? 'i-fa6-solid:tv' : 'i-fa6-solid:headphones'"
                                     />
+                                    <span class="btn-text mr-1">{{ isListening ? 'Watch' : 'Listen' }}</span>
                                 </router-link>
 
                             </div>
@@ -1287,17 +1302,23 @@ export default {
     width: 2.5rem !important; /* 40px */
     height: 2.5rem !important; /* 40px */
     min-height: 2.5rem !important; /* Fixed height */
-    border-radius: 50% !important; /* Circular shape */
+    border-radius: 9999px !important; /* Fully rounded pill shape */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
-    transition: all 0.2s ease !important; /* Smooth transitions for hover/click */
+    margin: 0 !important; /* No margin for buttons in combined container */
+    border: none !important; /* Remove default button border */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
     transform: scale(1) !important; /* Initial scale */
+    position: relative !important;
+    overflow: hidden !important;
 }
 
 .btn-icon:hover {
-    transform: scale(1.05) !important; /* Slight scale on hover */
+    transform: scale(1.25) !important; /* Larger scale on hover - now affects spacing */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
+    z-index: 10 !important; /* Ensure hover buttons appear on top */
 }
 
 .btn-icon:active {
@@ -1305,50 +1326,263 @@ export default {
     transition: all 0.1s ease !important; /* Quick transition for click */
 }
 
-/* Active state colors for various button types */
+/* Desktop hover animation: create "split in the middle" effect with text */
+@media (hover: hover) and (min-width: 1024px) {
+    .btn-icon {
+        position: relative;
+        overflow: hidden; /* Ensure content doesn't overflow initially */
+    }
+
+    .btn-icon .btn-text {
+        display: none; /* Hidden by default */
+        margin-right: 8px; /* For RTL layout */
+        white-space: nowrap;
+        font-size: 12px;
+        opacity: 0;
+        transform: translateX(-10px); /* For RTL - moving to the left */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-icon:hover .btn-text {
+        display: inline-block; /* Show text on hover */
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .btn-icon:hover {
+        width: auto !important; /* Allow width to expand for text */
+        min-width: 4.5rem !important; /* Expand to accommodate text */
+        border-radius: 9999px !important; /* Keep fully rounded shape */
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        transform: scale(1.25) !important; /* Larger scale on desktop hover */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
+        overflow: visible !important; /* Allow content to be visible */
+    }
+
+    .btn-icon:hover .btn-text {
+        display: inline-block; /* Show text on hover */
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Adjust positioning for different button areas */
+    .btn-icon-group:not(.flex-col) .btn-icon:hover {
+        width: auto !important;
+        min-width: 4.5rem !important;
+        border-radius: 9999px !important;
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+}
+
+/* Consistent and harmonious color scheme for all buttons */
 .btn-icon.btn-success {
-    background-color: #28a745 !important; /* Green for like when active */
+    background-color: #e8f5e9 !important; /* Light green for like */
+    color: #2e7d32 !important; /* Dark green text */
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-icon.btn-success:hover {
+    background-color: #4caf50 !important; /* Vibrant green on hover */
     color: white !important;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+}
+
+.btn-icon.btn-success.active {
+    background-color: #4caf50 !important; /* Vibrant green when active */
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
 }
 
 .btn-icon.btn-error {
-    background-color: #dc3545 !important; /* Red for dislike when active */
-    color: white !important;
+    background-color: #ffebee !important; /* Light red for dislike */
+    color: #c62828 !important; /* Dark red text */
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+.btn-icon.btn-error:hover {
+    background-color: #f44336 !important; /* Vibrant red on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+}
+
+.btn-icon.btn-error.active {
+    background-color: #f44336 !important; /* Vibrant red when active */
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
+}
+
+/* Consistent and harmonious color scheme for all buttons */
+.btn-icon.btn-success {
+    background-color: #e8f5e9 !important; /* Light green for like */
+    color: #2e7d32 !important; /* Dark green text */
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-icon.btn-success:hover {
+    background-color: #4caf50 !important; /* Vibrant green on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+}
+
+.btn-icon.btn-success.active {
+    background-color: #4caf50 !important; /* Vibrant green when active */
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
+}
+
+.btn-icon.btn-error {
+    background-color: #ffebee !important; /* Light red for dislike */
+    color: #c62828 !important; /* Dark red text */
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-icon.btn-error:hover {
+    background-color: #f44336 !important; /* Vibrant red on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+}
+
+.btn-icon.btn-error.active {
+    background-color: #f44336 !important; /* Vibrant red when active */
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
+}
+
+/* For like/dislike buttons that need transparent background */
 .btn-icon.btn-danger {
-    background-color: #ff0000 !important; /* Red for subscribe */
-    color: white !important;
+    background-color: #fff3e0 !important; /* Light orange for subscribe */
+    color: #ef6c00 !important; /* Dark orange text */
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.btn-icon.btn-secondary {
-    background-color: #6c757d !important; /* Gray for general buttons */
+.btn-icon.btn-danger:hover {
+    background-color: #ff9800 !important; /* Vibrant orange on hover */
     color: white !important;
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4) !important;
+}
+
+.btn-icon.btn-danger.subscribed {
+    background-color: #ff9800 !important; /* Vibrant orange when subscribed */
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3) !important;
 }
 
 .btn-icon.btn-unsubscribe {
-    background-color: #6c757d !important; /* Gray for unsubscribe */
-    color: white !important;
+    background-color: #f5f5f5 !important; /* Light gray for unsubscribe */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Inactive/normal state colors */
-.btn-icon.btn-secondary:not(.btn-success):not(.btn-error):not(.btn-danger):not(.btn-unsubscribe) {
-    background-color: rgba(108, 117, 125, 0.5) !important; /* Semi-transparent gray */
+.btn-icon.btn-unsubscribe:hover {
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
-.btn-icon.btn-success:not(.active) {
-    background-color: rgba(40, 167, 69, 0.3) !important; /* Semi-transparent green */
-    color: white !important;
+/* General secondary buttons with consistent color palette */
+.btn-icon.btn-secondary {
+    background-color: #f5f5f5 !important; /* Light gray for general buttons */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.btn-icon.btn-error:not(.active) {
-    background-color: rgba(220, 53, 69, 0.3) !important; /* Semi-transparent red */
+.btn-icon.btn-secondary:hover {
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
-.btn-icon.btn-danger:not(.subscribed) {
-    background-color: rgba(255, 0, 0, 0.3) !important; /* Semi-transparent red */
+/* Specialized buttons with function-specific colors */
+.btn-icon.btn-secondary[href*="rss"] {
+    background-color: #e3f2fd !important; /* Light blue for RSS */
+    color: #1976d2 !important; /* Dark blue text */
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[href*="rss"]:hover {
+    background-color: #2196f3 !important; /* Blue on hover */
     color: white !important;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Share"] {
+    background-color: #f3e5f5 !important; /* Light purple for share */
+    color: #7b1fa2 !important; /* Dark purple text */
+    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Share"]:hover {
+    background-color: #9c27b0 !important; /* Purple on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(156, 39, 176, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Download"] {
+    background-color: #e0f2f1 !important; /* Light teal for download */
+    color: #00695c !important; /* Dark teal text */
+    box-shadow: 0 2px 4px rgba(0, 188, 212, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Download"]:hover {
+    background-color: #00bcd4 !important; /* Teal on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(0, 188, 212, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[href*="youtube"] {
+    background-color: #ffebee !important; /* Light red for YouTube */
+    color: #d32f2f !important; /* Dark red text */
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[href*="youtube"]:hover {
+    background-color: #f44336 !important; /* YouTube red on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[href*="odysee"] {
+    background-color: #e8eaf6 !important; /* Light indigo for Odysee */
+    color: #303f9f !important; /* Dark indigo text */
+    box-shadow: 0 2px 4px rgba(63, 81, 181, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[href*="odysee"]:hover {
+    background-color: #3f51b5 !important; /* Indigo on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(63, 81, 181, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Watch"] {
+    background-color: #fff8e1 !important; /* Light amber for video mode */
+    color: #f57f17 !important; /* Dark amber text */
+    box-shadow: 0 2px 4px rgba(255, 235, 59, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Watch"]:hover {
+    background-color: #ffeb3b !important; /* Amber on hover */
+    color: #333 !important;
+    box-shadow: 0 4px 8px rgba(255, 235, 59, 0.4) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Listen"] {
+    background-color: #e8f5e9 !important; /* Light green for audio mode */
+    color: #2e7d32 !important; /* Dark green text */
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+}
+
+.btn-icon.btn-secondary[aria-label*="Listen"]:hover {
+    background-color: #4caf50 !important; /* Green on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
 }
 </style>
