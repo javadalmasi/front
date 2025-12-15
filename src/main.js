@@ -13,6 +13,8 @@ import { createI18n } from "vue-i18n";
 import { defineAsyncComponent } from "vue";
 import faLocale from "@/locales/fa.json";
 import enLocale from "@/locales/en.json";
+import arLocale from "@/locales/ar.json";
+import kuLocale from "@/locales/ku.json";
 import "vazirmatn/Vazirmatn-font-face.css";
 import "@unocss/reset/tailwind.css";
 import "uno.css";
@@ -638,9 +640,11 @@ const i18n = createI18n({
     messages: {
         fa: faLocale,
         en: enLocale,
+        ar: arLocale,
+        ku: kuLocale,
     },
     globalInstall: true,  // Enable global component installation
-    allowComposition: true,  // Allow composition API usage
+    allowComposition: true,  // Allow composition API usage,
 });
 
 window.i18n = i18n;

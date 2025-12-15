@@ -37,7 +37,7 @@
             />
           </div>
           <div class="mt-2">
-            <h3 class="font-bold line-clamp-2" v-text="video.title"></h3>
+            <div class="font-medium text-[14px] leading-6 line-clamp-2" v-text="video.title"></div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" v-text="video.channelName"></p>
           </div>
         </router-link>
@@ -71,7 +71,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
-import { getOptimalThumbnailUrl } from '../utils/ThumbnailUtils.js';
+import { getOptimalThumbnailUrl, transformThumbnailUrl } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserLikes",
@@ -94,7 +94,13 @@ export default {
 
       // Check if thumbnail is already a full URL
       if (thumbnail.startsWith('http')) {
-        return getOptimalThumbnailUrl(thumbnail, { type: 'general' });
+        // Use optimized dimensions 426x240 at quality 85 for like/dislike views
+        return transformThumbnailUrl(thumbnail, {
+          width: '426',
+          height: '240',
+          quality: 85,
+          type: 'general'
+        });
       }
       // If it's a relative path, return as is
       return thumbnail;

@@ -817,15 +817,23 @@ export default {
             });
 
             const quality = this.getPreferenceNumber("quality", 0);
-            const qualityConds =
-                quality > 0 && (this.video.audioStreams.length > 0 || this.video.livestream) && !disableVideo;
             // Enable ABR by default for adaptive streaming
             this.$player.configure("abr.enabled", true);
-            if (qualityConds) {
+
+            // Determine if we have video streams available to apply quality selection
+            const hasVideoStreams = this.video.videoStreams && this.video.videoStreams.length > 0;
+            const hasAudioStreams = this.video.audioStreams && this.video.audioStreams.length > 0;
+            const isLivestream = this.video.livestream;
+
+            // Check if quality has been explicitly set in preferences (not auto/0)
+            const qualityExplicitlySet = quality > 0;
+
+            // Apply quality selection if quality is explicitly set and we have streams
+            if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo) {
                 // If a specific quality is selected, disable ABR to respect user preference
                 this.$player.configure("abr.enabled", false);
             } else {
-                // Ensure ABR is enabled when no specific quality is selected
+                // Ensure ABR is enabled when no specific quality is selected or no video streams available
                 this.$player.configure("abr.enabled", true);
                 // Additional ABR configurations for optimal performance
                 this.$player.configure({
@@ -895,7 +903,7 @@ export default {
                         this.$ui.configure("overflowMenuButtons", newOverflowMenuButtons);
                     }
 
-                    if (qualityConds) {
+                    if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo) {
                         var leastDiff = Number.MAX_VALUE;
                         var bestStream = null;
 

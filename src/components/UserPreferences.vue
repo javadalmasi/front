@@ -12,10 +12,30 @@
       <!-- Left Column -->
       <div class="space-y-6">
         <!-- Appearance Settings -->
-        <div v-if="!isThemeSelectorDisabled" class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
+        <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow">
           <h2 class="text-xl font-bold mb-4">{{ $t('titles.appearance') }}</h2>
 
           <div class="grid grid-cols-1 gap-6">
+            <div v-if="!isLanguageSelectorDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex flex-col gap-2 w-full sm:w-64">
+                <label class="pref block font-semibold tooltip-container" for="selectLanguage">
+                  {{ $t('actions.language_selection') }}
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.language_selection') }}</span>
+                </label>
+                <select
+                  id="selectLanguage"
+                  v-model="selectedLanguage"
+                  class="select w-full"
+                  @change="onLanguageChange"
+                >
+                  <option value="fa">{{ $t('actions.persian') }}</option>
+                  <option value="en">{{ $t('actions.english') }}</option>
+                  <option value="ar">{{ $t('actions.arabic') }}</option>
+                  <option value="ku">{{ $t('actions.kurdish') }}</option>
+                </select>
+              </div>
+            </div>
+
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div class="flex flex-col gap-2 w-full sm:w-64">
                 <label class="pref block font-semibold tooltip-container" for="selectTheme">
@@ -783,6 +803,7 @@ export default {
       minSegmentLength: 0,
       dearrow: false,
       selectedTheme: "dark",
+      selectedLanguage: "fa", // Default to Persian
       autoPlayVideo: true,
       autoDisplayCaptions: false,
       autoPlayNextCountdown: 5,
@@ -887,6 +908,10 @@ export default {
     isAddToGroupDisabled() {
       return import.meta.env.VITE_DISABLE_ADD_TO_GROUP === "true";
     },
+    isLanguageSelectorDisabled() {
+      // Check if language selection is disabled via environment variable
+      return import.meta.env.VITE_DISABLE_LANGUAGE_SELECTOR === "true";
+    },
   },
   async mounted() {
     document.title = this.$t("titles.preferences") + " - " + this.getSiteName();
@@ -942,10 +967,9 @@ export default {
       let codecString = this.getPreferenceString("enabledCodecs", "vp9,avc");
       this.enabledCodecs = codecString.split(",");
 
-      // If user hasn't customized their codec settings (using defaults), check for AV1 support
-      if (codecString === "vp9,avc") {
-        this.checkAndEnableAV1IfSupported();
-      }
+      // Always check for AV1 support regardless of current codec settings
+      // This ensures AV1 is enabled when supported by the browser
+      this.checkAndEnableAV1IfSupported();
       this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
       this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
       this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
@@ -961,9 +985,32 @@ export default {
       this.logUserActivity = this.getPreferenceBoolean("logUserActivity", true);
       this.autoplay = this.getPreferenceBoolean("autoplay", true);
       this.defaultSpeed = this.getPreferenceString("defaultSpeed", "1.0");
+
+      // Load selected language
+      this.selectedLanguage = this.getPreferenceString("language", "fa");
+      // Update the current locale if needed
+      if (window.i18n && this.selectedLanguage !== window.i18n.global.locale.value) {
+        window.i18n.global.locale.value = this.selectedLanguage;
+      }
     }
   },
   methods: {
+    async onLanguageChange() {
+      if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
+        // Save the selected language to localStorage
+        localStorage.setItem("language", this.selectedLanguage);
+
+        // Change the language in the application
+        if (window.i18n) {
+          // Only reload if the language has actually changed
+          if (window.i18n.global.locale.value !== this.selectedLanguage) {
+            window.i18n.global.locale.value = this.selectedLanguage;
+            // Reload the page to apply the new language across the app
+            window.location.reload();
+          }
+        }
+      }
+    },
     async onChange() {
       if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
         var shouldReload = false;
@@ -1020,6 +1067,7 @@ export default {
         localStorage.setItem("logUserActivity", this.logUserActivity);
         localStorage.setItem("autoplay", this.autoplay);
         localStorage.setItem("defaultSpeed", this.defaultSpeed);
+        localStorage.setItem("language", this.selectedLanguage);
 
         // Apply theme immediately if it changed
         if (themeChanged) {
