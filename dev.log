@@ -1,0 +1,17 @@
+
+> vidioo@0.1.0 dev /app
+> vite
+
+
+  VITE v7.1.2  ready in 1992 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  UnoCSS Inspector: http://localhost:5173/__unocss/
+8:57:48 AM [vite] (client) hmr update /src/components/WatchVideo.vue
+8:59:00 AM [vite] (client) hmr update /src/components/WatchVideo.vue
+8:59:25 AM [vite] (client) hmr update /src/components/WatchVideo.vue
+9:00:20 AM [vite] (client) hmr update /src/components/WatchVideo.vue, /src/components/WatchVideo.vue?vue&type=style&index=0&lang.css
+9:00:29 AM [vite] (client) hmr update /src/components/WatchVideo.vue
+9:00:44 AM [vite] (client) hmr update /src/components/WatchVideo.vue
+9:00:55 AM [vite] (client) hmr update /src/components/WatchVideo.vue?vue&type=style&index=0&lang.css

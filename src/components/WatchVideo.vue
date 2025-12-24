@@ -86,21 +86,6 @@
                             <span> | </span>
                             <span :title="new Date(video.uploadDate).toLocaleString()" v-text="uploadDate" />
                         </div>
-                        <!-- Likes/disilikes -->
-                        <div v-if="likesDislikesEnabled" class="flex gap-2">
-                            <template v-if="video.likes >= 0">
-                                <div class="flex items-center">
-                                    <strong class="mr-1" v-text="addCommas(video.dislikes >= 0 ? video.dislikes : '?')" />
-                                    <div class="text-gray-500 mx-1">|</div>
-                                    <strong class="ml-1" v-text="addCommas(video.likes)" />
-                                </div>
-                            </template>
-                            <template v-if="video.likes < 0">
-                                <div>
-                                    <strong v-t="'video.ratings_disabled'" />
-                                </div>
-                            </template>
-                        </div>
                     </div>
                     <!-- Channel info & options flex container -->
                     <div class="flex items-center justify-between flex-wrap gap-1 px-2">
@@ -167,30 +152,28 @@
                             </button>
                             
                             <!-- Combined Like/Dislike Button (YouTube-style) -->
-                            <div
-                                v-if="!isLikeDislikeDisabled"
-                                class="like-dislike-container flex items-center rounded-full overflow-hidden border border-gray-300 dark:border-gray-600"
-                            >
+                            <div class="like-dislike-container flex items-center rounded-full overflow-hidden">
                                 <button
-                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary'}`"
+                                    v-if="likesDislikesEnabled && !isLikeDislikeDisabled"
+                                    :class="['btn-icon', 'flex', 'items-center', 'justify-center', 'h-10', 'min-w-10', 'rounded-l-full', 'p-0', 'pl-4', 'pr-3', { 'active': isVideoLiked(video.id) }]"
                                     @click="handleLike"
                                     :title="$t('actions.like')"
                                     :data-title="$t('actions.like')"
                                     aria-label="Like"
                                 >
                                     <i class="i-fa6-solid:thumbs-up" />
-                                    <span class="btn-text mr-1" v-t="'actions.like'" />
+                                    <span v-if="video.likes >= 0" class="ml-2 font-bold">{{ addCommas(video.likes) }}</span>
                                 </button>
-                                <div class="w-px h-8 bg-gray-300 dark:bg-gray-600 self-center"></div>
+                                <div v-if="likesDislikesEnabled && !isLikeDislikeDisabled" class="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center"></div>
                                 <button
-                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
+                                    v-if="likesDislikesEnabled && !isLikeDislikeDisabled"
+                                    :class="['btn-icon', 'flex', 'items-center', 'justify-center', 'h-10', 'min-w-10', 'rounded-r-full', 'p-0', 'px-3', { 'active': isVideoDisliked(video.id) }]"
                                     @click="handleDislike"
                                     :title="$t('actions.dislike')"
                                     :data-title="$t('actions.dislike')"
                                     aria-label="Dislike"
                                 >
                                     <i class="i-fa6-solid:thumbs-down" />
-                                    <span class="btn-text mr-1" v-t="'actions.dislike'" />
                                 </button>
                             </div>
                             
@@ -1255,7 +1238,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-enter-from,
 .v-leave-to {
     opacity: 0;
@@ -1298,291 +1281,51 @@ export default {
     line-height: 1.25rem;
 }
 
+/* --- Refactored Button Styles --- */
+
+/* Base style for all icon buttons in the action bar */
 .btn-icon {
-    width: 2.5rem !important; /* 40px */
-    height: 2.5rem !important; /* 40px */
-    min-height: 2.5rem !important; /* Fixed height */
-    border-radius: 9999px !important; /* Fully rounded pill shape */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
-    margin: 0 !important; /* No margin for buttons in combined container */
-    border: none !important; /* Remove default button border */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
-    transform: scale(1) !important; /* Initial scale */
-    position: relative !important;
-    overflow: hidden !important;
+    margin: 0 !important;
+    border: none !important;
+    background-color: #f2f2f2 !important;
+    color: #0f0f0f !important;
+    transition: background-color 0.2s ease-in-out !important;
+    height: 40px !important;
+    min-height: 40px !important;
+}
+
+.dark .btn-icon {
+    background-color: #272727 !important;
+    color: #f1f1f1 !important;
 }
 
 .btn-icon:hover {
-    transform: scale(1.25) !important; /* Larger scale on hover - now affects spacing */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
-    z-index: 10 !important; /* Ensure hover buttons appear on top */
+    background-color: #e5e5e5 !important;
 }
 
-.btn-icon:active {
-    transform: scale(0.95) !important; /* Scale down on click for press effect */
-    transition: all 0.1s ease !important; /* Quick transition for click */
+.dark .btn-icon:hover {
+    background-color: #3f3f3f !important;
 }
 
-/* Desktop hover animation: create "split in the middle" effect with text */
-@media (hover: hover) and (min-width: 1024px) {
-    .btn-icon {
-        position: relative;
-        overflow: hidden; /* Ensure content doesn't overflow initially */
-    }
-
-    .btn-icon .btn-text {
-        display: none; /* Hidden by default */
-        margin-right: 8px; /* For RTL layout */
-        white-space: nowrap;
-        font-size: 12px;
-        opacity: 0;
-        transform: translateX(-10px); /* For RTL - moving to the left */
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .btn-icon:hover .btn-text {
-        display: inline-block; /* Show text on hover */
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-    .btn-icon:hover {
-        width: auto !important; /* Allow width to expand for text */
-        min-width: 4.5rem !important; /* Expand to accommodate text */
-        border-radius: 9999px !important; /* Keep fully rounded shape */
-        padding-left: 14px !important;
-        padding-right: 14px !important;
-        transform: scale(1.25) !important; /* Larger scale on desktop hover */
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
-        overflow: visible !important; /* Allow content to be visible */
-    }
-
-    .btn-icon:hover .btn-text {
-        display: inline-block; /* Show text on hover */
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-    /* Adjust positioning for different button areas */
-    .btn-icon-group:not(.flex-col) .btn-icon:hover {
-        width: auto !important;
-        min-width: 4.5rem !important;
-        border-radius: 9999px !important;
-        padding-left: 14px !important;
-        padding-right: 14px !important;
-    }
+/* Individual rounded buttons (Share, Subscribe, etc.) */
+.btn-icon:not(.rounded-l-full):not(.rounded-r-full) {
+    border-radius: 9999px !important;
+    width: 40px !important;
 }
 
-/* Consistent and harmonious color scheme for all buttons */
-.btn-icon.btn-success {
-    background-color: #e8f5e9 !important; /* Light green for like */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+/* Active state for Liked button */
+.like-dislike-container .btn-icon.active {
+    background-color: #0f0f0f !important;
+    color: #f1f1f1 !important;
 }
 
-.btn-icon.btn-success:hover {
-    background-color: #4caf50 !important; /* Vibrant green on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
-}
-
-.btn-icon.btn-success.active {
-    background-color: #4caf50 !important; /* Vibrant green when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
-}
-
-.btn-icon.btn-error {
-    background-color: #ffebee !important; /* Light red for dislike */
-    color: #c62828 !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-error:hover {
-    background-color: #f44336 !important; /* Vibrant red on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
-}
-
-.btn-icon.btn-error.active {
-    background-color: #f44336 !important; /* Vibrant red when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
-}
-
-/* Consistent and harmonious color scheme for all buttons */
-.btn-icon.btn-success {
-    background-color: #e8f5e9 !important; /* Light green for like */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-success:hover {
-    background-color: #4caf50 !important; /* Vibrant green on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
-}
-
-.btn-icon.btn-success.active {
-    background-color: #4caf50 !important; /* Vibrant green when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
-}
-
-.btn-icon.btn-error {
-    background-color: #ffebee !important; /* Light red for dislike */
-    color: #c62828 !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-error:hover {
-    background-color: #f44336 !important; /* Vibrant red on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
-}
-
-.btn-icon.btn-error.active {
-    background-color: #f44336 !important; /* Vibrant red when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
-}
-
-/* For like/dislike buttons that need transparent background */
-.btn-icon.btn-danger {
-    background-color: #fff3e0 !important; /* Light orange for subscribe */
-    color: #ef6c00 !important; /* Dark orange text */
-    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-danger:hover {
-    background-color: #ff9800 !important; /* Vibrant orange on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4) !important;
-}
-
-.btn-icon.btn-danger.subscribed {
-    background-color: #ff9800 !important; /* Vibrant orange when subscribed */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3) !important;
-}
-
-.btn-icon.btn-unsubscribe {
-    background-color: #f5f5f5 !important; /* Light gray for unsubscribe */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-unsubscribe:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
-}
-
-/* General secondary buttons with consistent color palette */
-.btn-icon.btn-secondary {
-    background-color: #f5f5f5 !important; /* Light gray for general buttons */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-secondary:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
-}
-
-/* Specialized buttons with function-specific colors */
-.btn-icon.btn-secondary[href*="rss"] {
-    background-color: #e3f2fd !important; /* Light blue for RSS */
-    color: #1976d2 !important; /* Dark blue text */
-    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[href*="rss"]:hover {
-    background-color: #2196f3 !important; /* Blue on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Share"] {
-    background-color: #f3e5f5 !important; /* Light purple for share */
-    color: #7b1fa2 !important; /* Dark purple text */
-    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Share"]:hover {
-    background-color: #9c27b0 !important; /* Purple on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(156, 39, 176, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Download"] {
-    background-color: #e0f2f1 !important; /* Light teal for download */
-    color: #00695c !important; /* Dark teal text */
-    box-shadow: 0 2px 4px rgba(0, 188, 212, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Download"]:hover {
-    background-color: #00bcd4 !important; /* Teal on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(0, 188, 212, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[href*="youtube"] {
-    background-color: #ffebee !important; /* Light red for YouTube */
-    color: #d32f2f !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[href*="youtube"]:hover {
-    background-color: #f44336 !important; /* YouTube red on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[href*="odysee"] {
-    background-color: #e8eaf6 !important; /* Light indigo for Odysee */
-    color: #303f9f !important; /* Dark indigo text */
-    box-shadow: 0 2px 4px rgba(63, 81, 181, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[href*="odysee"]:hover {
-    background-color: #3f51b5 !important; /* Indigo on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(63, 81, 181, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Watch"] {
-    background-color: #fff8e1 !important; /* Light amber for video mode */
-    color: #f57f17 !important; /* Dark amber text */
-    box-shadow: 0 2px 4px rgba(255, 235, 59, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Watch"]:hover {
-    background-color: #ffeb3b !important; /* Amber on hover */
-    color: #333 !important;
-    box-shadow: 0 4px 8px rgba(255, 235, 59, 0.4) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Listen"] {
-    background-color: #e8f5e9 !important; /* Light green for audio mode */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-}
-
-.btn-icon.btn-secondary[aria-label*="Listen"]:hover {
-    background-color: #4caf50 !important; /* Green on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+.dark .like-dislike-container .btn-icon.active {
+    background-color: #f1f1f1 !important;
+    color: #0f0f0f !important;
 }
 </style>
