@@ -39,7 +39,7 @@ By using vidioo, you can freely watch and listen to content without the fear of 
 - [x] Playing just audio
 - [x] PWA support
 - [x] Locally saved Preferences
-- [x] [Available in many languages](src/locales), thanks to [our translators](https://hosted.weblate.org/projects/piped/frontend/)
+- [x] Persian/Farsi language support
 - [x] Embedded video support
 - [x] No age restriction
 - [x] Bypasses Geo restrictions if possible through a federated network

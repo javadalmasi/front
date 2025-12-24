@@ -157,9 +157,8 @@ export default {
         const App = this;
 
         (async function () {
-            // Get the language preference from localStorage, defaulting to Persian (fa)
-            const storedLanguage = localStorage.getItem("language") || "fa";
-            const locale = storedLanguage; // Use the stored language or default to Persian
+            // Set the locale to Persian (fa) as it's the only language
+            const locale = "fa";
 
             if (locale !== App.TimeAgoConfig.locale) {
                 const localeTime = await import(`../node_modules/javascript-time-ago/locale/${locale}.json`)

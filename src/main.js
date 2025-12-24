@@ -4,17 +4,14 @@ import App from "./App.vue";
 
 import TimeAgo from "javascript-time-ago";
 
-import en from "javascript-time-ago/locale/en";
+import fa from "javascript-time-ago/locale/fa";
 import { getOptimalThumbnailUrl } from "./utils/ThumbnailUtils";
 
-TimeAgo.addDefaultLocale(en);
+TimeAgo.addDefaultLocale(fa);
 
 import { createI18n } from "vue-i18n";
 import { defineAsyncComponent } from "vue";
 import faLocale from "@/locales/fa.json";
-import enLocale from "@/locales/en.json";
-import arLocale from "@/locales/ar.json";
-import kuLocale from "@/locales/ku.json";
 import "vazirmatn/Vazirmatn-font-face.css";
 import "@unocss/reset/tailwind.css";
 import "uno.css";
@@ -61,7 +58,7 @@ const mixin = {
         },
         addCommas(num) {
             num = parseInt(num);
-            return num.toLocaleString("en-US");
+            return num.toLocaleString("fa");
         },
         fetchJson: function (url, params, options) {
             if (params) {
@@ -573,55 +570,12 @@ const mixin = {
             }
         },
         async defaultLanguage() {
-            const languages = window.navigator.languages;
-            for (let i = 0; i < languages.length; i++) {
-                // Only allow Persian and English languages
-                if (languages[i].startsWith("fa")) {
-                    try {
-                        await import(`./locales/${languages[i]}.json`);
-                        return "fa"; // Always return "fa" for any Persian variant
-                    } catch {
-                        continue;
-                    }
-                } else if (languages[i].startsWith("en")) {
-                    try {
-                        await import(`./locales/${languages[i]}.json`);
-                        return "en"; // Always return "en" for any English variant
-                    } catch {
-                        continue;
-                    }
-                }
-            }
-            if (import.meta.env.VITE_DEFAULT_LANGUAGE) {
-                const defaultLang = import.meta.env.VITE_DEFAULT_LANGUAGE;
-                // Only allow fa or en as default
-                if (defaultLang.startsWith("fa") || defaultLang.startsWith("en")) {
-                    try {
-                        await import(`./locales/${defaultLang}.json`);
-                        return defaultLang.startsWith("fa") ? "fa" : "en";
-                    } catch {
-                        try {
-                            await import(`./locales/fa.json`);
-                            return "fa";
-                        } catch {
-                            return "en";
-                        }
-                    }
-                } else {
-                    // If default language is not fa or en, default to fa
-                    try {
-                        await import(`./locales/fa.json`);
-                        return "fa";
-                    } catch {
-                        return "en";
-                    }
-                }
-            }
+            // Always return Persian since it's the only language
             try {
                 await import(`./locales/fa.json`);
                 return "fa";
             } catch {
-                return "en";
+                return "fa";
             }
         },
     },
@@ -636,12 +590,9 @@ const mixin = {
 const i18n = createI18n({
     legacy: false,
     locale: "fa",
-    fallbackLocale: "en",
+    fallbackLocale: "fa",
     messages: {
         fa: faLocale,
-        en: enLocale,
-        ar: arLocale,
-        ku: kuLocale,
     },
     globalInstall: true,  // Enable global component installation
     allowComposition: true,  // Allow composition API usage,

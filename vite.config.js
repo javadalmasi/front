@@ -14,7 +14,6 @@ export default defineConfig({
         Unocss(),
         VueI18nPlugin({
             include: [
-                path.resolve(__dirname, "./src/locales/en.json"),
                 path.resolve(__dirname, "./src/locales/fa.json")
             ],
             strictMessage: false,

@@ -16,44 +16,7 @@
           <h2 class="text-xl font-bold mb-4">{{ $t('titles.appearance') }}</h2>
 
           <div class="grid grid-cols-1 gap-6">
-            <div v-if="!isLanguageSelectorDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div class="flex flex-col gap-2 w-full sm:w-64">
-                <label class="pref block font-semibold tooltip-container" for="selectLanguage">
-                  {{ $t('actions.language_selection') }}
-                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.language_selection') }}</span>
-                </label>
-                <select
-                  id="selectLanguage"
-                  v-model="selectedLanguage"
-                  class="select w-full"
-                  @change="onLanguageChange"
-                >
-                  <option value="fa">{{ $t('actions.persian') }}</option>
-                  <option value="en">{{ $t('actions.english') }}</option>
-                  <option value="ar">{{ $t('actions.arabic') }}</option>
-                  <option value="ku">{{ $t('actions.kurdish') }}</option>
-                </select>
-              </div>
-            </div>
 
-            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div class="flex flex-col gap-2 w-full sm:w-64">
-                <label class="pref block font-semibold tooltip-container" for="selectTheme">
-                  {{ $t('actions.theme') }}
-                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.theme') }}</span>
-                </label>
-                <select
-                  id="selectTheme"
-                  v-model="selectedTheme"
-                  class="select w-full"
-                  @change="onChange"
-                >
-                  <option value="auto">{{ $t('actions.auto') }}</option>
-                  <option value="dark">{{ $t('titles.dark_theme') }}</option>
-                  <option value="light">{{ $t('titles.light_theme') }}</option>
-                </select>
-              </div>
-            </div>
 
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div class="flex flex-col gap-2 w-full sm:w-64">
@@ -802,8 +765,6 @@ export default {
       showMarkers: true,
       minSegmentLength: 0,
       dearrow: false,
-      selectedTheme: "dark",
-      selectedLanguage: "fa", // Default to Persian
       autoPlayVideo: true,
       autoDisplayCaptions: false,
       autoPlayNextCountdown: 5,
@@ -844,9 +805,6 @@ export default {
       } catch {
         return false;
       }
-    },
-    isThemeSelectorDisabled() {
-      return import.meta.env.VITE_DISABLE_THEME_SELECTOR === "true";
     },
     isWatchOnYouTubeDisabled() {
       return import.meta.env.VITE_DISABLE_WATCH_ON_YOUTUBE === "true";
@@ -941,7 +899,6 @@ export default {
       this.showMarkers = this.getPreferenceBoolean("showMarkers", true);
       this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
       this.dearrow = this.getPreferenceBoolean("dearrow", false);
-      this.selectedTheme = this.getPreferenceString("theme", "dark");
       this.autoPlayVideo = this.getPreferenceBoolean("playerAutoPlay", true);
       this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
       this.autoPlayNextCountdown = this.getPreferenceNumber("autoPlayNextCountdown", 5);
@@ -986,40 +943,12 @@ export default {
       this.autoplay = this.getPreferenceBoolean("autoplay", true);
       this.defaultSpeed = this.getPreferenceString("defaultSpeed", "1.0");
 
-      // Load selected language
-      this.selectedLanguage = this.getPreferenceString("language", "fa");
-      // Update the current locale if needed
-      if (window.i18n && this.selectedLanguage !== window.i18n.global.locale.value) {
-        window.i18n.global.locale.value = this.selectedLanguage;
-      }
     }
   },
   methods: {
-    async onLanguageChange() {
-      if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
-        // Save the selected language to localStorage
-        localStorage.setItem("language", this.selectedLanguage);
-
-        // Change the language in the application
-        if (window.i18n) {
-          // Only reload if the language has actually changed
-          if (window.i18n.global.locale.value !== this.selectedLanguage) {
-            window.i18n.global.locale.value = this.selectedLanguage;
-            // Reload the page to apply the new language across the app
-            window.location.reload();
-          }
-        }
-      }
-    },
     async onChange() {
       if (typeof(Storage) !== "undefined" && this.testLocalStorage) {
         var shouldReload = false;
-        var themeChanged = false;
-
-        // Check if theme has changed
-        if (this.getPreferenceString("theme", "dark") !== this.selectedTheme) {
-          themeChanged = true;
-        }
 
         if (
           this.getPreferenceBoolean("watchHistory", true) != this.watchHistory ||
@@ -1037,8 +966,6 @@ export default {
         localStorage.setItem("minSegmentLength", this.minSegmentLength);
 
         localStorage.setItem("dearrow", this.dearrow);
-
-        localStorage.setItem("theme", this.selectedTheme);
         localStorage.setItem("playerAutoPlay", this.autoPlayVideo);
         localStorage.setItem("autoDisplayCaptions", this.autoDisplayCaptions);
         localStorage.setItem("autoPlayNextCountdown", this.autoPlayNextCountdown);
@@ -1067,12 +994,6 @@ export default {
         localStorage.setItem("logUserActivity", this.logUserActivity);
         localStorage.setItem("autoplay", this.autoplay);
         localStorage.setItem("defaultSpeed", this.defaultSpeed);
-        localStorage.setItem("language", this.selectedLanguage);
-
-        // Apply theme immediately if it changed
-        if (themeChanged) {
-          this.applyTheme(this.selectedTheme);
-        }
 
         if (shouldReload) window.location.reload();
       }
@@ -1233,34 +1154,6 @@ export default {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       }, 0);
-    },
-    applyTheme(theme) {
-      if (theme === "dark") {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
-      this.changeTitleBarColor(theme);
-      this.updateFavicon(theme);
-    },
-    changeTitleBarColor(theme) {
-      const currentColor = { dark: "#0F0F0F", light: "#FFF" };
-      const themeColor = document.querySelector("meta[name='theme-color']");
-      if (themeColor) {
-        themeColor.setAttribute("content", currentColor[theme]);
-      }
-    },
-    updateFavicon(theme) {
-      const favicon = document.querySelector("link[rel='icon']");
-      if (favicon) {
-        if (theme === "dark") {
-          favicon.href = "/img/icons/dark-logo-32x32.png";
-        } else {
-          favicon.href = "/img/icons/light-logo-32x32.png";
-        }
-      }
     },
     showToast(message) {
       // Using the same toast mechanism as in other components
