@@ -166,33 +166,31 @@
                                 <span class="btn-text mr-1" v-t="'actions.' + (subscribed ? 'unsubscribe' : 'subscribe')" />
                             </button>
                             
-                            <!-- Combined Like/Dislike Button (YouTube-style) -->
-                            <div
+                            <!-- Like Button -->
+                            <button
                                 v-if="!isLikeDislikeDisabled"
-                                class="like-dislike-container flex items-center rounded-full overflow-hidden border border-gray-300 dark:border-gray-600"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary'}`"
+                                @click="handleLike"
+                                :title="$t('actions.like')"
+                                :data-title="$t('actions.like')"
+                                aria-label="Like"
                             >
-                                <button
-                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary'}`"
-                                    @click="handleLike"
-                                    :title="$t('actions.like')"
-                                    :data-title="$t('actions.like')"
-                                    aria-label="Like"
-                                >
-                                    <i class="i-fa6-solid:thumbs-up" />
-                                    <span class="btn-text mr-1" v-t="'actions.like'" />
-                                </button>
-                                <div class="w-px h-8 bg-gray-300 dark:bg-gray-600 self-center"></div>
-                                <button
-                                    :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-none p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
-                                    @click="handleDislike"
-                                    :title="$t('actions.dislike')"
-                                    :data-title="$t('actions.dislike')"
-                                    aria-label="Dislike"
-                                >
-                                    <i class="i-fa6-solid:thumbs-down" />
-                                    <span class="btn-text mr-1" v-t="'actions.dislike'" />
-                                </button>
-                            </div>
+                                <i class="i-fa6-solid:thumbs-up" />
+                                <span class="btn-text mr-1" v-t="'actions.like'" />
+                            </button>
+
+                            <!-- Dislike Button -->
+                            <button
+                                v-if="!isLikeDislikeDisabled"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
+                                @click="handleDislike"
+                                :title="$t('actions.dislike')"
+                                :data-title="$t('actions.dislike')"
+                                aria-label="Dislike"
+                            >
+                                <i class="i-fa6-solid:thumbs-down" />
+                                <span class="btn-text mr-1" v-t="'actions.dislike'" />
+                            </button>
                             
                             <div class="flex items-center flex-wrap gap-1">
                                 <!-- RSS Feed button -->
@@ -1378,16 +1376,16 @@ export default {
 
 /* Consistent and harmonious color scheme for all buttons */
 .btn-icon.btn-success {
-    background-color: #e8f5e9 !important; /* Light green for like */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+    background-color: #f5f5f5 !important; /* Light gray for general buttons */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-success:hover {
-    background-color: #4caf50 !important; /* Vibrant green on hover */
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
 .btn-icon.btn-success.active {
@@ -1397,16 +1395,16 @@ export default {
 }
 
 .btn-icon.btn-error {
-    background-color: #ffebee !important; /* Light red for dislike */
-    color: #c62828 !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
+    background-color: #f5f5f5 !important; /* Light gray for general buttons */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-error:hover {
-    background-color: #f44336 !important; /* Vibrant red on hover */
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
 .btn-icon.btn-error.active {
@@ -1415,44 +1413,6 @@ export default {
     box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
 }
 
-/* Consistent and harmonious color scheme for all buttons */
-.btn-icon.btn-success {
-    background-color: #e8f5e9 !important; /* Light green for like */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-success:hover {
-    background-color: #4caf50 !important; /* Vibrant green on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
-}
-
-.btn-icon.btn-success.active {
-    background-color: #4caf50 !important; /* Vibrant green when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
-}
-
-.btn-icon.btn-error {
-    background-color: #ffebee !important; /* Light red for dislike */
-    color: #c62828 !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.btn-icon.btn-error:hover {
-    background-color: #f44336 !important; /* Vibrant red on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
-}
-
-.btn-icon.btn-error.active {
-    background-color: #f44336 !important; /* Vibrant red when active */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
-}
 
 /* For like/dislike buttons that need transparent background */
 .btn-icon.btn-danger {
@@ -1506,6 +1466,7 @@ export default {
     background-color: #e3f2fd !important; /* Light blue for RSS */
     color: #1976d2 !important; /* Dark blue text */
     box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[href*="rss"]:hover {
@@ -1518,6 +1479,7 @@ export default {
     background-color: #f3e5f5 !important; /* Light purple for share */
     color: #7b1fa2 !important; /* Dark purple text */
     box-shadow: 0 2px 4px rgba(156, 39, 176, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Share"]:hover {
@@ -1530,6 +1492,7 @@ export default {
     background-color: #e0f2f1 !important; /* Light teal for download */
     color: #00695c !important; /* Dark teal text */
     box-shadow: 0 2px 4px rgba(0, 188, 212, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Download"]:hover {
@@ -1542,6 +1505,7 @@ export default {
     background-color: #ffebee !important; /* Light red for YouTube */
     color: #d32f2f !important; /* Dark red text */
     box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[href*="youtube"]:hover {
@@ -1554,6 +1518,7 @@ export default {
     background-color: #e8eaf6 !important; /* Light indigo for Odysee */
     color: #303f9f !important; /* Dark indigo text */
     box-shadow: 0 2px 4px rgba(63, 81, 181, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[href*="odysee"]:hover {
@@ -1566,6 +1531,7 @@ export default {
     background-color: #fff8e1 !important; /* Light amber for video mode */
     color: #f57f17 !important; /* Dark amber text */
     box-shadow: 0 2px 4px rgba(255, 235, 59, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Watch"]:hover {
@@ -1578,11 +1544,46 @@ export default {
     background-color: #e8f5e9 !important; /* Light green for audio mode */
     color: #2e7d32 !important; /* Dark green text */
     box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Listen"]:hover {
     background-color: #4caf50 !important; /* Green on hover */
     color: white !important;
     box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+}
+
+/* Mobile-specific styles: hide button text, remove hover effects */
+@media (max-width: 768px) {
+    .btn-text {
+        display: none !important;
+    }
+
+    .btn-icon:hover {
+        transform: scale(1) !important; /* Remove hover scale effect on mobile */
+        box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important; /* Keep default shadow */
+    }
+
+    .btn-icon.btn-success:hover,
+    .btn-icon.btn-error:hover,
+    .btn-icon.btn-secondary:hover,
+    .btn-icon.btn-danger:hover,
+    .btn-icon.btn-unsubscribe:hover {
+        background-color: #f5f5f5 !important; /* Keep default background on mobile hover */
+        color: #424242 !important; /* Keep default text color on mobile hover */
+        transform: scale(1) !important;
+    }
+
+    /* Maintain active state colors on mobile */
+    .btn-icon.btn-success.active,
+    .btn-icon.btn-error.active {
+        background-color: #4caf50 !important; /* Green when active */
+        color: white !important;
+    }
+
+    .btn-icon.btn-error.active {
+        background-color: #f44336 !important; /* Red when active */
+        color: white !important;
+    }
 }
 </style>
