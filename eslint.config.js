@@ -24,6 +24,6 @@ export default [
     },
   },
   {
-    ignores: ["dist", "node_modules", "public", ".nuxt", ".output"],
+    ignores: ["dist", "node_modules", "public", ".output"],
   },
 ];
