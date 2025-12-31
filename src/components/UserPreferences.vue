@@ -931,12 +931,6 @@ export default {
       this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
       this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
       this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
-      // Load Persian country map
-      try {
-        this.CountryMap = await import(`../utils/CountryMaps/fa.json`).then(val => val.default);
-      } catch (e) {
-        console.error("Countries not translated into fa");
-      }
 
       // Load additional preferences
       this.logUserActivity = this.getPreferenceBoolean("logUserActivity", true);
