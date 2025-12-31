@@ -74,71 +74,77 @@
         فعالیت‌های شما در مرورگر شما ذخیره می‌شود و بر روی سرور ما نیست. می‌توانید از این داده‌ها نسخه پشتیبان تهیه کنید.
       </p>
 
-      <div v-if="activityLogs.length > 0">
-        <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-start mb-2 pb-2 border-b border-gray-300 dark:border-dark-300">
-          <i class="i-fa6-solid:circle-dot text-sm text-blue-500 ml-3 mt-1"></i>
-          <div class="flex-1">
-            <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
+      <!-- Combined Activity Logs (including search history) -->
+      <div>
+        <div v-if="combinedActivityLogs.length > 0">
+          <div v-for="(log, index) in displayedLogs" :key="index" class="flex items-start mb-2 pb-2 border-b border-gray-300 dark:border-dark-300">
+            <i
+              :class="log.isSearch ? 'i-fa6-solid:magnifying-glass text-blue-500' : 'i-fa6-solid:circle-dot text-blue-500'"
+              class="text-sm ml-3 mt-1"
+            ></i>
+            <div class="flex-1">
+              <p class="text-sm">{{ log.action }} - {{ log.timestamp }}</p>
 
-            <!-- Expandable JSON data section -->
-            <div v-if="expandedLogIndex === index || expandedLogIndex === 'all'" class="mt-2 bg-gray-100 dark:bg-dark-500 p-3 rounded-lg">
-              <div class="flex justify-between items-center mb-2">
-                <h4 class="font-semibold text-sm">اطلاعات JSON:</h4>
-                <div class="flex space-x-2">
-                  <button
-                    @click="copyJsonData(log)"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
-                    title="کپی اطلاعات"
-                  >
-                    <i class="i-fa6-solid:copy"></i>
-                  </button>
-                  <button
-                    v-if="expandedLogIndex !== 'all'"
-                    @click="expandedLogIndex = null"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
-                  >
-                    <i class="i-fa6-solid:times"></i>
-                  </button>
-                  <button
-                    v-else
-                    @click="allJsonExpanded = false; expandedLogIndex = null"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
-                  >
-                    <i class="i-fa6-solid:times"></i>
-                  </button>
+              <!-- Expandable JSON data section -->
+              <div v-if="expandedLogIndex === index || expandedLogIndex === 'all'" class="mt-2 bg-gray-100 dark:bg-dark-500 p-3 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-semibold text-sm">اطلاعات JSON:</h4>
+                  <div class="flex space-x-2">
+                    <button
+                      @click="copyJsonData(log)"
+                      class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                      title="کپی اطلاعات"
+                    >
+                      <i class="i-fa6-solid:copy"></i>
+                    </button>
+                    <button
+                      v-if="expandedLogIndex !== 'all'"
+                      @click="expandedLogIndex = null"
+                      class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm"
+                    >
+                      <i class="i-fa6-solid:times"></i>
+                    </button>
+                    <button
+                      v-else
+                      @click="allJsonExpanded = false; expandedLogIndex = null"
+                      class="text-gray-500 hover:text-gray-400 dark:text-gray-200 text-sm"
+                    >
+                      <i class="i-fa6-solid:times"></i>
+                    </button>
+                  </div>
                 </div>
+                <pre class="text-xs bg-gray-800 text-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto" v-html="formatJsonWithLinks(log)"></pre>
               </div>
-              <pre class="text-xs bg-gray-800 text-gray-100 p-2 rounded overflow-x-auto max-h-40 overflow-y-auto" v-html="formatJsonWithLinks(log)"></pre>
             </div>
+
+            <!-- Expand/Collapse button that shows JSON details on click -->
+            <button
+              class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors flex-shrink-0"
+              @click="toggleLogDetails(index)"
+              aria-label="نمایش جزئیات بیشتر"
+              title="نمایش جزئیات بیشتر"
+            >
+              <i
+                :class="expandedLogIndex === index ? 'i-fa6-solid:minus' : 'i-fa6-solid:expand'"
+                class="text-xs"
+              ></i>
+            </button>
           </div>
 
-          <!-- Expand/Collapse button that shows JSON details on click -->
-          <button
-            class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-dark-500 transition-colors flex-shrink-0"
-            @click="toggleLogDetails(index)"
-            aria-label="نمایش جزئیات بیشتر"
-            title="نمایش جزئیات بیشتر"
-          >
-            <i
-              :class="expandedLogIndex === index ? 'i-fa6-solid:minus' : 'i-fa6-solid:expand'"
-              class="text-xs"
-            ></i>
-          </button>
+          <div v-if="combinedActivityLogs.length > 10" class="mt-4 text-center">
+            <button
+              v-if="showMoreLogs"
+              class="btn btn-secondary"
+              @click="displayMoreLogs"
+              v-t="'info.load_more'"
+            >
+              نمایش بیشتر
+            </button>
+          </div>
         </div>
-
-        <div v-if="activityLogs.length > 10" class="mt-4 text-center">
-          <button
-            v-if="showMoreLogs"
-            class="btn btn-secondary"
-            @click="displayMoreLogs"
-            v-t="'info.load_more'"
-          >
-            نمایش بیشتر
-          </button>
+        <div v-else class="text-center py-4 text-gray-600 dark:text-gray-400" v-t="'info.no_recent_activity'">
+          فعالیت اخیری وجود ندارد
         </div>
-      </div>
-      <div v-else class="text-center py-4 text-gray-600 dark:text-gray-400" v-t="'info.no_recent_activity'">
-        فعالیت اخیری وجود ندارد
       </div>
     </div>
 
@@ -168,6 +174,8 @@ export default {
       dislikesCount: 0,
       recentVideos: [],  // For recent activity display
       activityLogs: [],
+      searchHistory: [],
+      combinedActivityLogs: [],
       showAllLogs: false,
       showConfirmClearLogs: false,
       showMoreLogs: true,
@@ -187,6 +195,7 @@ export default {
     await this.updateCounts();
     await this.getRecentActivity();
     await this.loadActivityLogs();
+    await this.loadSearchHistory();
   },
   methods: {
     async updateCounts() {
@@ -564,6 +573,9 @@ export default {
         // Initial display - show first 10 logs
         this.displayedLogs = this.activityLogs.slice(0, this.logsPerPage);
         this.currentPage = 1;
+
+        // Update combined logs after loading activity logs
+        this.updateCombinedActivityLogs();
       } catch (error) {
         console.error("Error loading activity logs:", error);
         // Fallback to empty array if there's an error
@@ -743,6 +755,64 @@ export default {
 
           checkDb();
         });
+      }
+    },
+    async loadSearchHistory() {
+      try {
+        const history = localStorage.getItem("search_history");
+        const parsedHistory = history ? JSON.parse(history) : [];
+
+        // If the history is in the old format (just strings), convert it to the new format
+        if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+          this.searchHistory = parsedHistory.map(query => ({
+            query: query,
+            timestamp: new Date().toISOString() // Use current timestamp for old entries
+          }));
+        } else {
+          this.searchHistory = parsedHistory;
+        }
+
+        this.updateCombinedActivityLogs();
+      } catch (error) {
+        console.error("Error loading search history:", error);
+        this.searchHistory = [];
+      }
+    },
+    updateCombinedActivityLogs() {
+      // Convert search history items to log format
+      const searchLogs = this.searchHistory.map(searchItem => ({
+        action: `جستجو: ${searchItem.query}`,
+        timestamp: new Date(searchItem.timestamp).toLocaleString(),
+        isSearch: true,
+        details: `Search query: ${searchItem.query}`,
+        url: `/results?search_query=${encodeURIComponent(searchItem.query)}`,
+        title: searchItem.query
+      }));
+
+      // Combine with activity logs and sort by timestamp (newest first)
+      this.combinedActivityLogs = [
+        ...searchLogs,
+        ...this.activityLogs
+      ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      // Update displayed logs
+      this.displayedLogs = this.combinedActivityLogs.slice(0, this.logsPerPage);
+      this.currentPage = 1;
+      this.showMoreLogs = this.combinedActivityLogs.length > this.logsPerPage;
+    },
+    displayMoreLogs() {
+      const startIndex = this.currentPage * this.logsPerPage;
+      const endIndex = Math.min(startIndex + this.logsPerPage, this.combinedActivityLogs.length);
+
+      if (startIndex < this.combinedActivityLogs.length) {
+        const newLogs = this.combinedActivityLogs.slice(startIndex, endIndex);
+        this.displayedLogs = [...this.displayedLogs, ...newLogs];
+        this.currentPage++;
+      }
+
+      // Hide the "Load More" button if we've reached the end
+      if (endIndex >= this.combinedActivityLogs.length) {
+        this.showMoreLogs = false;
       }
     }
   }

@@ -57,7 +57,7 @@
                 aria-label="Cancel search"
                 @click="cancelSearch"
             >
-                <div class="i-fa6-solid:arrow-left text-lg" />
+                <div class="i-fa6-solid:arrow-right text-lg" />
             </button>
             <SearchForm
                 ref="mobileSearch"

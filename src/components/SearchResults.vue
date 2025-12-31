@@ -144,17 +144,75 @@ export default {
             }
         },
         saveQueryToHistory() {
-            if (!this.getPreferenceBoolean("searchHistory", false)) return;
+            if (!this.getPreferenceBoolean("searchHistory", true)) return;
             const query = this.$route.query.search_query;
             if (!query) return;
-            const searchHistory = JSON.parse(localStorage.getItem("search_history")) ?? [];
-            if (searchHistory.includes(query)) {
-                const index = searchHistory.indexOf(query);
-                searchHistory.splice(index, 1);
+            this.addToSearchHistory(query);
+        },
+        addToSearchHistory(query) {
+            try {
+                let searchHistory = this.getSearchHistory();
+                // Remove the query if it already exists to avoid duplicates
+                searchHistory = searchHistory.filter(item => item.query !== query);
+                // Add the query to the beginning of the array with timestamp
+                const newSearchItem = {
+                    query: query,
+                    timestamp: new Date().toISOString()
+                };
+                searchHistory.unshift(newSearchItem);
+
+                // Apply auto-delete based on user preferences
+                searchHistory = this.applyAutoDeleteToSearchHistory(searchHistory);
+
+                localStorage.setItem("search_history", JSON.stringify(searchHistory));
+            } catch (error) {
+                console.error("Error adding to search history:", error);
             }
-            searchHistory.unshift(query);
-            if (searchHistory.length > 10) searchHistory.shift();
-            localStorage.setItem("search_history", JSON.stringify(searchHistory));
+        },
+        getSearchHistory() {
+            try {
+                const history = localStorage.getItem("search_history");
+                const parsedHistory = history ? JSON.parse(history) : [];
+
+                // If the history is in the old format (just strings), convert it to the new format
+                if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+                    return parsedHistory.map(query => ({
+                        query: query,
+                        timestamp: new Date().toISOString() // Use current timestamp for old entries
+                    }));
+                }
+
+                return parsedHistory;
+            } catch {
+                return [];
+            }
+        },
+        applyAutoDeleteToSearchHistory(searchHistory) {
+            try {
+                // Apply time-based deletion based on user preferences
+                const autoDeleteEnabled = this.getPreferenceBoolean("autoDeleteSearchHistory", false);
+                if (autoDeleteEnabled) {
+                    const delayHours = this.getPreferenceNumber("autoDeleteSearchHistoryDelayHours", 24);
+                    const maxTimeDiff = delayHours * 60 * 60 * 1000;
+
+                    searchHistory = searchHistory.filter(item => {
+                        const itemTime = new Date(item.timestamp).getTime();
+                        return Date.now() - itemTime <= maxTimeDiff;
+                    });
+                }
+
+                // Apply count-based deletion based on user preferences
+                const maxCount = this.getPreferenceNumber("autoDeleteSearchHistoryMaxCount", 50);
+                if (searchHistory.length > maxCount) {
+                    // Keep only the most recent items up to the max count
+                    searchHistory = searchHistory.slice(0, maxCount);
+                }
+
+                return searchHistory;
+            } catch (error) {
+                console.error("Error applying auto-delete to search history:", error);
+                return searchHistory; // Return original if error occurs
+            }
         },
     },
 };

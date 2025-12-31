@@ -2,7 +2,7 @@
   <div class="container mx-auto px-4 py-6">
     <div class="flex items-center mb-6">
       <router-link to="/user/gust" class="btn btn-secondary ml-4">
-        <i class="i-fa6-solid:arrow-left"></i>
+        <i class="i-fa6-solid:arrow-right"></i>
       </router-link>
       <h1 class="text-2xl font-bold" v-t="'titles.data_management'">مدیریت داده‌ها</h1>
     </div>
@@ -119,7 +119,30 @@
               </button>
             </div>
           </div>
-          
+
+          <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 flex items-center">
+              <i class="i-fa6-solid:magnifying-glass text-blue-500 ml-2"></i>
+              <span v-t="'titles.search_history'">تاریخچه جستجو</span>
+            </h3>
+            <div class="flex gap-2">
+              <button
+                class="btn btn-secondary flex-1"
+                @click="backupSearchHistory"
+                v-t="'actions.export'"
+              >
+                صدور
+              </button>
+              <button
+                class="btn btn-info flex-1"
+                @click="importSearchHistory"
+                v-t="'actions.import'"
+              >
+                ورود
+              </button>
+            </div>
+          </div>
+
           <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg">
             <h3 class="font-semibold mb-2 flex items-center">
               <i class="i-fa6-solid:gear text-blue-500 ml-2"></i>
@@ -230,6 +253,12 @@
           <p class="font-semibold" v-t="'actions.dislikes'">نپسندیده‌ها</p>
           <p class="text-2xl font-bold" v-text="dislikesCount"></p>
         </div>
+
+        <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg text-center">
+          <i class="i-fa6-solid:magnifying-glass text-2xl text-purple-500 block mb-2"></i>
+          <p class="font-semibold" v-t="'titles.search_history'">تاریخچه جستجو</p>
+          <p class="text-2xl font-bold" v-text="searchHistoryCount"></p>
+        </div>
       </div>
     </div>
 
@@ -257,6 +286,7 @@ export default {
       historyCount: 0,
       likesCount: 0,
       dislikesCount: 0,
+      searchHistoryCount: 0,
       showConfirmResetPreferences: false,
     };
   },
@@ -299,10 +329,32 @@ export default {
       // Get dislikes count
       const dislikes = JSON.parse(localStorage.getItem("dislikes") || "[]");
       this.dislikesCount = Array.isArray(dislikes) ? dislikes.length : 0;
+
+      // Get search history count
+      const searchHistory = this.getSearchHistory() || [];
+      this.searchHistoryCount = Array.isArray(searchHistory) ? searchHistory.length : 0;
     },
     getLocalSubscriptions() {
       const subs = localStorage.getItem("localSubscriptions");
       return subs ? JSON.parse(subs) : [];
+    },
+    getSearchHistory() {
+      try {
+        const history = localStorage.getItem("search_history");
+        const parsedHistory = history ? JSON.parse(history) : [];
+
+        // If the history is in the old format (just strings), convert it to the new format
+        if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+          return parsedHistory.map(query => ({
+            query: query,
+            timestamp: new Date().toISOString() // Use current timestamp for old entries
+          }));
+        }
+
+        return parsedHistory;
+      } catch {
+        return [];
+      }
     },
     async backupAllData() {
       try {
@@ -311,6 +363,7 @@ export default {
           history: await this.getHistoryData(),
           likes: JSON.parse(localStorage.getItem("likes") || "[]"),
           dislikes: JSON.parse(localStorage.getItem("dislikes") || "[]"),
+          searchHistory: this.getSearchHistory(),
           preferences: this.getAllPreferences(),
           timestamp: new Date().toISOString()
         };
@@ -396,6 +449,9 @@ export default {
                     }
                   });
                 }
+                if (data.searchHistory) {
+                  localStorage.setItem("search_history", JSON.stringify(data.searchHistory));
+                }
                 break;
               case 'subscriptions':
                 localStorage.setItem("localSubscriptions", JSON.stringify(data));
@@ -417,6 +473,9 @@ export default {
                     localStorage.setItem(key, data[key]);
                   }
                 });
+                break;
+              case 'searchHistory':
+                localStorage.setItem("search_history", JSON.stringify(data));
                 break;
             }
 
@@ -558,6 +617,24 @@ export default {
     },
     importPreferences() {
       this.importData('preferences');
+    },
+    backupSearchHistory() {
+      const searchHistory = this.getSearchHistory();
+      const data = JSON.stringify(searchHistory, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `search_history_${this.getTimestamp()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان تاریخچه جستجو ایجاد شد');
+    },
+    importSearchHistory() {
+      this.importData('searchHistory');
     },
     restoreAllData() {
       this.importData('all');

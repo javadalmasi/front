@@ -1,111 +1,251 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <div class="flex items-center mb-6">
-      <router-link to="/user/gust" class="btn btn-secondary mr-4">
+      <router-link to="/user/gust" class="btn btn-secondary ml-4">
         <i class="i-fa6-solid:arrow-right"></i>
       </router-link>
-      <h1 class="text-2xl font-bold" v-t="'titles.history'">تاریخچه تماشا</h1>
+      <h1 class="text-2xl font-bold" v-t="'titles.history'">تاریخچه</h1>
     </div>
 
-    <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
-      <div class="flex flex-wrap gap-4 mb-4">
-        <button class="btn btn-danger" @click="showConfirmClearDialog = true" v-t="'actions.clear_history'">
-          پاک کردن همه
-        </button>
-      </div>
+    <!-- Tabs for Video History and Search History -->
+    <div class="flex border-b border-gray-200 dark:border-dark-100 mb-6">
+      <button
+        :class="['tab', { 'active': activeTab === 'videos' }]"
+        @click="activeTab = 'videos'"
+        v-t="'titles.watch_history'"
+      >
+        تاریخچه ویدیوها
+      </button>
+      <button
+        :class="['tab', { 'active': activeTab === 'searches' }]"
+        @click="activeTab = 'searches'"
+        v-t="'titles.search_history'"
+      >
+        تاریخچه جستجوها
+      </button>
+    </div>
 
-      <div class="flex flex-wrap items-center gap-4">
-        <label class="flex items-center gap-2">
-          <input
-            id="autoDelete"
-            v-model="autoDeleteHistory"
-            type="checkbox"
-            @change="onChange"
-          />
-          <span v-t="'actions.auto_delete_watch_history'">حذف خودکار تاریخچه</span>
-        </label>
+    <!-- Video History Tab -->
+    <div v-if="activeTab === 'videos'">
+      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
+        <div class="flex flex-wrap gap-4 mb-4">
+          <button class="btn btn-danger" @click="showConfirmClearDialog = true" v-t="'actions.clear_history'">
+            پاک کردن همه
+          </button>
+        </div>
 
-        <div v-if="autoDeleteHistory" class="flex items-center gap-2">
-          <label v-t="'info.auto_delete_after'">حذف پس از</label>
-          <input
-            v-model="autoDeleteDelayHours"
-            type="number"
-            min="1"
-            class="input w-24"
-            @change="onChange"
-          />
-          <span v-t="'info.hours'">ساعت</span>
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input
+              id="autoDelete"
+              v-model="autoDeleteHistory"
+              type="checkbox"
+              @change="onChange"
+            />
+            <span v-t="'actions.auto_delete_watch_history'">حذف خودکار تاریخچه</span>
+          </label>
+
+          <div v-if="autoDeleteHistory" class="flex items-center gap-2">
+            <label v-t="'info.auto_delete_after'">حذف پس از</label>
+            <select
+              v-model="autoDeleteDelayHours"
+              class="select"
+              @change="onChange"
+            >
+              <option value="1" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ ساعت</option>
+              <option value="3" v-t="{ path: 'info.hours', args: { amount: '3' } }">۳ ساعت</option>
+              <option value="6" v-t="{ path: 'info.hours', args: { amount: '6' } }">۶ ساعت</option>
+              <option value="12" v-t="{ path: 'info.hours', args: { amount: '12' } }">۱۲ ساعت</option>
+              <option value="24" v-t="{ path: 'info.hours', args: { amount: '24' } }">۲۴ ساعت</option>
+              <option value="72" v-t="{ path: 'info.hours', args: { amount: '72' } }">۳ روز</option>
+              <option value="168" v-t="{ path: 'info.hours', args: { amount: '168' } }">۱ هفته</option>
+              <option value="336" v-t="{ path: 'info.hours', args: { amount: '336' } }">۲ هفته</option>
+              <option value="720" v-t="{ path: 'info.hours', args: { amount: '720' } }">۱ ماه</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="videos.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div
-        v-for="video in videos"
-        :key="video.videoId"
-        class="bg-gray-200 dark:bg-dark-400 rounded-xl shadow p-4 relative group"
-      >
-        <router-link :to="'/watch?v=' + video.videoId">
-          <div class="relative">
-            <img
-              :src="getCDNThumbnailUrl(video.thumbnail)"
-              :alt="video.title"
-              class="w-full aspect-video object-cover rounded-lg"
-              @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
-            />
-            <div
-              v-if="video.watchedAt"
-              class="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded"
-            >
-              {{ formatDate(video.watchedAt) }}
-            </div>
-          </div>
-          <div class="mt-2">
-            <div class="font-medium text-[14px] leading-6 line-clamp-2" v-text="video.title"></div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" v-text="video.channelName"></p>
-          </div>
-        </router-link>
-
-        <button
-          class="absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          @click="removeFromHistory(video.videoId)"
-          title="Remove from history"
+      <div v-if="videos.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div
+          v-for="video in videos"
+          :key="video.videoId"
+          class="bg-gray-200 dark:bg-dark-400 rounded-xl shadow p-4 relative group"
         >
-          <i class="i-fa6-solid:xmark"></i>
-        </button>
+          <router-link :to="'/watch?v=' + video.videoId">
+            <div class="relative">
+              <img
+                :src="getCDNThumbnailUrl(video.thumbnail)"
+                :alt="video.title"
+                class="w-full aspect-video object-cover rounded-lg"
+                @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
+              />
+              <div
+                v-if="video.watchedAt"
+                class="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded"
+              >
+                {{ formatDate(video.watchedAt) }}
+              </div>
+            </div>
+            <div class="mt-2">
+              <div class="font-medium text-[14px] leading-6 line-clamp-2" v-text="video.title"></div>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" v-text="video.channelName"></p>
+            </div>
+          </router-link>
+
+          <button
+            class="absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeFromHistory(video.videoId)"
+            title="Remove from history"
+          >
+            <i class="i-fa6-solid:xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div v-else class="text-center py-10">
+        <h2 class="text-xl font-bold mb-2" v-t="'info.no_history'">تاریخچه‌ای وجود ندارد</h2>
+        <p
+          class="mb-4"
+          v-if="!getPreferenceBoolean('watchHistory', true)"
+          v-t="'info.history_desc'"
+        >
+          ویدیوهای تماشا شده در اینجا ظاهر می‌شوند. تاریخچه تماشا را در تنظیمات فعال کنید تا تاریخچه تماشای خود را ذخیره کنید.
+        </p>
+        <p
+          class="mb-4"
+          v-else
+          v-t="'info.no_videos_in_history'"
+        >
+          شما هنوز هیچ ویدیویی را تماشا نکرده‌اید.
+        </p>
+        <router-link
+          v-if="!getPreferenceBoolean('watchHistory', true)"
+          to="/user/gust/preferences"
+          class="btn btn-primary"
+          v-t="'actions.enable_watch_history'"
+        >
+        </router-link>
       </div>
     </div>
-    <div v-else class="text-center py-10">
-      <h2 class="text-xl font-bold mb-2" v-t="'info.no_history'">تاریخچه‌ای وجود ندارد</h2>
-      <p
-        class="mb-4"
-        v-if="!getPreferenceBoolean('watchHistory', true)"
-        v-t="'info.history_desc'"
-      >
-        ویدیوهای تماشا شده در اینجا ظاهر می‌شوند. تاریخچه تماشا را در تنظیمات فعال کنید تا تاریخچه تماشای خود را ذخیره کنید.
-      </p>
-      <p
-        class="mb-4"
-        v-else
-        v-t="'info.no_videos_in_history'"
-      >
-        شما هنوز هیچ ویدیویی را تماشا نکرده‌اید.
-      </p>
-      <router-link
-        v-if="!getPreferenceBoolean('watchHistory', true)"
-        to="/user/gust/preferences"
-        class="btn btn-primary"
-        v-t="'actions.enable_watch_history'"
-      >
-      </router-link>
+
+    <!-- Search History Tab -->
+    <div v-if="activeTab === 'searches'">
+      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
+        <div class="flex flex-wrap gap-4 mb-4">
+          <button class="btn btn-danger" @click="showConfirmClearSearchDialog = true" v-t="'actions.clear_search_history'">
+            پاک کردن تاریخچه جستجو
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input
+              id="autoDeleteSearch"
+              v-model="autoDeleteSearchHistory"
+              type="checkbox"
+              @change="onAutoDeleteSearchHistoryChange"
+            />
+            <span v-t="'actions.auto_delete_search_history'">حذف خودکار تاریخچه جستجو</span>
+          </label>
+
+          <div v-if="autoDeleteSearchHistory" class="flex flex-wrap items-center gap-2">
+            <label v-t="'info.auto_delete_after'">حذف پس از</label>
+            <select
+              v-model="autoDeleteSearchHistoryDelayHours"
+              class="select"
+              @change="onAutoDeleteSearchHistoryChange"
+            >
+              <option value="24" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ روز</option>
+              <option value="48" v-t="{ path: 'info.hours', args: { amount: '2' } }">۲ روز</option>
+              <option value="168" v-t="{ path: 'info.hours', args: { amount: '7' } }">۱ هفته</option>
+              <option value="336" v-t="{ path: 'info.hours', args: { amount: '14' } }">۲ هفته</option>
+              <option value="720" v-t="{ path: 'info.hours', args: { amount: '30' } }">۱ ماه</option>
+            </select>
+          </div>
+        </div>
+
+        <div v-if="autoDeleteSearchHistory" class="flex flex-wrap items-center gap-4 mt-4">
+          <label class="flex items-center gap-2">
+            <span v-t="'actions.auto_delete_search_history_count'">یا حذف بیش از</span>
+          </label>
+          <div class="flex flex-wrap items-center gap-2">
+            <input
+              v-model="autoDeleteSearchHistoryMaxCount"
+              type="number"
+              min="50"
+              class="input w-24"
+              @change="onAutoDeleteSearchHistoryChange"
+            />
+            <span v-t="'info.items'">مورد</span>
+          </div>
+        </div>
+
+        <div v-if="autoDeleteSearchHistory" class="flex flex-wrap items-center gap-4 mt-4">
+          <label class="flex items-center gap-2">
+            <span v-t="'actions.auto_delete_search_history_time'">یا حذف بعد از</span>
+          </label>
+          <div class="flex flex-wrap items-center gap-2">
+            <select
+              v-model="autoDeleteSearchHistoryDelayHours"
+              class="select"
+              @change="onAutoDeleteSearchHistoryChange"
+            >
+              <option value="1" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ ساعت</option>
+              <option value="3" v-t="{ path: 'info.hours', args: { amount: '3' } }">۳ ساعت</option>
+              <option value="6" v-t="{ path: 'info.hours', args: { amount: '6' } }">۶ ساعت</option>
+              <option value="12" v-t="{ path: 'info.hours', args: { amount: '12' } }">۱۲ ساعت</option>
+              <option value="24" v-t="{ path: 'info.hours', args: { amount: '24' } }">۲۴ ساعت</option>
+              <option value="72" v-t="{ path: 'info.hours', args: { amount: '72' } }">۳ روز</option>
+              <option value="168" v-t="{ path: 'info.hours', args: { amount: '168' } }">۱ هفته</option>
+              <option value="336" v-t="{ path: 'info.hours', args: { amount: '336' } }">۲ هفته</option>
+              <option value="720" v-t="{ path: 'info.hours', args: { amount: '720' } }">۱ ماه</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="searchHistory.length > 0" class="space-y-4">
+        <div
+          v-for="(searchItem, index) in searchHistory"
+          :key="index"
+          class="bg-gray-200 dark:bg-dark-400 rounded-xl shadow p-4 relative group flex justify-between items-center"
+        >
+          <router-link :to="`/results?search_query=${encodeURIComponent(searchItem.query)}`" class="flex-1">
+            <div class="font-medium text-[16px] leading-6" v-text="searchItem.query"></div>
+            <div class="text-xs text-gray-500 mt-1" v-text="new Date(searchItem.timestamp).toLocaleString()"></div>
+          </router-link>
+
+          <button
+            class="delete-search-item bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center ml-2"
+            @click="removeFromSearchHistory(searchItem.query)"
+            title="Remove from search history"
+          >
+            <i class="i-fa6-solid:trash"></i>
+          </button>
+        </div>
+
+      </div>
+      <div v-else class="text-center py-10">
+        <h2 class="text-xl font-bold mb-2" v-t="'info.no_search_history'">تاریخچه جستجویی وجود ندارد</h2>
+        <p class="mb-4" v-t="'info.no_searches_in_history'">
+          جستجوهای شما در اینجا ظاهر می‌شوند.
+        </p>
+      </div>
     </div>
 
-    <!-- Confirmation Modal -->
+    <!-- Confirmation Modals -->
     <ConfirmModal
       v-if="showConfirmClearDialog"
       :message="$t('actions.confirm_clear_history')"
       @confirm="clearHistory"
       @close="showConfirmClearDialog = false"
+    />
+
+    <ConfirmModal
+      v-if="showConfirmClearSearchDialog"
+      :message="$t('actions.confirm_clear_search_history')"
+      @confirm="clearSearchHistory"
+      @close="showConfirmClearSearchDialog = false"
     />
   </div>
 </template>
@@ -122,9 +262,15 @@ export default {
   data() {
     return {
       videos: [],
+      searchHistory: [],
+      activeTab: 'videos', // Default to videos tab
       showConfirmClearDialog: false,
+      showConfirmClearSearchDialog: false,
       autoDeleteHistory: false,
       autoDeleteDelayHours: "24",
+      autoDeleteSearchHistory: false,
+      autoDeleteSearchHistoryDelayHours: "24",
+      autoDeleteSearchHistoryMaxCount: 50,
     };
   },
   async mounted() {
@@ -132,9 +278,17 @@ export default {
 
     this.autoDeleteHistory = this.getPreferenceBoolean("autoDeleteWatchHistory", false);
     this.autoDeleteDelayHours = this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24");
+    this.autoDeleteSearchHistory = this.getPreferenceBoolean("autoDeleteSearchHistory", false);
+    this.autoDeleteSearchHistoryDelayHours = this.getPreferenceString("autoDeleteSearchHistoryDelayHours", "24");
+    this.autoDeleteSearchHistoryMaxCount = parseInt(this.getPreferenceString("autoDeleteSearchHistoryMaxCount", "50"));
 
     // Initialize to empty array to prevent any undefined issues
     this.videos = [];
+    const rawSearchHistory = this.getSearchHistory();
+    // Convert to new format if needed
+    this.searchHistory = rawSearchHistory.map(item =>
+      typeof item === 'string' ? { query: item, timestamp: new Date().toISOString() } : item
+    );
 
     // Use local IndexedDB history
     if (window.db && this.getPreferenceBoolean("watchHistory", true)) {
@@ -175,6 +329,16 @@ export default {
         console.error("Error accessing IndexedDB:", error);
         this.videos = [];
       }
+    }
+  },
+  watch: {
+    // Watch for changes in localStorage search history and update component data
+    '$route'() {
+      // Update search history when the route changes to keep it in sync
+      const rawSearchHistory = this.getSearchHistory();
+      this.searchHistory = rawSearchHistory.map(item =>
+        typeof item === 'string' ? { query: item, timestamp: new Date().toISOString() } : item
+      );
     }
   },
   methods: {
@@ -362,7 +526,125 @@ export default {
     getPreferenceString(key, defaultValue = "") {
       const value = localStorage.getItem(`pref_${key}`);
       return value !== null ? value : defaultValue;
-    }
+    },
+    // New methods for search history
+    getSearchHistory() {
+      try {
+        const history = localStorage.getItem("search_history");
+        const parsedHistory = history ? JSON.parse(history) : [];
+
+        // If the history is in the old format (just strings), convert it to the new format
+        if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+          return parsedHistory.map(query => ({
+            query: query,
+            timestamp: new Date().toISOString() // Use current timestamp for old entries
+          }));
+        }
+
+        return parsedHistory;
+      } catch {
+        return [];
+      }
+    },
+    removeFromSearchHistory(searchItem) {
+      try {
+        let searchHistory = this.getSearchHistory();
+        searchHistory = searchHistory.filter(item => item.query !== searchItem);
+        localStorage.setItem("search_history", JSON.stringify(searchHistory));
+        this.searchHistory = searchHistory;
+        this.showToast(this.$t('info.search_removed_from_history') || 'جستجو از تاریخچه حذف شد');
+      } catch (error) {
+        console.error("Error removing from search history:", error);
+      }
+    },
+    clearSearchHistory() {
+      try {
+        localStorage.removeItem("search_history");
+        this.searchHistory = [];
+        this.showToast(this.$t('info.search_history_cleared') || 'تاریخچه جستجو پاک شد');
+      } catch (error) {
+        console.error("Error clearing search history:", error);
+      }
+    },
+    onAutoDeleteSearchHistoryChange() {
+      this.setPreference("autoDeleteSearchHistory", this.autoDeleteSearchHistory);
+      this.setPreference("autoDeleteSearchHistoryDelayHours", this.autoDeleteSearchHistoryDelayHours);
+      this.setPreference("autoDeleteSearchHistoryMaxCount", this.autoDeleteSearchHistoryMaxCount);
+
+      // Apply auto-delete immediately if enabled
+      if (this.autoDeleteSearchHistory) {
+        this.applyAutoDeleteSearchHistory();
+      }
+    },
+    applyAutoDeleteSearchHistory() {
+      try {
+        let searchHistory = this.getSearchHistory();
+
+        // Apply time-based deletion
+        if (this.autoDeleteSearchHistory) {
+          const maxTimeDiff = Number(this.autoDeleteSearchHistoryDelayHours) * 60 * 60 * 1000;
+          searchHistory = searchHistory.filter(item => {
+            const itemTime = new Date(item.timestamp).getTime();
+            return Date.now() - itemTime <= maxTimeDiff;
+          });
+        }
+
+        // Apply count-based deletion
+        if (searchHistory.length > this.autoDeleteSearchHistoryMaxCount) {
+          // Keep only the most recent items up to the max count
+          searchHistory = searchHistory.slice(0, this.autoDeleteSearchHistoryMaxCount);
+        }
+
+        // Save the filtered history
+        localStorage.setItem("search_history", JSON.stringify(searchHistory));
+        this.searchHistory = searchHistory;
+      } catch (error) {
+        console.error("Error applying auto-delete to search history:", error);
+      }
+    },
   }
 };
 </script>
+
+<style scoped>
+.tab {
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+
+.tab:hover {
+    color: #374151;
+}
+
+.tab.active {
+    color: #2563eb;
+    border-bottom-color: #2563eb;
+}
+
+.dark .tab {
+    color: #9ca3af;
+}
+
+.dark .tab:hover {
+    color: #d1d5db;
+}
+
+.dark .tab.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.delete-search-item {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.group:hover .delete-search-item {
+    opacity: 1;
+}
+</style>

@@ -1,16 +1,19 @@
 <template>
-    <div v-show="isVisible" class="suggestions-container absolute left-0 right-0 top-full mt-1">
+    <div
+        v-show="isVisible && searchText && searchText.length >= 3"
+        class="suggestions-container absolute top-full mt-1"
+    >
         <ul>
             <li
                 v-for="(suggestion, i) in searchSuggestions"
                 :key="i"
                 @mouseover="onMouseOver(i)"
-                @click="setSelected(i)"
             >
                 <router-link
                     class="suggestion"
                     :class="{ 'suggestion-selected': selected === i }"
                     :to="`/results?search_query=${encodeURIComponent(suggestion)}`"
+                    @click="setSelected(i)"
                     >{{ suggestion }}</router-link
                 >
             </li>
@@ -55,11 +58,7 @@ export default {
             // Ensure searchText is defined and is a string
             const currentSearchText = this.searchText || "";
 
-            if (!currentSearchText) {
-                if (this.getPreferenceBoolean("searchHistory", false))
-                    this.searchSuggestions = JSON.parse(localStorage.getItem("search_history")) ?? [];
-                else this.searchSuggestions = [];
-            } else if (this.getPreferenceBoolean("searchSuggestions", true)) {
+            if (currentSearchText && currentSearchText.length >= 3 && this.getPreferenceBoolean("searchSuggestions", true)) {
                 this.searchSuggestions =
                     (
                         await this.fetchJson(this.apiUrl() + "/opensearch/suggestions", {
@@ -68,12 +67,15 @@ export default {
                     )?.[1] ?? [];
             } else {
                 this.searchSuggestions = [];
-                return;
             }
-            if (currentSearchText) {
-                // Add current search text as first suggestion
-                this.searchSuggestions.unshift(currentSearchText);
+
+
+
+            // Limit total suggestions to 5 items
+            if (this.searchSuggestions.length > 5) {
+                this.searchSuggestions = this.searchSuggestions.slice(0, 5);
             }
+
             // Only set selected to 0 if there are suggestions and we're not just showing the current search text
             if (this.searchSuggestions.length > 0) {
                 // Don't automatically select the first item (current search text) to allow users to continue typing
@@ -92,13 +94,38 @@ export default {
                 this.$emit("searchchange", this.searchSuggestions[val]);
             }
         },
+        getSearchHistory() {
+            try {
+                const history = localStorage.getItem("search_history");
+                const parsedHistory = history ? JSON.parse(history) : [];
+
+                // If the history is in the old format (just strings), convert it to the new format
+                if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+                    return parsedHistory.map(query => ({
+                        query: query,
+                        timestamp: new Date().toISOString() // Use current timestamp for old entries
+                    }));
+                }
+
+                return parsedHistory;
+            } catch {
+                return [];
+            }
+        },
     },
 };
 </script>
 
 <style>
 .suggestions-container {
-    @apply max-w-3xl w-full box-border z-10 lt-md:max-w-[calc(100%-0.5rem)] bg-white border border-gray-200 rounded-md shadow-lg mt-1;
+    @apply w-full box-border z-10 bg-white border border-gray-200 rounded-md shadow-lg mt-1;
+}
+
+/* Mobile-specific full-width styles */
+@media (max-width: 767px) {
+    .suggestions-container {
+        border-radius: 0 !important;
+    }
 }
 
 .dark .suggestions-container {
@@ -106,7 +133,7 @@ export default {
 }
 
 .suggestion {
-    @apply block w-full px-4 py-2 text-sm leading-[1.65] text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-400 cursor-pointer;
+    @apply block w-full px-4 py-3 text-sm leading-[1.65] text-gray-800 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-dark-400 cursor-pointer lt-md:px-4 lt-md:py-3;
 }
 
 .suggestion-selected {

@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <div class="flex items-center mb-6">
-      <router-link to="/user/gust" class="btn btn-secondary mr-4">
+      <router-link to="/user/gust" class="btn btn-secondary ml-4">
         <i class="i-fa6-solid:arrow-right"></i>
       </router-link>
       <h1 class="text-2xl font-bold" v-t="'titles.subscriptions'">اشتراک‌ها</h1>

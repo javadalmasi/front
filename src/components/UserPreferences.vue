@@ -2,7 +2,7 @@
   <div class="container mx-auto px-4 py-6">
     <div class="flex items-center mb-6">
       <router-link to="/user/gust" class="btn btn-secondary ml-4">
-        <i class="i-fa6-solid:arrow-left"></i>
+        <i class="i-fa6-solid:arrow-right"></i>
       </router-link>
       <h1 class="text-2xl font-bold">{{ $t('titles.preferences') }}</h1>
     </div>
@@ -781,7 +781,7 @@ export default {
       showWatchOnYouTube: false,
       searchSuggestions: true,
       watchHistory: true,
-      searchHistory: false,
+      searchHistory: true,
       hideWatched: false,
       enabledCodecs: ["vp9", "avc"], // Default to vp9 and avc initially
       disableLBRY: false,
@@ -916,7 +916,7 @@ export default {
       this.showWatchOnYouTube = this.getPreferenceBoolean("showWatchOnYouTube", false);
       this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
       this.watchHistory = this.getPreferenceBoolean("watchHistory", true);
-      this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
+      this.searchHistory = this.getPreferenceBoolean("searchHistory", true);
       this.hideDislikedVideos = this.getPreferenceBoolean("hideDislikedVideos", true);
       this.showAlertOnDislikedVideos = this.getPreferenceBoolean("showAlertOnDislikedVideos", true);
       // Persian (fa) is the default language, no need to save in local storage
@@ -977,7 +977,9 @@ export default {
         localStorage.setItem("searchHistory", this.searchHistory);
         localStorage.setItem("hideDislikedVideos", this.hideDislikedVideos);
         localStorage.setItem("showAlertOnDislikedVideos", this.showAlertOnDislikedVideos);
-        if (!this.searchHistory) localStorage.removeItem("search_history");
+        if (!this.searchHistory) {
+            localStorage.removeItem("search_history");
+        }
         localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
         localStorage.setItem("disableLBRY", this.disableLBRY);
         localStorage.setItem("prefetchLimit", this.prefetchLimit);
