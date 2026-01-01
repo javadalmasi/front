@@ -367,6 +367,49 @@ const mixin = {
             });
             return progressiveUrls.optimizedUrl;
         },
+        getOptimalBannerUrl(bannerUrl) {
+            if (!bannerUrl) return bannerUrl;
+
+            // Check if this is a ytproxy URL with size parameters
+            if (bannerUrl.includes('ytproxy.ttj.dev') || bannerUrl.includes('googleusercontent.com')) {
+                // For banner URLs, we want to implement progressive loading
+                // First, get the preload URL with small size (w256)
+                const preloadUrl = bannerUrl.replace(/w\d+/g, 'w256');
+
+                // Then, get the optimized URL based on device width
+                const deviceWidth = window.innerWidth || screen.width;
+                let optimalWidth = 2560; // Default to large size
+
+                // Determine optimal width based on device size
+                if (deviceWidth <= 576) {
+                    optimalWidth = 512; // Small mobile
+                } else if (deviceWidth <= 768) {
+                    optimalWidth = 768; // Tablet
+                } else if (deviceWidth <= 1024) {
+                    optimalWidth = 1024; // Small desktop
+                } else if (deviceWidth <= 1440) {
+                    optimalWidth = 1536; // Medium desktop
+                } else {
+                    optimalWidth = 2560; // Large desktop/TV
+                }
+
+                // Ensure the width is a multiple of 256
+                optimalWidth = Math.ceil(optimalWidth / 256) * 256;
+
+                const optimizedUrl = bannerUrl.replace(/w\d+/g, `w${optimalWidth}`);
+
+                return {
+                    preloadUrl,
+                    optimizedUrl
+                };
+            }
+
+            // If not a recognized banner URL format, return as is
+            return {
+                preloadUrl: bannerUrl,
+                optimizedUrl: bannerUrl
+            };
+        },
         filterLivestreams(items) {
             if (this.isLiveStreamDisabled()) {
                 return items.filter(item => {

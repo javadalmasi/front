@@ -5,8 +5,13 @@
         <img
             v-if="channel.bannerUrl"
             loading="lazy"
-            :src="channel.bannerUrl"
-            class="w-full object-cover py-1.5 md:h-50"
+            :src="currentBannerUrl"
+            :class="{
+                'w-full object-cover py-1.5 md:h-50': true,
+                'banner-loaded': isBannerLoaded
+            }"
+            @load="onBannerLoad"
+            @error="onBannerError"
         />
         <div class="flex flex-col items-center justify-between md:flex-row">
             <div class="flex place-items-center gap-3">
@@ -120,6 +125,7 @@ export default {
             selectedTab: 0,
             contentItems: [],
             showGroupModal: false,
+            isBannerLoaded: false,
         };
     },
     computed: {
@@ -130,6 +136,12 @@ export default {
         isAddToGroupDisabled() {
             // Check if add to group button is disabled via environment variable
             return import.meta.env.VITE_DISABLE_ADD_TO_GROUP === "true";
+        },
+        currentBannerUrl() {
+            if (!this.channel?.bannerUrl) return '';
+
+            const bannerUrls = this.getOptimalBannerUrl(this.channel.bannerUrl);
+            return this.isBannerLoaded ? bannerUrls.optimizedUrl : bannerUrls.preloadUrl;
         },
     },
     mounted() {
@@ -147,6 +159,23 @@ export default {
         window.removeEventListener("scroll", this.handleScroll);
     },
     methods: {
+        onBannerLoad() {
+            // Banner preload image has loaded, now load the optimized version
+            if (!this.isBannerLoaded) {
+                // Preload the optimized image by creating an Image object
+                const bannerUrls = this.getOptimalBannerUrl(this.channel.bannerUrl);
+                const img = new Image();
+                img.src = bannerUrls.optimizedUrl;
+                img.onload = () => {
+                    // Once optimized image is loaded, update the state
+                    this.isBannerLoaded = true;
+                };
+            }
+        },
+        onBannerError(event) {
+            // Don't use placeholder images - just let the image fail gracefully
+            console.warn("Banner image failed to load:", event.target.src);
+        },
         async fetchSubscribedStatus() {
             if (!this.channel.id) return;
 
@@ -172,14 +201,14 @@ export default {
                         this.fetchSubscribedStatus();
                         this.updateWatched(this.channel.relatedStreams);
                         this.fetchDeArrowContent(this.channel.relatedStreams);
-                        
+
                         // Add the default videos tab
                         this.tabs.push({
                             name: "videos",
                             translatedName: this.$t("video.videos"),
                             content: this.channel.relatedStreams,
                         });
-                        
+
                         const tabQuery = this.$route.query.tab;
                         for (let i = 0; i < this.channel.tabs.length; i++) {
                             let tab = this.channel.tabs[i];
@@ -194,8 +223,26 @@ export default {
                                 });
                             }
                         }
+
+                        // Start loading the banner image after channel data is loaded
+                        this.loadBannerImage();
                     }
                 });
+        },
+        loadBannerImage() {
+            // Preload the optimized banner image after a short delay
+            // to ensure the preload image is shown first
+            setTimeout(() => {
+                if (this.channel?.bannerUrl && !this.isBannerLoaded) {
+                    const bannerUrls = this.getOptimalBannerUrl(this.channel.bannerUrl);
+                    const img = new Image();
+                    img.src = bannerUrls.optimizedUrl;
+                    img.onload = () => {
+                        // Once optimized image is loaded, update the state
+                        this.isBannerLoaded = true;
+                    };
+                }
+            }, 100); // Small delay to ensure preload image is shown first
         },
         handleScroll() {
             if (
@@ -347,6 +394,20 @@ export default {
 </script>
 
 <style scoped>
+img.w-full.object-cover.py-1\.5.md\:h-50 {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+img.w-full.object-cover.py-1\.5.md\:h-50:not(.banner-loaded) {
+    filter: blur(2px);
+}
+
+img.w-full.object-cover.py-1\.5.md\:h-50.banner-loaded {
+    opacity: 1;
+    filter: none;
+}
+
 .channel-tabs-container {
     margin: 0.25rem 0.25rem 0.5rem;
     position: relative;
