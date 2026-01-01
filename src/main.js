@@ -373,8 +373,9 @@ const mixin = {
             // Check if this is a ytproxy URL with size parameters
             if (bannerUrl.includes('ytproxy.ttj.dev') || bannerUrl.includes('googleusercontent.com')) {
                 // For banner URLs, we want to implement progressive loading
-                // First, get the preload URL with small size (w256)
-                const preloadUrl = bannerUrl.replace(/w\d+/g, 'w256');
+                // The URL format typically has parameters like =w2560- (e.g., =w2560-fcrop...)
+                // We need to specifically target the width parameter in the URL
+                const preloadUrl = bannerUrl.replace(/=w\d+-/g, '=w256-');
 
                 // Then, get the optimized URL based on device width
                 const deviceWidth = window.innerWidth || screen.width;
@@ -396,7 +397,7 @@ const mixin = {
                 // Ensure the width is a multiple of 256
                 optimalWidth = Math.ceil(optimalWidth / 256) * 256;
 
-                const optimizedUrl = bannerUrl.replace(/w\d+/g, `w${optimalWidth}`);
+                const optimizedUrl = bannerUrl.replace(/=w\d+-/g, `=w${optimalWidth}-`);
 
                 return {
                     preloadUrl,
