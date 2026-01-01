@@ -25,12 +25,18 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
     // Extract video ID from the original URL if not provided
     let videoId = options.videoId;
     if (!videoId && originalThumbnailUrl) {
-        // Extract video ID from YouTube thumbnail URL patterns
-        // Common YouTube thumbnail URL patterns:
+        // Extract video ID from various thumbnail URL patterns
+
+        // For YouTube thumbnail URL patterns:
         // - https://i.ytimg.com/vi/{videoId}/{style}.jpg
         // - https://img.youtube.com/vi/{videoId}/{style}.jpg
+        let videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
 
-        const videoIdMatch = originalThumbnailUrl.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+        // For relative paths like /vi_webp/{id}/maxresdefault.webp?host=i.ytimg.com
+        if (!videoIdMatch) {
+            videoIdMatch = originalThumbnailUrl.match(/\/vi_webp\/([a-zA-Z0-9_-]{11})\//);
+        }
+
         if (videoIdMatch && videoIdMatch[1]) {
             videoId = videoIdMatch[1];
         } else {

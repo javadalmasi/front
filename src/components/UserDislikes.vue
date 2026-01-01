@@ -92,8 +92,9 @@ export default {
     getCDNThumbnailUrl(thumbnail) {
       if (!thumbnail) return thumbnail; // Return as is if null/undefined
 
-      // Check if thumbnail is already a full URL
-      if (thumbnail.startsWith('http')) {
+      // Check if thumbnail is already a full URL or a relative path that needs transformation
+      // Handle both absolute URLs and relative paths like /vi_webp/{id}/maxresdefault.webp?host=i.ytimg.com
+      if (thumbnail.startsWith('http') || thumbnail.startsWith('/vi_webp/')) {
         // Use optimized dimensions 426x240 at quality 85 for like/dislike views
         return transformThumbnailUrl(thumbnail, {
           width: '426',
@@ -102,7 +103,7 @@ export default {
           type: 'general'
         });
       }
-      // If it's a relative path, return as is
+      // If it's another type of relative path, return as is
       return thumbnail;
     },
     async fetchDislikes() {
