@@ -17,6 +17,14 @@ import { findClosestAllowedDimension, determineFormat } from './ImageResizer.js'
  * @returns {string} The transformed thumbnail URL using the CDN format
  */
 export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
+    // Check if this is a proxy URL for a channel avatar (from yt3.ggpht.com)
+    // Channel avatars don't need video thumbnail transformation
+    if (originalThumbnailUrl && originalThumbnailUrl.includes('ytproxy.ttj.dev') &&
+        (originalThumbnailUrl.includes('host=yt3.ggpht.com') || originalThumbnailUrl.includes('/ytc/'))) {
+        // This is a proxy URL for a channel avatar, return the original URL without transformation
+        return originalThumbnailUrl;
+    }
+
     // Get the CDN base URL from environment variable
     const cdnBaseUrl =
         import.meta.env.VITE_CDN_THUMBNAIL_BASE_URL ||
@@ -35,6 +43,54 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
         // For relative paths like /vi_webp/{id}/maxresdefault.webp?host=i.ytimg.com
         if (!videoIdMatch) {
             videoIdMatch = originalThumbnailUrl.match(/\/vi_webp\/([a-zA-Z0-9_-]{11})\//);
+        }
+
+        // For proxy URLs like https://ytproxy.ttj.dev/{videoId}=...?host=yt3.ggpht.com
+        // Some proxy URLs may have the video ID in the path before query parameters
+        if (!videoIdMatch) {
+            // Try to extract from proxy URL patterns
+            // Pattern: https://ytproxy.ttj.dev/{encoded_part}?host=...
+            // The encoded part might contain the video ID or be derived from it
+            const proxyMatch = originalThumbnailUrl.match(/ytproxy\.ttj\.dev\/([a-zA-Z0-9_-]+)/);
+            if (proxyMatch && proxyMatch[1]) {
+                // For URLs with /ytc/ prefix, the video ID might be embedded differently
+                // If the extracted part looks like a video ID (11 chars), use it
+                const potentialVideoId = proxyMatch[1];
+                if (potentialVideoId.length === 11 && /^[a-zA-Z0-9_-]{11}$/.test(potentialVideoId)) {
+                    videoIdMatch = [potentialVideoId, potentialVideoId]; // [full_match, capture_group]
+                } else {
+                    // For /ytc/ URLs, try to extract video ID from patterns like:
+                    // /ytc/AIdro_{videoId} where the video ID follows AIdro_ (first 11 chars after AIdro_)
+                    const ytcMatch = originalThumbnailUrl.match(/\/ytc\/AIdro_([a-zA-Z0-9_-]{11})/);
+                    if (ytcMatch && ytcMatch[1]) {
+                        videoIdMatch = ytcMatch;
+                    }
+                    // Also try to extract potential video ID from other proxy URL patterns
+                    // Some proxy URLs might have the video ID embedded differently
+                    else {
+                        // For non-ytc URLs like https://ytproxy.ttj.dev/{video_id_encoded}=...
+                        // Check if the first path segment after domain starts with a potential video ID
+                        const nonYtcMatch = originalThumbnailUrl.match(/ytproxy\.ttj\.dev\/([a-zA-Z0-9_-]{11})[=\/]/);
+                        if (nonYtcMatch && nonYtcMatch[1]) {
+                            videoIdMatch = nonYtcMatch;
+                        }
+                        // If still no match, try to find a potential video ID in the path before the query parameter
+                        else {
+                            // Extract the part before the query string
+                            const pathPart = originalThumbnailUrl.split('?')[0];
+                            // Look for 11-character YouTube ID pattern in the path part
+                            const potentialVideoId = pathPart.match(/[a-zA-Z0-9_-]{11}/);
+                            if (potentialVideoId) {
+                                // Validate that it's a proper video ID format (not just any 11 chars)
+                                if (/^[a-zA-Z0-9_-]{11}$/.test(potentialVideoId[0])) {
+                                    // Create a match-like array with the full match at index 0 and capture at index 1
+                                    videoIdMatch = [potentialVideoId[0], potentialVideoId[0]];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (videoIdMatch && videoIdMatch[1]) {
