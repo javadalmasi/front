@@ -91,7 +91,7 @@
 import "shaka-player/dist/controls.css";
 import { replaceWithCdnUrl } from "@/utils/CdnUtils.js";
 import { parseTimeParam } from "@/utils/Misc.js";
-import { transformThumbnailUrl } from "@/utils/ThumbnailUtils.js";
+import { transformThumbnailUrl, getPlayerThumbnailSettings } from "@/utils/ThumbnailUtils.js";
 import { findClosestAllowedDimension } from "@/utils/ImageResizer.js";
 import ModalComponent from "./ModalComponent.vue";
 
@@ -384,34 +384,15 @@ export default {
             }
         },
         getOptimalThumbnailUrlForPlayer(originalThumbnailUrl) {
-            // For the video player, we want to determine the container size
-            // to provide an appropriately sized thumbnail
-            this.$nextTick(() => {
-                // We could update the poster after initial render if needed
-            });
-            
-            let containerWidth = 1280; // Default width for video player
-            let containerHeight = 720; // Default height for video player
-            
-            // Try to get actual container size
-            if (this.$refs.container && this.$refs.container.clientWidth) {
-                containerWidth = this.$refs.container.clientWidth;
-                // Calculate height based on 16:9 aspect ratio
-                containerHeight = Math.round((containerWidth * 9) / 16);
-            } else {
-                // Fallback to window dimensions at call time
-                containerWidth = window.innerWidth || screen.width || 1280;
-                containerHeight = Math.round((containerWidth * 9) / 16);
-            }
-            
-            // Use the closest allowed player dimension based on actual container size
-            const [width, height] = findClosestAllowedDimension(containerWidth, containerHeight, 'player');
-            
-            // Use transformThumbnailUrl with the determined optimal size
-            return transformThumbnailUrl(originalThumbnailUrl, { 
-                width: width, 
-                height: height, 
-                type: 'player' 
+            // For the video player, always use 1280x720 with quality 70 on all devices as requested
+            const settings = getPlayerThumbnailSettings();
+
+            // Use transformThumbnailUrl with the fixed player settings
+            return transformThumbnailUrl(originalThumbnailUrl, {
+                width: settings.width,
+                height: settings.height,
+                quality: settings.quality,
+                type: 'player'
             });
         },
         async loadVideo() {

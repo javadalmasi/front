@@ -7,16 +7,28 @@
  * List of allowed dimensions for general images (search results, sidebar, etc.) in the format [width, height]
  */
 const GENERAL_ALLOWED_DIMENSIONS = [
+    [128, 72],
+    [192, 108],
+    [256, 144],
+    [320, 180],
     [426, 240],
     [640, 360],
     [854, 480],
-    [960, 540]
+    [960, 540],
+    [1024, 576],
+    [1280, 720],
+    [1600, 900],
+    [1920, 1080]
 ];
 
 /**
  * List of allowed dimensions for video player thumbnails in the format [width, height]
  */
 const PLAYER_ALLOWED_DIMENSIONS = [
+    [128, 72],
+    [192, 108],
+    [256, 144],
+    [320, 180],
     [426, 240],
     [640, 360],
     [854, 480],
@@ -31,6 +43,10 @@ const PLAYER_ALLOWED_DIMENSIONS = [
  * All allowed dimensions (for backward compatibility)
  */
 const ALLOWED_DIMENSIONS = [
+    [128, 72],
+    [192, 108],
+    [256, 144],
+    [320, 180],
     [426, 240],
     [640, 360],
     [854, 480],
@@ -44,7 +60,7 @@ const ALLOWED_DIMENSIONS = [
 /**
  * List of allowed quality values
  */
-const ALLOWED_QUALITY_VALUES = [75, 85];
+const ALLOWED_QUALITY_VALUES = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
 
 /**
  * List of supported formats in order of browser priority
@@ -114,6 +130,28 @@ function isAllowedQuality(quality) {
 }
 
 /**
+ * Finds the closest allowed quality value to the given quality
+ * @param {number} quality - Desired quality
+ * @returns {number} - The closest allowed quality value
+ */
+function findClosestAllowedQuality(quality) {
+    if (quality <= 10) return 10;
+    if (quality >= 90) return 90;
+
+    // Round to nearest multiple of 5
+    const roundedQuality = Math.round(quality / 5) * 5;
+
+    // Find closest allowed quality value
+    return ALLOWED_QUALITY_VALUES.reduce((prev, curr) => {
+        const currDiff = Math.abs(curr - roundedQuality);
+        const prevDiff = Math.abs(prev - roundedQuality);
+        if (currDiff < prevDiff) return curr;
+        if (currDiff === prevDiff && curr > prev) return curr; // Choose higher in case of tie
+        return prev;
+    });
+}
+
+/**
  * Determines the format to use, validating it against supported formats
  * @param {string} requestedFormat - The format requested by the user
  * @returns {string} - The format if valid, or undefined if not supported
@@ -149,45 +187,33 @@ function resizeImage(imageUrl, options = {}) {
         options.height || 0,
         options.type || 'general'
     );
-    
+
     // Validate and normalize quality (required parameter)
     let quality = 85; // Default to 85 if not specified
     if (options.quality !== undefined) {
-        if (isAllowedQuality(options.quality)) {
-            quality = options.quality;
-        } else {
-            // If provided quality is not allowed, find the closest allowed value
-            // In case of tie, choose the higher value (85)
-            quality = ALLOWED_QUALITY_VALUES.reduce((prev, curr) => {
-                const currDiff = Math.abs(curr - options.quality);
-                const prevDiff = Math.abs(prev - options.quality);
-                if (currDiff < prevDiff) return curr;
-                if (currDiff === prevDiff && curr > prev) return curr; // Choose higher in case of tie
-                return prev;
-            });
-        }
+        quality = findClosestAllowedQuality(options.quality);
     }
-    
+
     // Determine the format to use
     let format = determineFormat(options.format);
-    
+
     // Construct the URL with parameters
     // Handle both browser and server environments
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
     const url = new URL(imageUrl, baseUrl);
-    
+
     // Add dimension parameters
     url.searchParams.set('width', width.toString());
     url.searchParams.set('height', height.toString());
-    
+
     // Always add quality parameter as it's required
     url.searchParams.set('quality', quality.toString());
-    
+
     // Add format parameter only if specified and valid
     if (format) {
         url.searchParams.set('format', format);
     }
-    
+
     return url.toString();
 }
 
@@ -278,6 +304,7 @@ export {
     findClosestAllowedDimension,
     isAllowedDimension,
     isAllowedQuality,
+    findClosestAllowedQuality,
     determineFormat,
     isFormatSupported,
     getAllowedDimensions,

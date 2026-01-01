@@ -5,11 +5,14 @@
                 <img
                     loading="lazy"
                     class="aspect-video w-full rounded-lg object-cover"
-                    :src="optimizedThumbnail"
+                    :src="currentThumbnail"
                     :alt="item.title"
                     :class="{
                         'shorts-img': item.isShort,
+                        'progressive-loaded': isLoaded
                     }"
+                    @load="onImageLoad"
+                    @error="onImageError"
                 />
             </div>
             <!-- progress bar -->
@@ -85,7 +88,7 @@
     </div>
 </template>
 <script>
-import { transformThumbnailUrl } from "../utils/ThumbnailUtils";
+import { getProgressiveThumbnailUrls, transformThumbnailUrl } from "../utils/ThumbnailUtils";
 import { findClosestAllowedDimension } from "../utils/ImageResizer";
 
 export default {
@@ -110,6 +113,7 @@ export default {
     data() {
         return {
             isHovered: false,
+            isLoaded: false,
         };
     },
     computed: {
@@ -156,7 +160,7 @@ export default {
 
             return thumbnail;
         },
-        optimizedThumbnail() {
+        progressiveThumbnailUrls() {
             // Only transform video thumbnails, not channel avatars or other images
             if (this.thumbnail) {
                 // Check if this is likely a video thumbnail by checking for common video ID patterns
@@ -165,40 +169,74 @@ export default {
                     const videoIdMatch = this.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
                     if (videoIdMatch && videoIdMatch[1]) {
                         // For VideoThumbnail, we need to determine optimal size based on actual container size
-                        // Instead of using screen size, we should use the expected container size or aspect ratio
+                        // Instead of using screen size, we'll use the expected container size or aspect ratio
                         // Since we can't access the rendered element in computed property, we'll use contextual hints
-                        
+
                         // For different contexts, use different base sizes:
                         // - Small thumbnails (likely in smaller containers): use smaller dimensions
                         // - Regular thumbnails: use medium dimensions
                         let baseWidth, baseHeight;
-                        
+
                         // Use contextual sizing based on props or item characteristics
                         if (this.small) {
                             // For small thumbnails, use smallest allowed dimension
                             [baseWidth, baseHeight] = findClosestAllowedDimension(200, 110, 'general');
                         } else {
-                            // For regular thumbnails (like in search results), we can estimate 
+                            // For regular thumbnails (like in search results), we can estimate
                             // For a 384x216 container, the closest would be 426x240
                             [baseWidth, baseHeight] = findClosestAllowedDimension(384, 216, 'general');
                         }
-                        
-                        // Use transformThumbnailUrl with the determined optimal size
-                        return transformThumbnailUrl(this.thumbnail, { 
-                            width: baseWidth, 
-                            height: baseHeight, 
-                            type: 'general' 
+
+                        // Use getProgressiveThumbnailUrls with the determined optimal size
+                        return getProgressiveThumbnailUrls(this.thumbnail, {
+                            width: baseWidth,
+                            height: baseHeight,
+                            type: 'general'
                         });
                     } else {
-                        // If we can't extract the video ID, use the original URL
-                        return this.thumbnail;
+                        // If we can't extract the video ID, use the original URL for both preload and optimized
+                        return {
+                            preloadUrl: this.thumbnail,
+                            optimizedUrl: this.thumbnail
+                        };
                     }
                 }
-                // For other images (like channel avatars), return the original URL
-                return this.thumbnail;
+                // For other images (like channel avatars), return the original URL for both
+                return {
+                    preloadUrl: this.thumbnail,
+                    optimizedUrl: this.thumbnail
+                };
             }
-            return this.thumbnail;
+            return {
+                preloadUrl: this.thumbnail,
+                optimizedUrl: this.thumbnail
+            };
         },
+        preloadThumbnail() {
+            return this.progressiveThumbnailUrls.preloadUrl;
+        },
+        optimizedThumbnail() {
+            return this.progressiveThumbnailUrls.optimizedUrl;
+        },
+        currentThumbnail() {
+            // Return the preload thumbnail initially, then the optimized one after it loads
+            return this.isLoaded ? this.optimizedThumbnail : this.preloadThumbnail;
+        },
+    },
+    mounted() {
+        // After the preload image has loaded, fetch the optimized image after a short delay
+        // to ensure the preload image is shown first
+        setTimeout(() => {
+            if (!this.isLoaded) {
+                // Preload the optimized image by creating an Image object
+                const img = new Image();
+                img.src = this.optimizedThumbnail;
+                img.onload = () => {
+                    // Once optimized image is loaded, switch to it
+                    this.isLoaded = true;
+                };
+            }
+        }, 100); // Small delay to ensure preload image is shown first
     },
     methods: {
         isLiveStreamDisabled() {
@@ -230,6 +268,18 @@ export default {
             // The hover effect is handled by CSS classes bound to the isHovered data property
             // No need to manually manipulate the styles anymore
         },
+        onImageLoad() {
+            // Image has loaded (either preload or optimized)
+            // Mark as loaded to switch to the optimized image
+            if (!this.isLoaded) {
+                this.isLoaded = true;
+            }
+        },
+        onImageError(event) {
+            // Don't use placeholder images - just let the image fail gracefully
+            // You can add alternative error handling here if needed
+            console.warn("Thumbnail failed to load:", event.target.src);
+        },
     },
 };
 </script>
@@ -256,6 +306,21 @@ export default {
     transition:
         opacity 0.3s ease,
         backdrop-filter 0.3s ease;
+}
+
+/* Progressive loading transition - only apply to video thumbnails */
+.watched-container img {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.watched-container img:not(.progressive-loaded) {
+    filter: blur(2px);
+}
+
+.watched-container img.progressive-loaded {
+    opacity: 1;
+    filter: none;
 }
 
 /* Hover states for watched overlay */

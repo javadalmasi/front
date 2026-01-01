@@ -4,10 +4,11 @@
             <div class="relative">
                 <img
                     loading="lazy"
-                    :src="optimizedThumbnail"
+                    :src="currentThumbnail"
                     alt="Playlist thumbnail"
-                    class="aspect-video w-full rounded-lg object-cover"
-                    @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
+                    class="aspect-video w-full rounded-lg object-cover progressive-image"
+                    @load="onImageLoad"
+                    @error="onImageError"
                 />
                 <div
                     class="absolute bottom-2 right-2 flex items-center gap-1 rounded bg-black bg-opacity-75 px-1.5 py-0.5 text-xs text-white leading-[1.6]"
@@ -43,7 +44,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
+import { getProgressiveThumbnailUrls, getOptimalThumbnailUrl } from "../utils/ThumbnailUtils";
 
 const props = defineProps({
     item: {
@@ -62,7 +63,7 @@ const props = defineProps({
 
 const uploaderNameRef = ref(null);
 
-const optimizedThumbnail = computed(() => {
+const progressiveThumbnailUrls = computed(() => {
     // Apply the same thumbnail optimization as used in VideoThumbnail
     if (props.item.thumbnail) {
         // Check if this is likely a video thumbnail by checking for common video ID patterns
@@ -71,21 +72,38 @@ const optimizedThumbnail = computed(() => {
             const videoIdMatch = props.item.thumbnail.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
             if (videoIdMatch && videoIdMatch[1]) {
                 // For playlist items, use smaller dimensions similar to other tabs (426x240)
-                // instead of letting getOptimalThumbnailUrl choose based on screen size
-                return getOptimalThumbnailUrl(props.item.thumbnail, {
+                // instead of letting getProgressiveThumbnailUrls choose based on screen size
+                return getProgressiveThumbnailUrls(props.item.thumbnail, {
                     width: 426,
                     height: 240,
                     type: 'general'
                 });
             } else {
-                // If we can't extract the video ID, use the original URL
-                return props.item.thumbnail;
+                // If we can't extract the video ID, use the original URL for both
+                return {
+                    preloadUrl: props.item.thumbnail,
+                    optimizedUrl: props.item.thumbnail
+                };
             }
         }
-        // For other images (like channel avatars), return the original URL
-        return props.item.thumbnail;
+        // For other images (like channel avatars), return the original URL for both
+        return {
+            preloadUrl: props.item.thumbnail,
+            optimizedUrl: props.item.thumbnail
+        };
     }
-    return props.item.thumbnail;
+    return {
+        preloadUrl: props.item.thumbnail,
+        optimizedUrl: props.item.thumbnail
+    };
+});
+
+const preloadThumbnail = computed(() => {
+    return progressiveThumbnailUrls.value.preloadUrl;
+});
+
+const optimizedThumbnail = computed(() => {
+    return progressiveThumbnailUrls.value.optimizedUrl;
 });
 
 const titleStyle = computed(() => {
@@ -105,7 +123,7 @@ const titleStyle = computed(() => {
 const videoUrl = computed(() => {
     const videoIdMatch = props.item.thumbnail?.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
     const videoId = videoIdMatch ? videoIdMatch[1] : null;
-    
+
     // Convert playlist URL format from `/playlist?list=...` to `&list=...` for watch URL
     let playlistParams = '';
     if (props.item.url) {
@@ -118,12 +136,45 @@ const videoUrl = computed(() => {
             playlistParams = `&list=${listId}${index}`;
         }
     }
-    
+
     if (videoId) {
         return `/watch?v=${videoId}${playlistParams}`;
     }
-    
+
     // Fallback to original URL if video ID extraction fails
     return props.item.url;
 });
+
+// Reactive variable to track if the optimized image has loaded
+const isLoaded = ref(false);
+
+// Computed property for the current thumbnail to show
+const currentThumbnail = computed(() => {
+    return isLoaded.value ? optimizedThumbnail.value : preloadThumbnail.value;
+});
+
+// Method to handle progressive image loading
+const onImageLoad = (event) => {
+    // After preload image loads, load the optimized image in the background
+    // Only apply progressive loading if this is actually a video thumbnail
+    if (!isLoaded.value && props.item.thumbnail &&
+        (props.item.thumbnail.includes("ytimg.com") || props.item.thumbnail.includes("youtube.com"))) {
+        // Preload the optimized image by creating an Image object
+        const img = new Image();
+        img.src = optimizedThumbnail.value;
+        img.onload = () => {
+            // Once optimized image is loaded, update the state
+            isLoaded.value = true;
+        };
+    } else {
+        // If it's not a video thumbnail, just mark as loaded immediately
+        isLoaded.value = true;
+    }
+};
+
+// Method to handle image errors
+const onImageError = (event) => {
+    // Don't use placeholder images - just let the image fail gracefully
+    console.warn("Playlist thumbnail failed to load:", event.target.src);
+};
 </script>

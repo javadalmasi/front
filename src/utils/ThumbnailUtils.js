@@ -2,7 +2,7 @@
  * Utility functions for handling thumbnail URLs
  */
 
-import { findClosestAllowedDimension, determineFormat } from './ImageResizer.js';
+import { findClosestAllowedDimension, determineFormat, findClosestAllowedQuality } from './ImageResizer.js';
 
 /**
  * Transforms a YouTube thumbnail URL to the new CDN format
@@ -115,17 +115,13 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
     // Build the CDN URL
     let cdnUrl = `${cdnBaseUrl}${videoId}?resize=${width},${height}`;
 
-    // Constrain quality to allowed values [75, 85]
+    // Use the new findClosestAllowedQuality function to support wider range
     let quality = 85; // Default to 85 if not specified
     if (options.quality !== undefined) {
-        const allowedQualities = [75, 85];
-        quality = allowedQualities.reduce((prev, curr) => {
-            const currDiff = Math.abs(curr - options.quality);
-            const prevDiff = Math.abs(prev - options.quality);
-            if (currDiff < prevDiff) return curr;
-            if (currDiff === prevDiff && curr > prev) return curr; // Choose higher in case of tie
-            return prev;
-        });
+        quality = findClosestAllowedQuality(options.quality);
+    } else {
+        // If no quality specified, default to 85
+        quality = 85;
     }
     // Always add quality parameter as it's required
     cdnUrl += `&quality=${quality}`;
@@ -140,48 +136,93 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
 }
 
 /**
+ * Detects the device type based on screen size, user agent, and other characteristics
+ * @returns {string} Device type: 'mobile', 'tablet', 'desktop', or 'tv'
+ */
+function getDeviceType() {
+    if (typeof window === 'undefined') {
+        return 'desktop'; // Default to desktop for SSR
+    }
+
+    const screenWidth = window.innerWidth || screen.width;
+    const userAgent = navigator.userAgent || '';
+
+    // Check for mobile devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+    // Check for tablet devices
+    const isTablet = /iPad|Android(?=.*\bMobile\b)(?=.*\bSafari\b)|Android|Tablet/i.test(userAgent) ||
+                    (screenWidth >= 768 && screenWidth <= 1024 && (window.orientation !== undefined));
+
+    // Check for TV-like devices (larger screens)
+    const isTV = screenWidth > 1920 || /SmartTV|TV|TVOS|GoogleTV|HbbTV|CE-HTML/i.test(userAgent);
+
+    if (isMobile && !isTablet) {
+        return 'mobile';
+    } else if (isTablet) {
+        return 'tablet';
+    } else if (isTV) {
+        return 'tv';
+    } else {
+        return 'desktop';
+    }
+}
+
+/**
  * Gets appropriate dimensions and quality for general thumbnails (search results, sidebar, etc.)
- * based on screen size, device characteristics, and pixel density
+ * based on device type, screen size, and pixel density
  * @returns {Object} width, height, and quality suitable for general thumbnails (constrained to allowed values)
  */
 export function getGeneralThumbnailSettings() {
-    // Define optimal dimensions based on screen width
+    // Define optimal dimensions based on device type
     if (typeof window === 'undefined') {
         // Default to a common size when not in browser (SSR or testing)
         const [width, height] = findClosestAllowedDimension(640, 360, 'general');
         return {
             width: width.toString(),
             height: height.toString(),
-            quality: 85,
+            quality: 75,
         };
     }
-    
-    const screenWidth = window.innerWidth || screen.width;
+
+    const deviceType = getDeviceType();
     // Get pixel ratio for high-DPI displays (Retina, etc.)
     const pixelRatio = window.devicePixelRatio || 1;
 
     let baseWidth, baseHeight, quality;
 
-    if (screenWidth <= 480) {
-        // Mobile: smaller thumbnails
-        baseWidth = 426; // Use allowed dimension for general
-        baseHeight = 240;
-        quality = 75; // Use allowed quality
-    } else if (screenWidth <= 768) {
-        // Tablet: medium thumbnails
-        baseWidth = 640; // Use allowed dimension for general
-        baseHeight = 360;
-        quality = 75; // Use allowed quality
-    } else if (screenWidth <= 1024) {
-        // Small desktop: standard thumbnails
-        baseWidth = 854; // Use allowed dimension for general
-        baseHeight = 480;
-        quality = 85; // Use allowed quality
-    } else {
-        // Large desktop: larger thumbnails
-        baseWidth = 960; // Use allowed dimension for general
-        baseHeight = 540;
-        quality = 85; // Use allowed quality
+    switch (deviceType) {
+        case 'mobile':
+            // Mobile: up to 320x180 at max
+            baseWidth = 320;
+            baseHeight = 180;
+            quality = pixelRatio > 1 ? 65 : 60; // Moderate quality for mobile
+            break;
+        case 'tablet':
+            // Tablet: up to 320x180 at max
+            baseWidth = 320;
+            baseHeight = 180;
+            quality = pixelRatio > 1 ? 70 : 65; // Moderate quality for tablet
+            break;
+        case 'tv':
+            // TV: based on screen size, up to 1024x576 for large screens
+            const screenWidth = window.innerWidth || screen.width;
+            if (screenWidth > 1920) {
+                baseWidth = 1024;
+                baseHeight = 576;
+            } else {
+                baseWidth = 640;
+                baseHeight = 360;
+            }
+            quality = pixelRatio > 1 ? 80 : 75; // Higher quality for larger displays
+            break;
+        case 'desktop':
+        default:
+            // Desktop: up to 426x240 at max
+            baseWidth = 426;
+            baseHeight = 240;
+            quality = pixelRatio > 1 ? 70 : 65; // Moderate quality for desktop
+            break;
     }
 
     // Scale dimensions by pixel ratio for high-DPI displays but ensure they're allowed
@@ -190,69 +231,28 @@ export function getGeneralThumbnailSettings() {
 
     // Find closest allowed dimension for general type
     const [finalWidth, finalHeight] = findClosestAllowedDimension(scaledWidth, scaledHeight, 'general');
+    const finalQuality = findClosestAllowedQuality(quality);
 
     return {
         width: finalWidth.toString(),
         height: finalHeight.toString(),
-        quality: quality,
+        quality: finalQuality,
     };
 }
 
 /**
  * Gets appropriate dimensions and quality for player thumbnails
- * based on screen size, device characteristics, and pixel density
+ * Always returns 1280x720 with quality 70 on all devices as requested
  * @returns {Object} width, height, and quality suitable for player thumbnails (constrained to allowed values)
  */
 export function getPlayerThumbnailSettings() {
-    // Define optimal dimensions based on screen width
-    if (typeof window === 'undefined') {
-        // Default to a common size when not in browser (SSR or testing)
-        const [width, height] = findClosestAllowedDimension(1280, 720, 'player');
-        return {
-            width: width.toString(),
-            height: height.toString(),
-            quality: 85,
-        };
-    }
-    
-    const screenWidth = window.innerWidth || screen.width;
-    // Get pixel ratio for high-DPI displays (Retina, etc.)
-    const pixelRatio = window.devicePixelRatio || 1;
-
-    let baseWidth, baseHeight, quality;
-
-    if (screenWidth <= 480) {
-        // Mobile: smaller thumbnails
-        baseWidth = 426; // Use allowed dimension
-        baseHeight = 240;
-        quality = 75; // Use allowed quality
-    } else if (screenWidth <= 768) {
-        // Tablet: medium thumbnails
-        baseWidth = 640; // Use allowed dimension
-        baseHeight = 360;
-        quality = 75; // Use allowed quality
-    } else if (screenWidth <= 1024) {
-        // Small desktop: standard thumbnails
-        baseWidth = 854; // Use allowed dimension
-        baseHeight = 480;
-        quality = 85; // Use allowed quality
-    } else {
-        // Large desktop: larger thumbnails
-        baseWidth = 1280; // Use allowed dimension for player
-        baseHeight = 720;
-        quality = 85; // Use allowed quality
-    }
-
-    // Scale dimensions by pixel ratio for high-DPI displays but ensure they're allowed
-    const scaledWidth = Math.round(baseWidth * pixelRatio);
-    const scaledHeight = Math.round(baseHeight * pixelRatio);
-
-    // Find closest allowed dimension for player type
-    const [finalWidth, finalHeight] = findClosestAllowedDimension(scaledWidth, scaledHeight, 'player');
+    // Always return 1280x720 with quality 70 on all devices
+    const [width, height] = findClosestAllowedDimension(1280, 720, 'player');
+    const quality = findClosestAllowedQuality(70);
 
     return {
-        width: finalWidth.toString(),
-        height: finalHeight.toString(),
+        width: width.toString(),
+        height: height.toString(),
         quality: quality,
     };
 }
@@ -270,7 +270,38 @@ export function getOptimalThumbnailSettings(type = 'general') {
     }
 }
 
+/**
+ * Generates both preload and optimized thumbnail URLs for progressive loading
+ * @param {string} originalThumbnailUrl - Original thumbnail URL
+ * @param {Object} additionalOptions - Additional options to override
+ * @param {string} additionalOptions.format - Image format (avif, webp, jpeg) with browser priority
+ * @param {string} additionalOptions.type - Type of image ('general' for search/sidebar or 'player' for video player), defaults to 'general'
+ * @returns {Object} Object containing preloadUrl and optimizedUrl for progressive loading
+ */
+export function getProgressiveThumbnailUrls(originalThumbnailUrl, additionalOptions = {}) {
+    const type = additionalOptions.type || 'general';
 
+    // Preload URL with fixed small size and low quality for fast loading
+    const preloadUrl = transformThumbnailUrl(originalThumbnailUrl, {
+        width: 32,
+        height: 18,
+        quality: 20,
+        format: additionalOptions.format,
+        type: type
+    });
+
+    // Optimized URL based on device type and settings
+    const settings = getOptimalThumbnailSettings(type);
+    const optimizedUrl = transformThumbnailUrl(originalThumbnailUrl, {
+        ...settings,
+        ...additionalOptions
+    });
+
+    return {
+        preloadUrl,
+        optimizedUrl
+    };
+}
 
 /**
  * Generates a thumbnail URL optimally sized for the current device
@@ -284,9 +315,9 @@ export function getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions =
     const type = additionalOptions.type || 'general';
     const settings = getOptimalThumbnailSettings(type);
     // Include format in the options with browser priority
-    const options = { 
-        ...settings, 
-        ...additionalOptions 
+    const options = {
+        ...settings,
+        ...additionalOptions
     };
     return transformThumbnailUrl(originalThumbnailUrl, options);
 }

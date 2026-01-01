@@ -5,7 +5,7 @@ import App from "./App.vue";
 import TimeAgo from "javascript-time-ago";
 
 import fa from "javascript-time-ago/locale/fa";
-import { getOptimalThumbnailUrl } from "./utils/ThumbnailUtils";
+import { getOptimalThumbnailUrl, getProgressiveThumbnailUrls } from "./utils/ThumbnailUtils";
 
 TimeAgo.addDefaultLocale(fa);
 
@@ -358,6 +358,14 @@ const mixin = {
         },
         getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions = {}) {
             return getOptimalThumbnailUrl(originalThumbnailUrl, additionalOptions);
+        },
+        getPlayerThumbnailUrl(originalThumbnailUrl, additionalOptions = {}) {
+            // Always return 1280x720 with quality 70 for player thumbnails
+            const progressiveUrls = getProgressiveThumbnailUrls(originalThumbnailUrl, {
+                ...additionalOptions,
+                type: 'player'
+            });
+            return progressiveUrls.optimizedUrl;
         },
         filterLivestreams(items) {
             if (this.isLiveStreamDisabled()) {

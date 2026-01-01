@@ -78,7 +78,7 @@
                 :src="getCDNThumbnailUrl(video.thumbnail)"
                 :alt="video.title"
                 class="w-full aspect-video object-cover rounded-lg"
-                @error="$event.target.src = '/img/placeholder-video-thumbnail.webp'"
+                @error="onImageError"
               />
               <div
                 v-if="video.watchedAt"
@@ -252,7 +252,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
-import { getOptimalThumbnailUrl, transformThumbnailUrl } from '../utils/ThumbnailUtils.js';
+import { getOptimalThumbnailUrl, transformThumbnailUrl, getProgressiveThumbnailUrls } from '../utils/ThumbnailUtils.js';
 
 export default {
   name: "UserHistory",
@@ -348,13 +348,11 @@ export default {
       // Check if thumbnail is already a full URL or a relative path that needs transformation
       // Handle both absolute URLs and relative paths like /vi_webp/{id}/maxresdefault.webp?host=i.ytimg.com
       if (thumbnail.startsWith('http') || thumbnail.startsWith('/vi_webp/')) {
-        // Use smaller dimensions 426x240 at quality 85 specifically for history view as requested
-        return transformThumbnailUrl(thumbnail, {
-          width: '426',
-          height: '240',
-          quality: 85,
+        // Use the progressive loading approach for history view
+        const progressiveUrls = getProgressiveThumbnailUrls(thumbnail, {
           type: 'general'
         });
+        return progressiveUrls.optimizedUrl; // Return the optimized URL for history view
       }
       // If it's another type of relative path, return as is
       return thumbnail;
@@ -602,6 +600,10 @@ export default {
       } catch (error) {
         console.error("Error applying auto-delete to search history:", error);
       }
+    },
+    onImageError(event) {
+      // Don't use placeholder images - just let the image fail gracefully
+      console.warn("History thumbnail failed to load:", event.target.src);
     },
   }
 };
