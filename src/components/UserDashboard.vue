@@ -196,6 +196,7 @@ export default {
     await this.getRecentActivity();
     await this.loadActivityLogs();
     await this.loadSearchHistory();
+    await this.loadChannelHistory();
   },
   methods: {
     async updateCounts() {
@@ -252,6 +253,84 @@ export default {
       } catch (e) {
         console.error("Error getting dislikes count:", e);
         this.dislikesCount = 0;
+      }
+
+      // Get search history count
+      try {
+        const searchHistory = this.getSearchHistory() || [];
+        this.searchHistoryCount = Array.isArray(searchHistory) ? searchHistory.length : 0;
+      } catch (e) {
+        console.error("Error getting search history count:", e);
+        this.searchHistoryCount = 0;
+      }
+
+      // Get channel history count
+      await this.loadChannelHistoryCount();
+    },
+    async loadChannelHistoryCount() {
+      // Wait for database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          this.channelHistoryCount = 0;
+          return;
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        await new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, setting channel history count to 0");
+              this.channelHistoryCount = 0;
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
+
+      // Check if we have access to the database
+      if (!window.db) {
+        console.error("Database not available for channel history count");
+        this.channelHistoryCount = 0;
+        return;
+      }
+
+      // Check if the channel_history store exists
+      if (!window.db.objectStoreNames.contains("channel_history")) {
+        console.error("channel_history object store does not exist");
+        this.channelHistoryCount = 0;
+        return;
+      }
+
+      try {
+        const tx = window.db.transaction("channel_history", "readonly");
+        const store = tx.objectStore("channel_history");
+        const countRequest = store.count();
+
+        // Return a promise that resolves with the count
+        this.channelHistoryCount = await new Promise((resolve, reject) => {
+          countRequest.onsuccess = () => {
+            resolve(countRequest.result);
+          };
+          countRequest.onerror = (event) => {
+            console.error("Error counting channel history:", event.target.error);
+            reject(event.target.error);
+          };
+        });
+      } catch (e) {
+        console.error("Error getting channel history count:", e);
+        this.channelHistoryCount = 0;
       }
     },
     async backupData(type) {
@@ -778,6 +857,83 @@ export default {
         this.searchHistory = [];
       }
     },
+    async loadChannelHistory() {
+      try {
+        // Wait for database to be ready
+        if (!window.db) {
+          // If IndexedDB is not available in this browser
+          if (!("indexedDB" in window)) {
+            console.warn("IndexedDB not supported in this browser");
+            return;
+          }
+
+          // Wait for a reasonable amount of time for the database to initialize
+          await new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+            const checkDb = () => {
+              if (window.db) {
+                resolve();
+              } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(checkDb, 100);
+              } else {
+                console.warn("Database not ready after waiting, skipping channel history load");
+                resolve();
+              }
+            };
+
+            checkDb();
+          });
+        }
+
+        // Check if we have access to the database
+        if (!window.db) {
+          console.error("Database not available for channel history");
+          return;
+        }
+
+        // Check if the channel_history store exists
+        if (!window.db.objectStoreNames.contains("channel_history")) {
+          console.error("channel_history object store does not exist");
+          return;
+        }
+
+        const tx = window.db.transaction("channel_history", "readonly");
+        const store = tx.objectStore("channel_history");
+        const index = store.index("visitedAt");
+
+        // Get last 10 most recent channel visits
+        const request = index.getAll(null, 10);
+
+        request.onsuccess = () => {
+          const channelHistory = request.result.reverse(); // Reverse to show newest first
+
+          // Convert to log format
+          const channelLogs = channelHistory.map(channel => ({
+            action: `بازدید کانال: ${channel.name}`,
+            timestamp: new Date(channel.visitedAt).toLocaleString(),
+            isChannel: true,
+            details: `Channel: ${channel.name}`,
+            url: channel.url,
+            title: channel.name,
+            pageUrl: window.location.origin + channel.url,
+            timeSpent: null
+          }));
+
+          // Add to activity logs
+          this.activityLogs = [...channelLogs, ...this.activityLogs];
+          this.updateCombinedActivityLogs();
+        };
+
+        request.onerror = (e) => {
+          console.error("Error getting channel history:", e.target.error);
+        };
+      } catch (error) {
+        console.error("Error loading channel history:", error);
+      }
+    },
     updateCombinedActivityLogs() {
       // Convert search history items to log format
       const searchLogs = this.searchHistory.map(searchItem => ({
@@ -789,10 +945,17 @@ export default {
         title: searchItem.query
       }));
 
+      // Convert activity logs to include channel history
+      const activityLogs = this.activityLogs.map(log => ({
+        ...log,
+        isSearch: log.isSearch || false,
+        isChannel: log.isChannel || false
+      }));
+
       // Combine with activity logs and sort by timestamp (newest first)
       this.combinedActivityLogs = [
         ...searchLogs,
-        ...this.activityLogs
+        ...activityLogs
       ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
       // Update displayed logs

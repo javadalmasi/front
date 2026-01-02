@@ -150,6 +150,24 @@
           پاک کردن تاریخچه جستجو
         </button>
       </div>
+
+      <!-- Clear Channel History -->
+      <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
+        <h3 class="text-lg font-bold mb-2 flex items-center">
+          <i class="i-fa6-solid:user-group text-red-500 ml-2"></i>
+          <span v-t="'actions.clear_channel_history'">پاک کردن تاریخچه کانال</span>
+        </h3>
+        <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_channel_history_description'">
+          تمام تاریخچه بازدیدهای کانال را پاک می‌کند.
+        </p>
+        <button
+          class="btn btn-danger"
+          @click="showConfirmClearChannelHistory = true"
+          v-t="'actions.clear_channel_history'"
+        >
+          پاک کردن تاریخچه کانال
+        </button>
+      </div>
     </div>
     
     <!-- Reset Preferences -->
@@ -226,6 +244,13 @@
       @confirm="clearSearchHistory"
       @close="showConfirmClearSearchHistory = false"
     />
+
+    <ConfirmModal
+      v-if="showConfirmClearChannelHistory"
+      :message="$t('info.confirm_clear_channel_history') || 'آیا از پاک کردن تمام تاریخچه کانال اطمینان دارید؟'"
+      @confirm="clearChannelHistory"
+      @close="showConfirmClearChannelHistory = false"
+    />
   </div>
 </template>
 
@@ -247,6 +272,7 @@ export default {
       showConfirmResetPreferences: false,
       showConfirmClearActivityLogs: false,
       showConfirmClearSearchHistory: false,
+      showConfirmClearChannelHistory: false,
     };
   },
   methods: {
@@ -368,6 +394,63 @@ export default {
       } catch (error) {
         console.error("Clear search history error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه جستجو');
+      }
+    },
+    async clearChannelHistory() {
+      try {
+        // Wait for database to be ready
+        if (!window.db) {
+          // If IndexedDB is not available in this browser
+          if (!("indexedDB" in window)) {
+            console.warn("IndexedDB not supported in this browser");
+            this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
+            return;
+          }
+
+          // Wait for a reasonable amount of time for the database to initialize
+          await new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+            const checkDb = () => {
+              if (window.db) {
+                resolve();
+              } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(checkDb, 100);
+              } else {
+                console.warn("Database not ready after waiting, skipping channel history clear");
+                resolve();
+              }
+            };
+
+            checkDb();
+          });
+        }
+
+        // Check if we have access to the database
+        if (!window.db) {
+          console.error("Database not available for channel history clear");
+          this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
+          return;
+        }
+
+        // Check if the channel_history store exists
+        if (!window.db.objectStoreNames.contains("channel_history")) {
+          console.error("channel_history object store does not exist");
+          this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
+          return;
+        }
+
+        const tx = window.db.transaction("channel_history", "readwrite");
+        const store = tx.objectStore("channel_history");
+        store.clear();
+
+        this.showToast(this.$t('info.channel_history_cleared') || 'تاریخچه کانال پاک شد');
+        this.showConfirmClearChannelHistory = false;
+      } catch (error) {
+        console.error("Clear channel history error:", error);
+        this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه کانال');
       }
     },
     showToast(message) {

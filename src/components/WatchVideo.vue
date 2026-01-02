@@ -23,7 +23,7 @@
     <div v-else-if="video && video.error" class="min-h-[80vh] flex flex-col items-center justify-center">
         <h1 v-t="'info.error'" class="text-3xl font-bold"></h1>
         <p class="mt-4 text-xl">{{ video.message || $t("info.video_not_found") }}</p>
-        <a v-t="'actions.back_to_home'" :href="homeUrl" class="btn mt-4"></a>
+        <button v-t="'actions.back_to_home'" class="btn mt-4" @click="backToHome"></button>
     </div>
     <LoadingIndicatorPage v-else :show-content="!!video && !isEmbed && !checkIfLivestreamDisabled(video)" class="w-full">
         <Transition>
@@ -770,6 +770,9 @@ export default {
     methods: {
         onDescriptionExpanded(isExpanded) {
             this.showAdditionalInfo = isExpanded;
+        },
+        backToHome() {
+            this.$router.push('/');
         },
         checkIfLivestreamDisabled(video) {
             // Don't consider short videos as livestreams to be disabled

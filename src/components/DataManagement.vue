@@ -145,6 +145,29 @@
 
           <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg">
             <h3 class="font-semibold mb-2 flex items-center">
+              <i class="i-fa6-solid:user-group text-blue-500 ml-2"></i>
+              <span v-t="'titles.channel_history'">تاریخچه کانال</span>
+            </h3>
+            <div class="flex gap-2">
+              <button
+                class="btn btn-secondary flex-1"
+                @click="backupChannelHistory"
+                v-t="'actions.export'"
+              >
+                صدور
+              </button>
+              <button
+                class="btn btn-info flex-1"
+                @click="importChannelHistory"
+                v-t="'actions.import'"
+              >
+                ورود
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 flex items-center">
               <i class="i-fa6-solid:gear text-blue-500 ml-2"></i>
               <span v-t="'titles.preferences'">تنظیمات</span>
             </h3>
@@ -259,6 +282,12 @@
           <p class="font-semibold" v-t="'titles.search_history'">تاریخچه جستجو</p>
           <p class="text-2xl font-bold" v-text="searchHistoryCount"></p>
         </div>
+
+        <div class="bg-gray-100 dark:bg-dark-500 p-4 rounded-lg text-center">
+          <i class="i-fa6-solid:user-group text-2xl text-orange-500 block mb-2"></i>
+          <p class="font-semibold" v-t="'titles.channel_history'">تاریخچه کانال</p>
+          <p class="text-2xl font-bold" v-text="channelHistoryCount"></p>
+        </div>
       </div>
     </div>
 
@@ -287,6 +316,7 @@ export default {
       likesCount: 0,
       dislikesCount: 0,
       searchHistoryCount: 0,
+      channelHistoryCount: 0,
       showConfirmResetPreferences: false,
     };
   },
@@ -333,6 +363,75 @@ export default {
       // Get search history count
       const searchHistory = this.getSearchHistory() || [];
       this.searchHistoryCount = Array.isArray(searchHistory) ? searchHistory.length : 0;
+
+      // Get channel history count
+      await this.loadChannelHistoryCount();
+    },
+    async loadChannelHistoryCount() {
+      // Wait for database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          this.channelHistoryCount = 0;
+          return;
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        await new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, setting channel history count to 0");
+              this.channelHistoryCount = 0;
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
+
+      // Check if we have access to the database
+      if (!window.db) {
+        console.error("Database not available for channel history count");
+        this.channelHistoryCount = 0;
+        return;
+      }
+
+      // Check if the channel_history store exists
+      if (!window.db.objectStoreNames.contains("channel_history")) {
+        console.error("channel_history object store does not exist");
+        this.channelHistoryCount = 0;
+        return;
+      }
+
+      try {
+        const tx = window.db.transaction("channel_history", "readonly");
+        const store = tx.objectStore("channel_history");
+        const countRequest = store.count();
+
+        // Return a promise that resolves with the count
+        this.channelHistoryCount = await new Promise((resolve, reject) => {
+          countRequest.onsuccess = () => {
+            resolve(countRequest.result);
+          };
+          countRequest.onerror = (event) => {
+            console.error("Error counting channel history:", event.target.error);
+            reject(event.target.error);
+          };
+        });
+      } catch (e) {
+        console.error("Error getting channel history count:", e);
+        this.channelHistoryCount = 0;
+      }
     },
     getLocalSubscriptions() {
       const subs = localStorage.getItem("localSubscriptions");
@@ -364,6 +463,7 @@ export default {
           likes: JSON.parse(localStorage.getItem("likes") || "[]"),
           dislikes: JSON.parse(localStorage.getItem("dislikes") || "[]"),
           searchHistory: this.getSearchHistory(),
+          channelHistory: await this.getChannelHistoryData(),
           preferences: this.getAllPreferences(),
           timestamp: new Date().toISOString()
         };
@@ -391,6 +491,66 @@ export default {
         try {
           const tx = window.db.transaction("watch_history", "readonly");
           const store = tx.objectStore("watch_history");
+          const request = store.getAll();
+
+          request.onsuccess = () => {
+            resolve(request.result);
+          };
+
+          request.onerror = (e) => {
+            reject(e.target.error);
+          };
+        } catch (error) {
+          reject(error);
+        }
+      });
+    },
+    async getChannelHistoryData() {
+      // Wait for database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          return [];
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        await new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, returning empty channel history data");
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
+
+      // Check if we have access to the database
+      if (!window.db) {
+        console.error("Database not available for channel history");
+        return [];
+      }
+
+      // Check if the channel_history store exists
+      if (!window.db.objectStoreNames.contains("channel_history")) {
+        console.error("channel_history object store does not exist");
+        return [];
+      }
+
+      return new Promise((resolve, reject) => {
+        try {
+          const tx = window.db.transaction("channel_history", "readonly");
+          const store = tx.objectStore("channel_history");
           const request = store.getAll();
 
           request.onsuccess = () => {
@@ -452,6 +612,9 @@ export default {
                 if (data.searchHistory) {
                   localStorage.setItem("search_history", JSON.stringify(data.searchHistory));
                 }
+                if (data.channelHistory && window.db) {
+                  await this.importChannelHistoryData(data.channelHistory);
+                }
                 break;
               case 'subscriptions':
                 localStorage.setItem("localSubscriptions", JSON.stringify(data));
@@ -459,6 +622,11 @@ export default {
               case 'history':
                 if (window.db) {
                   await this.importHistoryData(data);
+                }
+                break;
+              case 'channelHistory':
+                if (window.db) {
+                  await this.importChannelHistoryData(data);
                 }
                 break;
               case 'likes':
@@ -518,6 +686,75 @@ export default {
       clearTx.onerror = (e) => {
         console.error("Error clearing history:", e);
         this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
+      };
+    },
+    async importChannelHistoryData(channelHistoryData) {
+      // Wait for database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          return;
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        await new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, skipping channel history import");
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
+
+      // Check if we have access to the database
+      if (!window.db) {
+        console.error("Database not available for channel history import");
+        return;
+      }
+
+      // Check if the channel_history store exists
+      if (!window.db.objectStoreNames.contains("channel_history")) {
+        console.error("channel_history object store does not exist");
+        return;
+      }
+
+      const clearTx = window.db.transaction("channel_history", "readwrite");
+      const clearStore = clearTx.objectStore("channel_history");
+      clearStore.clear();
+
+      clearTx.oncomplete = () => {
+        const addTx = window.db.transaction("channel_history", "readwrite");
+        const addStore = addTx.objectStore("channel_history");
+
+        channelHistoryData.forEach(item => {
+          addStore.add(item);
+        });
+
+        addTx.oncomplete = () => {
+          this.showToast(this.$t('info.channel_history_imported_successfully') || 'تاریخچه کانال با موفقیت وارد شد');
+        };
+
+        addTx.onerror = (e) => {
+          console.error("Error importing channel history:", e);
+          this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه کانال');
+        };
+      };
+
+      clearTx.onerror = (e) => {
+        console.error("Error clearing channel history:", e);
+        this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه کانال');
       };
     },
     backupSubscriptions() {
@@ -635,6 +872,32 @@ export default {
     },
     importSearchHistory() {
       this.importData('searchHistory');
+    },
+    backupChannelHistory() {
+      if (window.db) {
+        this.getChannelHistoryData().then(channelHistoryData => {
+          const data = JSON.stringify(channelHistoryData, null, 2);
+          const blob = new Blob([data], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `channel_history_${this.getTimestamp()}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان تاریخچه کانال ایجاد شد');
+        }).catch(e => {
+          console.error("Backup channel history error:", e);
+          this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان تاریخچه کانال');
+        });
+      } else {
+        this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
+      }
+    },
+    importChannelHistory() {
+      this.importData('channelHistory');
     },
     restoreAllData() {
       this.importData('all');

@@ -441,6 +441,24 @@
               </div>
             </div>
 
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center">
+                <label class="toggle-switch ml-2">
+                  <input
+                    id="chkStoreChannelHistory"
+                    v-model="channelHistory"
+                    type="checkbox"
+                    @change="onChange"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <label class="pref font-semibold tooltip-container" for="chkStoreChannelHistory">
+                  <span v-t="'actions.store_channel_history'">ذخیره تاریخچه کانال</span>
+                  <span class="tooltip-text">{{ getTooltipByActionLabel('actions.store_channel_history') }}</span>
+                </label>
+              </div>
+            </div>
+
             <div v-if="watchHistory && !isWatchHistoryStorageDisabled" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div class="flex items-center">
                 <label class="toggle-switch ml-2">
@@ -794,6 +812,7 @@ export default {
       logUserActivity: true, // Default to true as requested
       autoplay: true,
       defaultSpeed: "1.0",
+      channelHistory: true, // Default to true as requested
     };
   },
   computed: {
@@ -936,6 +955,7 @@ export default {
       this.logUserActivity = this.getPreferenceBoolean("logUserActivity", true);
       this.autoplay = this.getPreferenceBoolean("autoplay", true);
       this.defaultSpeed = this.getPreferenceString("defaultSpeed", "1.0");
+      this.channelHistory = this.getPreferenceBoolean("channelHistory", true);
 
     }
   },
@@ -990,6 +1010,7 @@ export default {
         localStorage.setItem("logUserActivity", this.logUserActivity);
         localStorage.setItem("autoplay", this.autoplay);
         localStorage.setItem("defaultSpeed", this.defaultSpeed);
+        localStorage.setItem("channelHistory", this.channelHistory);
 
         if (shouldReload) window.location.reload();
       }

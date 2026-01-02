@@ -7,7 +7,7 @@
       <h1 class="text-2xl font-bold" v-t="'titles.history'">تاریخچه</h1>
     </div>
 
-    <!-- Tabs for Video History and Search History -->
+    <!-- Tabs for Video History, Search History and Channel History -->
     <div class="flex border-b border-gray-200 dark:border-dark-100 mb-6">
       <button
         :class="['tab', { 'active': activeTab === 'videos' }]"
@@ -22,6 +22,13 @@
         v-t="'titles.search_history'"
       >
         تاریخچه جستجوها
+      </button>
+      <button
+        :class="['tab', { 'active': activeTab === 'channels' }]"
+        @click="activeTab = 'channels'"
+        v-t="'titles.channel_history'"
+      >
+        تاریخچه کانال‌ها
       </button>
     </div>
 
@@ -47,21 +54,14 @@
 
           <div v-if="autoDeleteHistory" class="flex items-center gap-2">
             <label v-t="'info.auto_delete_after'">حذف پس از</label>
-            <select
+            <input
               v-model="autoDeleteDelayHours"
-              class="select"
+              type="number"
+              min="1"
+              class="input w-24"
               @change="onChange"
-            >
-              <option value="1" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ ساعت</option>
-              <option value="3" v-t="{ path: 'info.hours', args: { amount: '3' } }">۳ ساعت</option>
-              <option value="6" v-t="{ path: 'info.hours', args: { amount: '6' } }">۶ ساعت</option>
-              <option value="12" v-t="{ path: 'info.hours', args: { amount: '12' } }">۱۲ ساعت</option>
-              <option value="24" v-t="{ path: 'info.hours', args: { amount: '24' } }">۲۴ ساعت</option>
-              <option value="72" v-t="{ path: 'info.hours', args: { amount: '72' } }">۳ روز</option>
-              <option value="168" v-t="{ path: 'info.hours', args: { amount: '168' } }">۱ هفته</option>
-              <option value="336" v-t="{ path: 'info.hours', args: { amount: '336' } }">۲ هفته</option>
-              <option value="720" v-t="{ path: 'info.hours', args: { amount: '720' } }">۱ ماه</option>
-            </select>
+            />
+            <span v-t="'info.hours'">ساعت</span>
           </div>
         </div>
       </div>
@@ -150,17 +150,14 @@
 
           <div v-if="autoDeleteSearchHistory" class="flex flex-wrap items-center gap-2">
             <label v-t="'info.auto_delete_after'">حذف پس از</label>
-            <select
+            <input
               v-model="autoDeleteSearchHistoryDelayHours"
-              class="select"
+              type="number"
+              min="1"
+              class="input w-24"
               @change="onAutoDeleteSearchHistoryChange"
-            >
-              <option value="24" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ روز</option>
-              <option value="48" v-t="{ path: 'info.hours', args: { amount: '2' } }">۲ روز</option>
-              <option value="168" v-t="{ path: 'info.hours', args: { amount: '7' } }">۱ هفته</option>
-              <option value="336" v-t="{ path: 'info.hours', args: { amount: '14' } }">۲ هفته</option>
-              <option value="720" v-t="{ path: 'info.hours', args: { amount: '30' } }">۱ ماه</option>
-            </select>
+            />
+            <span v-t="'info.hours'">ساعت</span>
           </div>
         </div>
 
@@ -177,29 +174,6 @@
               @change="onAutoDeleteSearchHistoryChange"
             />
             <span v-t="'info.items'">مورد</span>
-          </div>
-        </div>
-
-        <div v-if="autoDeleteSearchHistory" class="flex flex-wrap items-center gap-4 mt-4">
-          <label class="flex items-center gap-2">
-            <span v-t="'actions.auto_delete_search_history_time'">یا حذف بعد از</span>
-          </label>
-          <div class="flex flex-wrap items-center gap-2">
-            <select
-              v-model="autoDeleteSearchHistoryDelayHours"
-              class="select"
-              @change="onAutoDeleteSearchHistoryChange"
-            >
-              <option value="1" v-t="{ path: 'info.hours', args: { amount: '1' } }">۱ ساعت</option>
-              <option value="3" v-t="{ path: 'info.hours', args: { amount: '3' } }">۳ ساعت</option>
-              <option value="6" v-t="{ path: 'info.hours', args: { amount: '6' } }">۶ ساعت</option>
-              <option value="12" v-t="{ path: 'info.hours', args: { amount: '12' } }">۱۲ ساعت</option>
-              <option value="24" v-t="{ path: 'info.hours', args: { amount: '24' } }">۲۴ ساعت</option>
-              <option value="72" v-t="{ path: 'info.hours', args: { amount: '72' } }">۳ روز</option>
-              <option value="168" v-t="{ path: 'info.hours', args: { amount: '168' } }">۱ هفته</option>
-              <option value="336" v-t="{ path: 'info.hours', args: { amount: '336' } }">۲ هفته</option>
-              <option value="720" v-t="{ path: 'info.hours', args: { amount: '720' } }">۱ ماه</option>
-            </select>
           </div>
         </div>
       </div>
@@ -233,6 +207,96 @@
       </div>
     </div>
 
+    <!-- Channel History Tab -->
+    <div v-if="activeTab === 'channels'">
+      <div class="bg-gray-200 dark:bg-dark-400 p-6 rounded-xl shadow mb-6">
+        <div class="flex flex-wrap gap-4 mb-4">
+          <button class="btn btn-danger" @click="showConfirmClearChannelDialog = true" v-t="'actions.clear_channel_history'">
+            پاک کردن همه
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input
+              id="autoDeleteChannel"
+              v-model="autoDeleteChannelHistory"
+              type="checkbox"
+              @change="onAutoDeleteChannelHistoryChange"
+            />
+            <span v-t="'actions.auto_delete_channel_history'">حذف خودکار تاریخچه کانال</span>
+          </label>
+
+          <div v-if="autoDeleteChannelHistory" class="flex items-center gap-2">
+            <label v-t="'info.auto_delete_after'">حذف پس از</label>
+            <input
+              v-model="autoDeleteChannelHistoryDelayHours"
+              type="number"
+              min="1"
+              class="input w-24"
+              @change="onAutoDeleteChannelHistoryChange"
+            />
+            <span v-t="'info.hours'">ساعت</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="channels.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div
+          v-for="channel in channels"
+          :key="channel.channelId"
+          class="bg-gray-200 dark:bg-dark-400 rounded-xl shadow p-4 relative group"
+        >
+          <router-link :to="channel.url">
+            <div class="flex items-center">
+              <img
+                :src="channel.avatar"
+                :alt="channel.name"
+                class="w-16 h-16 rounded-full object-cover"
+                @error="onImageError"
+              />
+              <div class="mr-3">
+                <div class="font-medium text-[14px] leading-6 line-clamp-2" v-text="channel.name"></div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" v-text="formatDate(channel.visitedAt)"></p>
+              </div>
+            </div>
+          </router-link>
+
+          <button
+            class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            @click="removeFromChannelHistory(channel.channelId)"
+            title="Remove from channel history"
+          >
+            <i class="i-fa6-solid:xmark"></i>
+          </button>
+        </div>
+      </div>
+      <div v-else class="text-center py-10">
+        <h2 class="text-xl font-bold mb-2" v-t="'info.no_channel_history'">تاریخچه کانالی وجود ندارد</h2>
+        <p
+          class="mb-4"
+          v-if="!getPreferenceBoolean('channelHistory', true)"
+          v-t="'info.channel_history_desc'"
+        >
+          بازدیدهای شما از کانال‌ها در اینجا ظاهر می‌شوند. تاریخچه کانال را در تنظیمات فعال کنید تا بازدیدهای خود از کانال‌ها را ذخیره کنید.
+        </p>
+        <p
+          class="mb-4"
+          v-else
+          v-t="'info.no_channels_in_history'"
+        >
+          شما هنوز از هیچ کانالی بازدید نکرده‌اید.
+        </p>
+        <router-link
+          v-if="!getPreferenceBoolean('channelHistory', true)"
+          to="/user/gust/preferences"
+          class="btn btn-primary"
+          v-t="'actions.enable_channel_history'"
+        >
+        </router-link>
+      </div>
+    </div>
+
     <!-- Confirmation Modals -->
     <ConfirmModal
       v-if="showConfirmClearDialog"
@@ -246,6 +310,13 @@
       :message="$t('actions.confirm_clear_search_history')"
       @confirm="clearSearchHistory"
       @close="showConfirmClearSearchDialog = false"
+    />
+
+    <ConfirmModal
+      v-if="showConfirmClearChannelDialog"
+      :message="$t('actions.confirm_clear_channel_history')"
+      @confirm="clearChannelHistory"
+      @close="showConfirmClearChannelDialog = false"
     />
   </div>
 </template>
@@ -263,27 +334,34 @@ export default {
     return {
       videos: [],
       searchHistory: [],
+      channels: [],
       activeTab: 'videos', // Default to videos tab
       showConfirmClearDialog: false,
       showConfirmClearSearchDialog: false,
+      showConfirmClearChannelDialog: false,
       autoDeleteHistory: false,
-      autoDeleteDelayHours: "24",
+      autoDeleteDelayHours: 24,
       autoDeleteSearchHistory: false,
-      autoDeleteSearchHistoryDelayHours: "24",
+      autoDeleteSearchHistoryDelayHours: 24,
       autoDeleteSearchHistoryMaxCount: 50,
+      autoDeleteChannelHistory: false,
+      autoDeleteChannelHistoryDelayHours: 24,
     };
   },
   async mounted() {
     document.title = this.$t("titles.history") + " - " + this.getSiteName();
 
     this.autoDeleteHistory = this.getPreferenceBoolean("autoDeleteWatchHistory", false);
-    this.autoDeleteDelayHours = this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24");
+    this.autoDeleteDelayHours = parseInt(this.getPreferenceString("autoDeleteWatchHistoryDelayHours", "24"));
     this.autoDeleteSearchHistory = this.getPreferenceBoolean("autoDeleteSearchHistory", false);
-    this.autoDeleteSearchHistoryDelayHours = this.getPreferenceString("autoDeleteSearchHistoryDelayHours", "24");
+    this.autoDeleteSearchHistoryDelayHours = parseInt(this.getPreferenceString("autoDeleteSearchHistoryDelayHours", "24"));
     this.autoDeleteSearchHistoryMaxCount = parseInt(this.getPreferenceString("autoDeleteSearchHistoryMaxCount", "50"));
+    this.autoDeleteChannelHistory = this.getPreferenceBoolean("autoDeleteChannelHistory", false);
+    this.autoDeleteChannelHistoryDelayHours = parseInt(this.getPreferenceString("autoDeleteChannelHistoryDelayHours", "24"));
 
     // Initialize to empty array to prevent any undefined issues
     this.videos = [];
+    this.channels = [];
     const rawSearchHistory = this.getSearchHistory();
     // Convert to new format if needed
     this.searchHistory = rawSearchHistory.map(item =>
@@ -329,6 +407,11 @@ export default {
         console.error("Error accessing IndexedDB:", error);
         this.videos = [];
       }
+    }
+
+    // Load channel history from IndexedDB
+    if (this.getPreferenceBoolean("channelHistory", true)) {
+      this.loadChannelHistory();
     }
   },
   watch: {
@@ -379,7 +462,7 @@ export default {
     },
     onChange() {
       this.setPreference("autoDeleteWatchHistory", this.autoDeleteHistory);
-      this.setPreference("autoDeleteWatchHistoryDelayHours", this.autoDeleteDelayHours);
+      this.setPreference("autoDeleteWatchHistoryDelayHours", this.autoDeleteDelayHours.toString());
 
       if (!this.autoDeleteHistory) return false;
     },
@@ -567,7 +650,7 @@ export default {
     },
     onAutoDeleteSearchHistoryChange() {
       this.setPreference("autoDeleteSearchHistory", this.autoDeleteSearchHistory);
-      this.setPreference("autoDeleteSearchHistoryDelayHours", this.autoDeleteSearchHistoryDelayHours);
+      this.setPreference("autoDeleteSearchHistoryDelayHours", this.autoDeleteSearchHistoryDelayHours.toString());
       this.setPreference("autoDeleteSearchHistoryMaxCount", this.autoDeleteSearchHistoryMaxCount);
 
       // Apply auto-delete immediately if enabled
@@ -604,6 +687,151 @@ export default {
     onImageError(event) {
       // Don't use placeholder images - just let the image fail gracefully
       console.warn("History thumbnail failed to load:", event.target.src);
+    },
+    async loadChannelHistory() {
+      // Wait for database to be ready
+      if (!window.db) {
+        // If IndexedDB is not available in this browser
+        if (!("indexedDB" in window)) {
+          console.warn("IndexedDB not supported in this browser");
+          return;
+        }
+
+        // Wait for a reasonable amount of time for the database to initialize
+        await new Promise((resolve) => {
+          let attempts = 0;
+          const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+          const checkDb = () => {
+            if (window.db) {
+              resolve();
+            } else if (attempts < maxAttempts) {
+              attempts++;
+              setTimeout(checkDb, 100);
+            } else {
+              console.warn("Database not ready after waiting, skipping channel history load");
+              resolve();
+            }
+          };
+
+          checkDb();
+        });
+      }
+
+      // Check if we have access to the database
+      if (!window.db) {
+        console.error("Database not available for channel history");
+        return;
+      }
+
+      // Check if the channel_history store exists
+      if (!window.db.objectStoreNames.contains("channel_history")) {
+        console.error("channel_history object store does not exist");
+        return;
+      }
+
+      try {
+        const tx = window.db.transaction("channel_history", "readonly");
+        const store = tx.objectStore("channel_history");
+        const index = store.index("visitedAt");
+
+        const request = index.openCursor(null, "prev");
+        const channels = []; // Local temporary array to collect channels
+
+        request.onsuccess = e => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const channel = cursor.value;
+            channels.push({
+              channelId: channel.channelId,
+              name: channel.name,
+              avatar: channel.avatar,
+              url: channel.url,
+              visitedAt: channel.visitedAt
+            });
+            cursor.continue();
+          } else {
+            // Assign collected channels to component's data
+            this.channels = channels;
+          }
+        };
+
+        // Add error handler for proper debugging
+        request.onerror = e => {
+          console.error("Error accessing channel history from IndexedDB:", e.target.error);
+          this.channels = []; // Ensure it's reset even if there's an error
+        };
+      } catch (error) {
+        console.error("Error accessing channel history IndexedDB:", error);
+        this.channels = [];
+      }
+    },
+    removeFromChannelHistory(channelId) {
+      if (window.db) {
+        const tx = window.db.transaction("channel_history", "readwrite");
+        const store = tx.objectStore("channel_history");
+        store.delete(channelId);
+
+        // Remove from UI as well
+        this.channels = this.channels.filter(channel => channel.channelId !== channelId);
+        this.showToast(this.$t('info.channel_removed_from_history') || 'کانال از تاریخچه حذف شد');
+      }
+    },
+    async clearChannelHistory() {
+      if (window.db) {
+        const tx = window.db.transaction("channel_history", "readwrite");
+        const store = tx.objectStore("channel_history");
+        store.clear();
+        this.channels = [];
+        this.showToast(this.$t('info.channel_history_cleared') || 'تاریخچه کانال پاک شد');
+      }
+    },
+    onAutoDeleteChannelHistoryChange() {
+      this.setPreference("autoDeleteChannelHistory", this.autoDeleteChannelHistory);
+      this.setPreference("autoDeleteChannelHistoryDelayHours", this.autoDeleteChannelHistoryDelayHours.toString());
+
+      // Apply auto-delete immediately if enabled
+      if (this.autoDeleteChannelHistory) {
+        this.applyAutoDeleteChannelHistory();
+      }
+    },
+    applyAutoDeleteChannelHistory() {
+      try {
+        if (!window.db) return;
+
+        // Apply time-based deletion
+        if (this.autoDeleteChannelHistory) {
+          const maxTimeDiff = Number(this.autoDeleteChannelHistoryDelayHours) * 60 * 60 * 1000;
+          const cutoffTime = Date.now() - maxTimeDiff;
+
+          const tx = window.db.transaction("channel_history", "readwrite");
+          const store = tx.objectStore("channel_history");
+          const index = store.index("visitedAt");
+
+          const request = index.openCursor();
+          request.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+              const channel = cursor.value;
+              const channelTime = new Date(channel.visitedAt).getTime();
+
+              if (channelTime < cutoffTime) {
+                // Delete this channel entry
+                cursor.delete();
+              }
+              cursor.continue();
+            } else {
+              // Refresh the UI after deletion
+              this.channels = this.channels.filter(channel => {
+                const channelTime = new Date(channel.visitedAt).getTime();
+                return channelTime >= cutoffTime;
+              });
+            }
+          };
+        }
+      } catch (error) {
+        console.error("Error applying auto-delete to channel history:", error);
+      }
     },
   }
 };

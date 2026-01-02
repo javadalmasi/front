@@ -117,7 +117,7 @@ export default {
         this.setupActivityLogging();
 
         if ("indexedDB" in window) {
-            const request = indexedDB.open("vidioo-db", 6);
+            const request = indexedDB.open("vidioo-db", 7);
             request.onupgradeneeded = ev => {
                 const db = request.result;
                 console.log("Upgrading object store.");
@@ -133,6 +133,11 @@ export default {
                 if (!db.objectStoreNames.contains("channel_groups")) {
                     const store = db.createObjectStore("channel_groups", { keyPath: "groupName" });
                     store.createIndex("groupName", "groupName", { unique: true });
+                }
+                if (!db.objectStoreNames.contains("channel_history") && ev.oldVersion < 7) {
+                    const store = db.createObjectStore("channel_history", { keyPath: "channelId" });
+                    store.createIndex("channelId", "channelId", { unique: true });
+                    store.createIndex("visitedAt", "visitedAt", { unique: false });
                 }
                 // migration to fix an invalid previous length of channel ids: 11 -> 24
                 (async () => {
@@ -299,6 +304,11 @@ export default {
 
                 // Store the activity log in localStorage
                 this.logActivity(activityEntry);
+
+                // If this is a channel visit, also log it to channel history if enabled
+                if (to.name === 'Channel') {
+                    this.logChannelVisit(to);
+                }
             }, { immediate: true });
         },
         getActionBasedOnRoute(routeName) {
@@ -307,6 +317,8 @@ export default {
                 return 'تماشای ویدیو';
             } else if (routeName === 'SearchResults') {
                 return 'جست و جو';
+            } else if (routeName === 'Channel') {
+                return 'بازدید کانال';
             } else if (routeName === 'UserDashboard') {
                 return 'بازدید داشبورد';
             } else if (routeName === 'UserPreferences') {
@@ -336,6 +348,7 @@ export default {
                 'UserLikes': 'ویدیوهای پسندیده شده',
                 'UserDislikes': 'ویدیوهای نپسندیده شده',
                 'UserSubscriptions': 'اشتراک‌ها',
+                'UserChannelHistory': 'تاریخچه کانال',
                 'Import': 'درون‌ریزی',
                 'Subscriptions': 'فهرست اشتراک',
                 'HistoryPage': 'تاریخچه',
@@ -379,6 +392,92 @@ export default {
             } catch (error) {
                 console.error("Error logging activity:", error);
             }
+        },
+        async logChannelVisit(route) {
+            // Check if channel history is enabled in preferences
+            let channelHistoryEnabled = true;
+            const prefValue = localStorage.getItem("pref_channelHistory");
+            if (prefValue !== null) {
+                channelHistoryEnabled = (prefValue === "true");
+            }
+
+            if (!channelHistoryEnabled) {
+                return; // Don't log if disabled
+            }
+
+            // Wait for database to be ready
+            if (!window.db) {
+                // If IndexedDB is not available in this browser
+                if (!("indexedDB" in window)) {
+                    console.warn("IndexedDB not supported in this browser");
+                    return;
+                }
+
+                // Wait for a reasonable amount of time for the database to initialize
+                await new Promise((resolve) => {
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+                    const checkDb = () => {
+                        if (window.db) {
+                            resolve();
+                        } else if (attempts < maxAttempts) {
+                            attempts++;
+                            setTimeout(checkDb, 100);
+                        } else {
+                            console.warn("Database not ready after waiting, skipping channel history save");
+                            resolve();
+                        }
+                    };
+
+                    checkDb();
+                });
+            }
+
+            // Check if we have access to the database
+            if (!window.db) {
+                console.error("Database not available for channel history");
+                return;
+            }
+
+            // Check if the channel_history store exists
+            if (!window.db.objectStoreNames.contains("channel_history")) {
+                console.error("channel_history object store does not exist");
+                return;
+            }
+
+            // Get channel information from the current page if available
+            // This is a fallback in case the channel data isn't available in the route
+            const channelName = document.querySelector('h1')?.textContent?.trim() ||
+                               document.title.replace(' - vidioo', '').trim() ||
+                               `کانال ${route.params.channelId}`;
+            const channelAvatar = document.querySelector('img[loading="lazy"]')?.src ||
+                                  `/img/placeholder-avatar.jpg`;
+
+            // Prepare channel data for history
+            const channelData = {
+                channelId: route.params.channelId,
+                name: channelName,
+                avatar: channelAvatar,
+                url: route.fullPath, // Store the full route path
+                visitedAt: new Date().toISOString()
+            };
+
+            // Save to IndexedDB
+            const tx = window.db.transaction("channel_history", "readwrite");
+            const store = tx.objectStore("channel_history");
+
+            // Add the channel data to the store
+            store.put(channelData);
+
+            // Handle transaction completion
+            tx.oncomplete = () => {
+                console.log("Channel visit logged to history successfully");
+            };
+
+            tx.onerror = (event) => {
+                console.error("Error saving channel visit to history:", event.target.error);
+            };
         },
         getSiteName() {
             return import.meta.env.VITE_SITE_NAME || "vidioo";

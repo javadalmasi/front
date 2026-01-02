@@ -226,6 +226,9 @@ export default {
 
                         // Start loading the banner image after channel data is loaded
                         this.loadBannerImage();
+
+                        // Save channel visit to history if enabled
+                        this.saveChannelToHistory();
                     }
                 });
         },
@@ -388,6 +391,79 @@ export default {
                 // Set empty array if there's an error to prevent endless loading state
                 this.contentItems = this.tabs[index].content = [];
             });
+        },
+        async saveChannelToHistory() {
+            // Check if channel history is enabled in preferences
+            const channelHistoryEnabled = this.getPreferenceBoolean("channelHistory", true);
+            if (!channelHistoryEnabled) {
+                return; // Don't save if disabled
+            }
+
+            // Wait for database to be ready
+            if (!window.db) {
+                // If IndexedDB is not available in this browser
+                if (!("indexedDB" in window)) {
+                    console.warn("IndexedDB not supported in this browser");
+                    return;
+                }
+
+                // Wait for a reasonable amount of time for the database to initialize
+                await new Promise((resolve) => {
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds with 100ms intervals
+
+                    const checkDb = () => {
+                        if (window.db) {
+                            resolve();
+                        } else if (attempts < maxAttempts) {
+                            attempts++;
+                            setTimeout(checkDb, 100);
+                        } else {
+                            console.warn("Database not ready after waiting, skipping channel history save");
+                            resolve();
+                        }
+                    };
+
+                    checkDb();
+                });
+            }
+
+            // Check if we have access to the database
+            if (!window.db) {
+                console.error("Database not available for channel history");
+                return;
+            }
+
+            // Check if the channel_history store exists
+            if (!window.db.objectStoreNames.contains("channel_history")) {
+                console.error("channel_history object store does not exist");
+                return;
+            }
+
+            // Prepare channel data for history
+            const channelData = {
+                channelId: this.channel.id,
+                name: this.channel.name,
+                avatar: this.channel.avatarUrl,
+                url: this.$route.path, // Store the current route path
+                visitedAt: new Date().toISOString()
+            };
+
+            // Save to IndexedDB
+            const tx = window.db.transaction("channel_history", "readwrite");
+            const store = tx.objectStore("channel_history");
+
+            // Add the channel data to the store
+            store.put(channelData);
+
+            // Handle transaction completion
+            tx.oncomplete = () => {
+                console.log("Channel saved to history successfully");
+            };
+
+            tx.onerror = (event) => {
+                console.error("Error saving channel to history:", event.target.error);
+            };
         },
     },
 };
