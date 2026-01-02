@@ -50,12 +50,12 @@ export default {
     setupServiceWorkerUpdate() {
       // Register service worker with update functionality
       const { needRefresh, updateServiceWorker } = registerSW({
-        onNeedRefresh() {
+        onNeedRefresh: () => {
           // Show update notification when new version is available
           console.log('New version available, showing update notification');
           this.showUpdateNotification = true;
         },
-        onRegisteredSW(swScriptUrl, registration) {
+        onRegisteredSW: (swScriptUrl, registration) => {
           console.log('Service Worker registered with scope:', registration?.scope);
           this.registration = registration;
 
@@ -66,7 +66,7 @@ export default {
             }, 60000); // Check for updates every minute
           }
         },
-        onRegisterError(error) {
+        onRegisterError: (error) => {
           console.error('Service Worker registration error:', error);
         }
       });
