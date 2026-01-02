@@ -998,6 +998,24 @@ export default {
       this.currentPage = 1;
       this.showMoreLogs = this.combinedActivityLogs.length > this.logsPerPage;
     },
+    getSearchHistory() {
+      try {
+        const history = localStorage.getItem("search_history");
+        const parsedHistory = history ? JSON.parse(history) : [];
+
+        // If the history is in the old format (just strings), convert it to the new format
+        if (parsedHistory.length > 0 && typeof parsedHistory[0] === 'string') {
+          return parsedHistory.map(query => ({
+            query: query,
+            timestamp: new Date().toISOString() // Use current timestamp for old entries
+          }));
+        }
+
+        return parsedHistory;
+      } catch {
+        return [];
+      }
+    },
     displayMoreLogs() {
       const startIndex = this.currentPage * this.logsPerPage;
       const endIndex = Math.min(startIndex + this.logsPerPage, this.combinedActivityLogs.length);
