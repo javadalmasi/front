@@ -1379,85 +1379,48 @@ export default {
 
 /* Consistent and harmonious color scheme for all buttons */
 .btn-icon.btn-success {
-    background-color: #e8f5e9 !important; /* Light green for like button */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    @apply bg-gray-100 dark:bg-dark-800 text-gray-800 dark:text-gray-200;
 }
-
 .btn-icon.btn-success:hover {
-    background-color: #4caf50 !important; /* Green on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+    @apply bg-gray-200 dark:bg-dark-700;
 }
-
 .btn-icon.btn-success.active {
-    background-color: #2e7d32 !important; /* Dark green when active (more distinct) */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.3) !important;
+    @apply bg-green-500 dark:bg-green-600 text-white;
 }
 
 .btn-icon.btn-error {
-    background-color: #ffebee !important; /* Light red for dislike button */
-    color: #c62828 !important; /* Dark red text */
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    @apply bg-gray-100 dark:bg-dark-800 text-gray-800 dark:text-gray-200;
 }
-
 .btn-icon.btn-error:hover {
-    background-color: #f44336 !important; /* Red on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+    @apply bg-gray-200 dark:bg-dark-700;
 }
-
 .btn-icon.btn-error.active {
-    background-color: #c62828 !important; /* Dark red when active (more distinct) */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(198, 40, 40, 0.3) !important;
+    @apply bg-red-500 dark:bg-red-600 text-white;
 }
-
 
 /* For subscribe button that should match channel page style */
 .btn-icon.btn-danger {
-    background-color: #dc2626 !important; /* Red for subscribe (matching btn-danger from App.vue) */
-    color: white !important; /* White text */
-    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    @apply bg-red-600 text-white;
 }
-
 .btn-icon.btn-danger:hover {
-    background-color: #b91c1c !important; /* Darker red on hover (matching btn-danger hover from App.vue) */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4) !important;
+    @apply bg-red-700;
 }
 
 /* No specific subscribed state for btn-danger since when subscribed, it uses btn-unsubscribe class */
 
 .btn-icon.btn-unsubscribe {
-    background-color: #6b7280 !important; /* Gray for unsubscribe (matching btn-secondary from App.vue) */
-    color: white !important; /* White text */
-    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    @apply bg-gray-500 text-white;
 }
-
 .btn-icon.btn-unsubscribe:hover {
-    background-color: #4b5563 !important; /* Darker gray on hover (matching btn-secondary hover from App.vue) */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4) !important;
+    @apply bg-gray-600;
 }
 
 /* General secondary buttons with consistent color palette */
 .btn-icon.btn-secondary {
-    background-color: #f5f5f5 !important; /* Light gray for general buttons */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    @apply bg-gray-100 dark:bg-dark-800 text-gray-800 dark:text-gray-200;
 }
-
 .btn-icon.btn-secondary:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
-    color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+    @apply bg-gray-200 dark:bg-dark-700;
 }
 
 /* Specialized buttons with function-specific colors */
