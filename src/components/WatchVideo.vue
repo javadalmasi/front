@@ -155,7 +155,7 @@
 
                             <!-- Subscribe/Unsubscribe Button -->
                             <button
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'}`"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-md p-0 ${subscribed ? 'btn btn-unsubscribe' : 'btn btn-danger'}`"
                                 @click="subscribeHandler"
                                 :title="$t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe'))"
                                 :data-title="$t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe'))"
@@ -1392,9 +1392,9 @@ export default {
 }
 
 .btn-icon.btn-success.active {
-    background-color: #4caf50 !important; /* Vibrant green when active */
+    background-color: #2e7d32 !important; /* Dark green when active (more distinct) */
     color: white !important;
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3) !important;
+    box-shadow: 0 2px 4px rgba(46, 125, 50, 0.3) !important;
 }
 
 .btn-icon.btn-error {
@@ -1411,43 +1411,39 @@ export default {
 }
 
 .btn-icon.btn-error.active {
-    background-color: #f44336 !important; /* Vibrant red when active */
+    background-color: #c62828 !important; /* Dark red when active (more distinct) */
     color: white !important;
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3) !important;
+    box-shadow: 0 2px 4px rgba(198, 40, 40, 0.3) !important;
 }
 
 
-/* For like/dislike buttons that need transparent background */
+/* For subscribe button that should match channel page style */
 .btn-icon.btn-danger {
-    background-color: #fff3e0 !important; /* Light orange for subscribe */
-    color: #ef6c00 !important; /* Dark orange text */
-    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.2) !important;
+    background-color: #dc2626 !important; /* Red for subscribe (matching btn-danger from App.vue) */
+    color: white !important; /* White text */
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-danger:hover {
-    background-color: #ff9800 !important; /* Vibrant orange on hover */
+    background-color: #b91c1c !important; /* Darker red on hover (matching btn-danger hover from App.vue) */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4) !important;
 }
 
-.btn-icon.btn-danger.subscribed {
-    background-color: #ff9800 !important; /* Vibrant orange when subscribed */
-    color: white !important;
-    box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3) !important;
-}
+/* No specific subscribed state for btn-danger since when subscribed, it uses btn-unsubscribe class */
 
 .btn-icon.btn-unsubscribe {
-    background-color: #f5f5f5 !important; /* Light gray for unsubscribe */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
+    background-color: #6b7280 !important; /* Gray for unsubscribe (matching btn-secondary from App.vue) */
+    color: white !important; /* White text */
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-unsubscribe:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
+    background-color: #4b5563 !important; /* Darker gray on hover (matching btn-secondary hover from App.vue) */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4) !important;
 }
 
 /* General secondary buttons with consistent color palette */
@@ -1578,14 +1574,13 @@ export default {
     }
 
     /* Maintain active state colors on mobile */
-    .btn-icon.btn-success.active,
-    .btn-icon.btn-error.active {
-        background-color: #4caf50 !important; /* Green when active */
+    .btn-icon.btn-success.active {
+        background-color: #2e7d32 !important; /* Dark green when active */
         color: white !important;
     }
 
     .btn-icon.btn-error.active {
-        background-color: #f44336 !important; /* Red when active */
+        background-color: #c62828 !important; /* Dark red when active */
         color: white !important;
     }
 
@@ -1597,6 +1592,16 @@ export default {
     .btn-icon.btn-error:hover {
         background-color: #ffebee !important; /* Keep light red on mobile hover */
         color: #c62828 !important; /* Keep dark red text on mobile hover */
+    }
+
+    .btn-icon.btn-danger:hover {
+        background-color: #dc2626 !important; /* Keep red for subscribe on mobile hover */
+        color: white !important; /* Keep white text on mobile hover */
+    }
+
+    .btn-icon.btn-unsubscribe:hover {
+        background-color: #6b7280 !important; /* Keep gray for unsubscribe on mobile hover */
+        color: white !important; /* Keep white text on mobile hover */
     }
 }
 </style>
