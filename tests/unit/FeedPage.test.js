@@ -20,29 +20,18 @@ const mockRoute = {
   query: {}
 };
 
-// Create a wrapper component that extends the original component with mocked methods
-const createComponentWithMocks = (additionalMethods = {}) => {
-  return {
-    ...FeedPage,
-    methods: {
-      ...FeedPage.methods,
-      fetchFeed: vi.fn().mockResolvedValue({}),
-      getPreferenceString: vi.fn().mockReturnValue('default'),
-      isLiveStreamDisabled: vi.fn().mockReturnValue(false),
-      ...additionalMethods
-    }
-  };
-};
-
 describe('FeedPage.vue', () => {
   it('renders properly', () => {
-    const MockedComponent = createComponentWithMocks();
-    const wrapper = shallowMount(MockedComponent, {
+    const wrapper = shallowMount(FeedPage, {
       global: {
         mocks: {
           $route: mockRoute,
           $router: mockRouter,
-          $t: mock$t
+          $t: mock$t,
+          fetchFeed: vi.fn().mockResolvedValue([]),
+          getPreferenceString: vi.fn().mockReturnValue('default'),
+          isLiveStreamDisabled: vi.fn().mockReturnValue(false),
+          fetchDeArrowContent: vi.fn()
         }
       }
     });
