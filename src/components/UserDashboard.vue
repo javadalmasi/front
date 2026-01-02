@@ -209,15 +209,18 @@ export default {
         this.subscriptionCount = 0;
       }
 
-      // Get history count
+      // Get history count (cumulative: videos, searches, and channels)
       try {
+        let totalHistoryCount = 0;
+
+        // Count watch history from IndexedDB
         if (window.db) {
           const tx = window.db.transaction("watch_history", "readonly");
           const store = tx.objectStore("watch_history");
           const countRequest = store.count();
 
           // Return a promise that resolves with the count
-          this.historyCount = await new Promise((resolve, reject) => {
+          const videoHistoryCount = await new Promise((resolve, reject) => {
             countRequest.onsuccess = () => {
               resolve(countRequest.result);
             };
@@ -226,10 +229,42 @@ export default {
               reject(event.target.error);
             };
           });
+          totalHistoryCount += videoHistoryCount;
         } else {
-          console.warn("Database not available for history count");
-          this.historyCount = 0;
+          console.warn("Database not available for video history count");
         }
+
+        // Count search history from localStorage
+        try {
+          const searchHistory = this.getSearchHistory() || [];
+          totalHistoryCount += Array.isArray(searchHistory) ? searchHistory.length : 0;
+        } catch (e) {
+          console.error("Error getting search history count:", e);
+        }
+
+        // Count channel history from IndexedDB
+        try {
+          if (window.db && window.db.objectStoreNames.contains("channel_history")) {
+            const tx = window.db.transaction("channel_history", "readonly");
+            const store = tx.objectStore("channel_history");
+            const countRequest = store.count();
+
+            const channelHistoryCount = await new Promise((resolve, reject) => {
+              countRequest.onsuccess = () => {
+                resolve(countRequest.result);
+              };
+              countRequest.onerror = (event) => {
+                console.error("Error counting channel history:", event.target.error);
+                reject(event.target.error);
+              };
+            });
+            totalHistoryCount += channelHistoryCount;
+          }
+        } catch (e) {
+          console.error("Error getting channel history count:", e);
+        }
+
+        this.historyCount = totalHistoryCount;
       } catch (e) {
         console.error("Error getting history count:", e);
         this.historyCount = 0;

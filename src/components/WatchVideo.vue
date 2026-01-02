@@ -1303,7 +1303,7 @@ export default {
     width: 2.5rem !important; /* 40px */
     height: 2.5rem !important; /* 40px */
     min-height: 2.5rem !important; /* Fixed height */
-    border-radius: 9999px !important; /* Fully rounded pill shape */
+    border-radius: 0.5rem !important; /* Standard border radius to match app style */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1317,7 +1317,7 @@ export default {
 }
 
 .btn-icon:hover {
-    transform: scale(1.25) !important; /* Larger scale on hover - now affects spacing */
+    transform: scale(1.05) !important; /* Slight scale on hover - reduced from 1.25 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow for depth */
     z-index: 10 !important; /* Ensure hover buttons appear on top */
 }
@@ -1353,10 +1353,10 @@ export default {
     .btn-icon:hover {
         width: auto !important; /* Allow width to expand for text */
         min-width: 4.5rem !important; /* Expand to accommodate text */
-        border-radius: 9999px !important; /* Keep fully rounded shape */
+        border-radius: 0.5rem !important; /* Keep standard border radius */
         padding-left: 14px !important;
         padding-right: 14px !important;
-        transform: scale(1.25) !important; /* Larger scale on desktop hover */
+        transform: scale(1.05) !important; /* Reduced scale on desktop hover */
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
         overflow: visible !important; /* Allow content to be visible */
     }
@@ -1371,7 +1371,7 @@ export default {
     .btn-icon-group:not(.flex-col) .btn-icon:hover {
         width: auto !important;
         min-width: 4.5rem !important;
-        border-radius: 9999px !important;
+        border-radius: 0.5rem !important; /* Keep standard border radius */
         padding-left: 14px !important;
         padding-right: 14px !important;
     }
@@ -1379,16 +1379,16 @@ export default {
 
 /* Consistent and harmonious color scheme for all buttons */
 .btn-icon.btn-success {
-    background-color: #f5f5f5 !important; /* Light gray for general buttons */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
+    background-color: #e8f5e9 !important; /* Light green for like button */
+    color: #2e7d32 !important; /* Dark green text */
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-success:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
+    background-color: #4caf50 !important; /* Green on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
 }
 
 .btn-icon.btn-success.active {
@@ -1398,16 +1398,16 @@ export default {
 }
 
 .btn-icon.btn-error {
-    background-color: #f5f5f5 !important; /* Light gray for general buttons */
-    color: #424242 !important; /* Dark gray text */
-    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
+    background-color: #ffebee !important; /* Light red for dislike button */
+    color: #c62828 !important; /* Dark red text */
+    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-error:hover {
-    background-color: #757575 !important; /* Medium gray on hover */
+    background-color: #f44336 !important; /* Red on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
 }
 
 .btn-icon.btn-error.active {
@@ -1587,6 +1587,16 @@ export default {
     .btn-icon.btn-error.active {
         background-color: #f44336 !important; /* Red when active */
         color: white !important;
+    }
+
+    .btn-icon.btn-success:hover {
+        background-color: #e8f5e9 !important; /* Keep light green on mobile hover */
+        color: #2e7d32 !important; /* Keep dark green text on mobile hover */
+    }
+
+    .btn-icon.btn-error:hover {
+        background-color: #ffebee !important; /* Keep light red on mobile hover */
+        color: #c62828 !important; /* Keep dark red text on mobile hover */
     }
 }
 </style>
