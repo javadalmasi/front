@@ -38,6 +38,9 @@
                 'pr-0': sidebarState === 'closed' || isWatchPage,
             }"
         />
+
+        <!-- Update Notification Component -->
+        <UpdateNotification />
     </div>
 </template>
 
@@ -45,6 +48,7 @@
 import NavBar from "./components/NavBar.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import AppSidebar from "./components/Sidebar.vue";
+import UpdateNotification from "./components/UpdateNotification.vue";
 
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -53,6 +57,7 @@ export default {
         NavBar,
         FooterComponent,
         AppSidebar,
+        UpdateNotification,
     },
     data() {
         return {
@@ -103,6 +108,9 @@ export default {
 
         this.checkIsMobile();
         window.addEventListener("resize", this.checkIsMobile);
+
+        // Listen for PWA update events
+        window.addEventListener('pwaUpdateAvailable', this.handlePWAUpdate);
 
         this.isWatchPage = this.$route.name === "WatchVideo" || this.$route.name === "SearchResults";
         if (this.isWatchPage) {
@@ -481,6 +489,11 @@ export default {
         },
         getSiteName() {
             return import.meta.env.VITE_SITE_NAME || "vidioo";
+        },
+        handlePWAUpdate() {
+            // This method will be called when a PWA update is available
+            // The UpdateNotification component will handle the UI and refresh logic
+            console.log('PWA update available, notification will be shown');
         }
     },
 };
