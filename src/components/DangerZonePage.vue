@@ -49,15 +49,15 @@
         <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_subscriptions_description'">
           تمام اشتراک‌ها را از لیست شما حذف می‌کند.
         </p>
-        <button 
-          class="btn btn-danger" 
+        <button
+          class="btn btn-danger"
           @click="showConfirmClearSubscriptions = true"
           v-t="'actions.clear_subscriptions'"
         >
           پاک کردن اشتراک‌ها
         </button>
       </div>
-      
+
       <!-- Clear History -->
       <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
         <h3 class="text-lg font-bold mb-2 flex items-center">
@@ -67,15 +67,15 @@
         <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_history_description'">
           تمام تاریخچه تماشا ویدیوها را پاک می‌کند.
         </p>
-        <button 
-          class="btn btn-danger" 
+        <button
+          class="btn btn-danger"
           @click="showConfirmClearHistory = true"
           v-t="'actions.clear_watch_history'"
         >
           پاک کردن تاریخچه
         </button>
       </div>
-      
+
       <!-- Clear Likes -->
       <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
         <h3 class="text-lg font-bold mb-2 flex items-center">
@@ -85,15 +85,15 @@
         <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_likes_description'">
           تمام ویدیوهای پسندیده شده را از لیست شما حذف می‌کند.
         </p>
-        <button 
-          class="btn btn-danger" 
+        <button
+          class="btn btn-danger"
           @click="showConfirmClearLikes = true"
           v-t="'actions.clear_likes'"
         >
           پاک کردن پسندیده‌ها
         </button>
       </div>
-      
+
       <!-- Clear Dislikes -->
       <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
         <h3 class="text-lg font-bold mb-2 flex items-center">
@@ -103,14 +103,53 @@
         <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_dislikes_description'">
           تمام ویدیوهای نپسندیده شده را از لیست شما حذف می‌کند.
         </p>
-        <button 
-          class="btn btn-danger" 
+        <button
+          class="btn btn-danger"
           @click="showConfirmClearDislikes = true"
           v-t="'actions.clear_dislikes'"
         >
           پاک کردن نپسندیده‌ها
         </button>
-      </div> 
+      </div>
+    </div>
+
+    <!-- Additional Data Type Resets -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Clear Activity Logs -->
+      <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
+        <h3 class="text-lg font-bold mb-2 flex items-center">
+          <i class="i-fa6-solid:clock-rotate-left text-red-500 ml-2"></i>
+          <span v-t="'actions.clear_activity_logs'">پاک کردن فعالیت‌های اخیر</span>
+        </h3>
+        <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_activity_logs_description'">
+          تمام گزارش‌های فعالیت‌های اخیر کاربر را پاک می‌کند.
+        </p>
+        <button
+          class="btn btn-danger"
+          @click="showConfirmClearActivityLogs = true"
+          v-t="'actions.clear_activity_logs'"
+        >
+          پاک کردن فعالیت‌های اخیر
+        </button>
+      </div>
+
+      <!-- Clear Search History -->
+      <div class="bg-gray-100 dark:bg-dark-400 p-6 rounded-xl shadow">
+        <h3 class="text-lg font-bold mb-2 flex items-center">
+          <i class="i-fa6-solid:magnifying-glass text-red-500 ml-2"></i>
+          <span v-t="'actions.clear_search_history'">پاک کردن تاریخچه جستجو</span>
+        </h3>
+        <p class="mb-4 text-gray-700 dark:text-gray-300" v-t="'info.clear_search_history_description'">
+          تمام تاریخچه جستجوهای انجام شده را پاک می‌کند.
+        </p>
+        <button
+          class="btn btn-danger"
+          @click="showConfirmClearSearchHistory = true"
+          v-t="'actions.clear_search_history'"
+        >
+          پاک کردن تاریخچه جستجو
+        </button>
+      </div>
     </div>
     
     <!-- Reset Preferences -->
@@ -173,6 +212,20 @@
       @confirm="resetPreferences"
       @close="showConfirmResetPreferences = false"
     />
+
+    <ConfirmModal
+      v-if="showConfirmClearActivityLogs"
+      :message="$t('info.confirm_clear_activity_logs') || 'آیا از پاک کردن تمام گزارش‌های فعالیت اخیر اطمینان دارید؟'"
+      @confirm="clearActivityLogs"
+      @close="showConfirmClearActivityLogs = false"
+    />
+
+    <ConfirmModal
+      v-if="showConfirmClearSearchHistory"
+      :message="$t('info.confirm_clear_search_history') || 'آیا از پاک کردن تمام تاریخچه جستجو اطمینان دارید؟'"
+      @confirm="clearSearchHistory"
+      @close="showConfirmClearSearchHistory = false"
+    />
   </div>
 </template>
 
@@ -192,6 +245,8 @@ export default {
       showConfirmClearLikes: false,
       showConfirmClearDislikes: false,
       showConfirmResetPreferences: false,
+      showConfirmClearActivityLogs: false,
+      showConfirmClearSearchHistory: false,
     };
   },
   methods: {
@@ -285,14 +340,34 @@ export default {
             keysToRemove.push(key);
           }
         }
-        
+
         keysToRemove.forEach(key => localStorage.removeItem(key));
-        
+
         this.showToast(this.$t('info.preferences_reset') || 'تنظیمات بازنشانی شدند');
         this.showConfirmResetPreferences = false;
       } catch (error) {
         console.error("Reset preferences error:", error);
         this.showToast(this.$t('info.reset_error') || 'خطا در بازنشانی تنظیمات');
+      }
+    },
+    async clearActivityLogs() {
+      try {
+        localStorage.removeItem("userActivityLogs");
+        this.showToast(this.$t('info.activity_logs_cleared') || 'گزارش فعالیت‌های اخیر پاک شد');
+        this.showConfirmClearActivityLogs = false;
+      } catch (error) {
+        console.error("Clear activity logs error:", error);
+        this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن گزارش فعالیت‌ها');
+      }
+    },
+    async clearSearchHistory() {
+      try {
+        localStorage.removeItem("search_history");
+        this.showToast(this.$t('info.search_history_cleared') || 'تاریخچه جستجو پاک شد');
+        this.showConfirmClearSearchHistory = false;
+      } catch (error) {
+        console.error("Clear search history error:", error);
+        this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه جستجو');
       }
     },
     showToast(message) {
