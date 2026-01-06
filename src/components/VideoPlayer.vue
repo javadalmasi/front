@@ -45,7 +45,7 @@
             @click="onClickSkipSegment"
         >
             <span v-t="'actions.skip_segment'" />
-            <i class="material-icons-round">skip_next</i>
+            <i class="i-material-symbols:skip-next-rounded"></i>
         </button>
         <span
             v-if="error > 0"
@@ -576,8 +576,7 @@ export default {
                         this.newTabButton_.ariaPressed = "false";
 
                         this.newTabIcon_ = document.createElement("i");
-                        this.newTabIcon_.classList.add("material-icons-round");
-                        this.newTabIcon_.textContent = "launch";
+                        this.newTabIcon_.classList.add("i-material-symbols:launch-rounded");
                         this.newTabButton_.appendChild(this.newTabIcon_);
 
                         const label = document.createElement("label");
@@ -615,8 +614,7 @@ export default {
                         this.button.setAttribute("data-shaka-theater-mode", "true");
 
                         this.icon = document.createElement("i");
-                        this.icon.classList.add("material-icons-round");
-                        this.icon.textContent = "fullscreen";
+                        this.icon.classList.add("i-material-symbols:fullscreen-rounded");
                         this.button.appendChild(this.icon);
 
                         const label = document.createElement("label");
@@ -653,8 +651,7 @@ export default {
                         this.button.setAttribute("data-shaka-loop", "true");
 
                         this.icon = document.createElement("i");
-                        this.icon.classList.add("material-icons-round");
-                        this.icon.textContent = "repeat";
+                        this.icon.classList.add("i-material-symbols:repeat-rounded");
                         this.button.appendChild(this.icon);
 
                         const label = document.createElement("label");
@@ -691,8 +688,7 @@ export default {
                         this.button.setAttribute("data-shaka-autoplay", "true");
 
                         this.icon = document.createElement("i");
-                        this.icon.classList.add("material-icons-round");
-                        this.icon.textContent = "playlist_play";
+                        this.icon.classList.add("i-material-symbols:playlist-play-rounded");
                         this.button.appendChild(this.icon);
 
                         const label = document.createElement("label");
@@ -1320,7 +1316,7 @@ export default {
     @apply rounded-none;
 }
 
-.shaka-video-container .material-icons-round {
+.shaka-video-container i[class*='i-material-symbols'] {
     @apply !text-xl leading-[1.65];
 }
 
@@ -1377,7 +1373,7 @@ export default {
     line-height: 1.5em;
 }
 
-.skip-segment-button .material-icons-round {
+.skip-segment-button i[class*='i-material-symbols'] {
     font-size: 1.6em !important;
     line-height: inherit !important;
 }
