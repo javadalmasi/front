@@ -487,10 +487,15 @@ export default {
 
                     // Get available qualities from video streams
                     if (this.video.videoStreams && this.video.videoStreams.length > 0) {
-                        // Extract unique quality values (height) and sort in descending order (highest first)
-                        const uniqueHeights = [...new Set(this.video.videoStreams.map(stream => stream.height))].sort((a, b) => b - a);
+                        // Extract unique quality values (height) and sort in ascending order (lowest first) for faster initial playback
+                        const uniqueHeights = [...new Set(this.video.videoStreams.map(stream => stream.height))].sort((a, b) => a - b);
                         this.availableQualities = uniqueHeights;
-                        debugLogger.log('Available qualities:', this.availableQualities);
+                        debugLogger.log('Available qualities (sorted low to high):', this.availableQualities);
+
+                        // Start with the lowest quality for fastest initial playback
+                        if (this.availableQualities.length > 0) {
+                            this.currentQualityIndex = 0; // Start with lowest quality
+                        }
                     }
 
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
@@ -565,7 +570,9 @@ export default {
                                         // If we have a specific quality to use, configure the player accordingly
                                         if (this.currentQualityIndex >= 0 && this.currentQualityIndex < this.availableQualities.length) {
                                             // Disable ABR to force specific quality
-                                            localPlayer.configure("abr.enabled", false);
+                                            if (localPlayer && typeof localPlayer.configure === 'function') {
+                                                localPlayer.configure("abr.enabled", false);
+                                            }
 
                                             // Find the best stream for the selected quality
                                             const tracks = localPlayer.getVariantTracks()
@@ -581,7 +588,9 @@ export default {
                                             }
                                         } else {
                                             // Enable ABR for auto quality selection
-                                            localPlayer.configure("abr.enabled", true);
+                                            if (localPlayer && typeof localPlayer.configure === 'function') {
+                                                localPlayer.configure("abr.enabled", true);
+                                            }
                                         }
 
                                         // Reload the same content with the new settings
@@ -656,11 +665,13 @@ export default {
                         // This ensures errors are only logged to console when debug mode is enabled
                     });
 
-                    localPlayer.configure(
-                        "streaming.bufferingGoal",
-                        Math.max(this.getPreferenceNumber("bufferGoal", 10), 10),
-                    );
-                    localPlayer.configure("streaming.bufferBehind", 300);
+                    if (localPlayer && typeof localPlayer.configure === 'function') {
+                        localPlayer.configure(
+                            "streaming.bufferingGoal",
+                            Math.max(this.getPreferenceNumber("bufferGoal", 10), 10),
+                        );
+                        localPlayer.configure("streaming.bufferBehind", 300);
+                    }
 
                     this.setPlayerAttrs(localPlayer, videoEl, uri, mime, this.$shaka);
                 });
@@ -945,28 +956,32 @@ export default {
 
             const prefetchLimit = Math.min(Math.max(this.getPreferenceNumber("prefetchLimit", 2), 0), 10);
 
-            this.$player.configure({
-                preferredVideoCodecs: this.preferredVideoCodecs,
-                preferredAudioCodecs: ["opus", "mp4a"],
-                manifest: {
-                    disableVideo: disableVideo,
-                },
-                streaming: {
-                    segmentPrefetchLimit: prefetchLimit,
-                    retryParameters: {
-                        maxAttempts: Infinity,
-                        baseDelay: 250,
-                        backoffFactor: 1.5,
+            if (this.$player && typeof this.$player.configure === 'function') {
+                this.$player.configure({
+                    preferredVideoCodecs: this.preferredVideoCodecs,
+                    preferredAudioCodecs: ["opus", "mp4a"],
+                    manifest: {
+                        disableVideo: disableVideo,
                     },
-                },
-                abr: {
-                    enabled: true, // Explicitly enable ABR by default
-                },
-            });
+                    streaming: {
+                        segmentPrefetchLimit: prefetchLimit,
+                        retryParameters: {
+                            maxAttempts: Infinity,
+                            baseDelay: 250,
+                            backoffFactor: 1.5,
+                        },
+                    },
+                    abr: {
+                        enabled: true, // Explicitly enable ABR by default
+                    },
+                });
+            }
 
             const quality = this.getPreferenceNumber("quality", 0);
             // Enable ABR by default for adaptive streaming
-            this.$player.configure("abr.enabled", true);
+            if (this.$player && typeof this.$player.configure === 'function') {
+                this.$player.configure("abr.enabled", true);
+            }
 
             // Determine if we have video streams available to apply quality selection
             const hasVideoStreams = this.video.videoStreams && this.video.videoStreams.length > 0;
@@ -979,7 +994,9 @@ export default {
             // Apply quality selection if quality is explicitly set and we have streams
             if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo) {
                 // If a specific quality is selected, disable ABR to respect user preference
-                this.$player.configure("abr.enabled", false);
+                if (this.$player && typeof this.$player.configure === 'function') {
+                    this.$player.configure("abr.enabled", false);
+                }
 
                 // Store the user's preferred quality as the starting point for fallback
                 if (this.availableQualities.length > 0) {
@@ -996,16 +1013,20 @@ export default {
                 }
             } else {
                 // Ensure ABR is enabled when no specific quality is selected or no video streams available
-                this.$player.configure("abr.enabled", true);
+                if (this.$player && typeof this.$player.configure === 'function') {
+                    this.$player.configure("abr.enabled", true);
+                }
                 // Additional ABR configurations for optimal performance
-                this.$player.configure({
-                    abr: {
-                        restrictions: {
-                            maxBandwidth: Infinity, // Allow highest bandwidth when ABR is active
-                            minBandwidth: 0, // Allow lowest bandwidth when ABR is active
+                if (this.$player && typeof this.$player.configure === 'function') {
+                    this.$player.configure({
+                        abr: {
+                            restrictions: {
+                                maxBandwidth: Infinity, // Allow highest bandwidth when ABR is active
+                                minBandwidth: 0, // Allow lowest bandwidth when ABR is active
+                            },
                         },
-                    },
-                });
+                    });
+                }
             }
 
             const time = this.$route.query.t ?? this.$route.query.start;
@@ -1097,6 +1118,14 @@ export default {
                             });
 
                         player.selectVariantTrack(bestStream, true);
+                    }
+
+                    // If we started with lowest quality, attempt to upgrade to default quality (720p) after successful load
+                    if (this.currentQualityIndex === 0 && this.availableQualities.length > 1) {
+                        // Wait a bit to ensure playback starts successfully, then upgrade quality
+                        setTimeout(() => {
+                            this.upgradeToDefaultQuality(player, lang);
+                        }, 2000); // Wait 2 seconds before upgrading quality
                     }
 
                     this.video.subtitles.map(subtitle => {
@@ -1429,6 +1458,55 @@ export default {
                 // Set to undefined anyway to prevent further issues
                 this.$ui = undefined;
                 this.$player = undefined;
+            }
+        },
+        upgradeToDefaultQuality(player, lang) {
+            // Find the default quality (720p) or closest available quality
+            const defaultQuality = 720; // Default quality preference
+            let targetQualityIndex = -1;
+
+            // Look for 720p quality or find the closest one
+            for (let i = 0; i < this.availableQualities.length; i++) {
+                if (this.availableQualities[i] === defaultQuality) {
+                    targetQualityIndex = i;
+                    break;
+                }
+                // If we don't find exact match, find the closest quality that's not the lowest
+                if (this.availableQualities[i] >= defaultQuality && targetQualityIndex === -1) {
+                    targetQualityIndex = i;
+                }
+            }
+
+            // If we still don't have a target and there are higher qualities, use the next available
+            if (targetQualityIndex === -1 && this.availableQualities.length > 1) {
+                targetQualityIndex = Math.min(this.availableQualities.length - 1, 1); // Use at least the second quality
+            }
+
+            if (targetQualityIndex !== -1 && targetQualityIndex !== this.currentQualityIndex) {
+                // Update current quality index to the target
+                this.currentQualityIndex = targetQualityIndex;
+
+                // Find the best stream for the selected quality
+                if (player && player.getVariantTracks && typeof player.getVariantTracks === 'function') {
+                    const tracks = player.getVariantTracks()
+                        .filter(track => track.height === this.availableQualities[targetQualityIndex]);
+
+                    if (tracks && tracks.length > 0) {
+                        // Select the track with the best bandwidth for this quality
+                        const bestTrack = tracks.reduce((best, current) =>
+                            current.bandwidth > best.bandwidth ? current : best
+                        );
+                        if (player.selectVariantTrack && typeof player.selectVariantTrack === 'function') {
+                            player.selectVariantTrack(bestTrack, true);
+                            debugLogger.log(`Upgraded to quality: ${bestTrack.height}p`);
+                        }
+                    }
+                }
+            }
+
+            // Re-enable ABR for adaptive streaming after initial quality upgrade
+            if (player && typeof player.configure === 'function') {
+                player.configure("abr.enabled", true);
             }
         },
     },
