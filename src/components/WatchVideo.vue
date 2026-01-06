@@ -143,7 +143,7 @@
                             <!-- Download Frame Button -->
                             <button
                                 v-if="!isDownloadThumbnailDisabled"
-                                class="btn btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 <md:hidden"
+                                class="btn btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0"
                                 @click="downloadCurrentFrame"
                                 :title="$t('actions.download_frame')"
                                 :data-title="$t('actions.download_frame')"
@@ -1555,12 +1555,63 @@ export default {
     box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
 }
 
-/* Mobile-specific styles: hide button text, remove hover effects */
-@media (max-width: 768px) {
-    .btn-text {
-        display: none !important;
+/* Hide button text on all devices by default, show only on desktop hover */
+.btn-text {
+    display: none !important;
+}
+
+/* Desktop hover animation: show text on hover */
+@media (hover: hover) and (min-width: 769px) {
+    .btn-icon {
+        position: relative;
+        overflow: hidden; /* Ensure content doesn't overflow initially */
     }
 
+    .btn-icon .btn-text {
+        display: none; /* Hidden by default */
+        margin-right: 8px; /* For RTL layout */
+        white-space: nowrap;
+        font-size: 12px;
+        opacity: 0;
+        transform: translateX(-10px); /* For RTL - moving to the left */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-icon:hover .btn-text {
+        display: inline-block; /* Show text on hover */
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .btn-icon:hover {
+        width: auto !important; /* Allow width to expand for text */
+        min-width: 4.5rem !important; /* Expand to accommodate text */
+        border-radius: 0.5rem !important; /* Keep standard border radius */
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        transform: scale(1.05) !important; /* Reduced scale on desktop hover */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Smooth spring-like transition */
+        overflow: visible !important; /* Allow content to be visible */
+    }
+
+    .btn-icon:hover .btn-text {
+        display: inline-block; /* Show text on hover */
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Adjust positioning for different button areas */
+    .btn-icon-group:not(.flex-col) .btn-icon:hover {
+        width: auto !important;
+        min-width: 4.5rem !important;
+        border-radius: 0.5rem !important; /* Keep standard border radius */
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+}
+
+/* Mobile-specific styles: remove hover effects */
+@media (max-width: 768px) {
     .btn-icon:hover {
         transform: scale(1) !important; /* Remove hover scale effect on mobile */
         box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important; /* Keep default shadow */
