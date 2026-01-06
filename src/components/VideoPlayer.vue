@@ -1319,7 +1319,7 @@ export default {
 .shaka-video-container i[class*='i-material-symbols'] {
     @apply !text-base leading-[1.65];
     font-size: 1em !important;
-    margin-right: 0.5em;
+    margin-right: 10px;
 }
 
 .shaka-current-time {
