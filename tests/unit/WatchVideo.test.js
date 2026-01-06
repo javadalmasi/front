@@ -84,8 +84,10 @@ const ModifiedWatchVideo = {
     getSiteName: vi.fn().mockReturnValue('vidioo'),
     migrateOldStorageKeys: vi.fn(),
     setupServiceWorkerUpdate: vi.fn(),
-    // Override mounted to prevent original behavior that causes errors
-    mounted: vi.fn(), // Skip the original mounted behavior
+  },
+  // Completely override the mounted hook to prevent original behavior
+  mounted() {
+    // Do nothing to prevent the original mounted behavior that causes errors
   }
 };
 
