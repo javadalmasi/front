@@ -37,7 +37,7 @@ describe('ContentItem.vue', () => {
     const wrapper = shallowMount(MockedComponent, {
       props: {
         item: {
-          type: 'video'
+          type: 'stream'  // Use 'stream' instead of 'video' to match component logic
         }
       },
       global: {

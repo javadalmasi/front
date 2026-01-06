@@ -27,6 +27,9 @@ const createComponentWithMocks = (additionalMethods = {}) => {
     methods: {
       ...SubscriptionsPage.methods,
       getLocalSubscriptions: vi.fn().mockReturnValue([]),
+      apiUrl: vi.fn().mockReturnValue('http://localhost:8000'),
+      fetchJson: vi.fn().mockResolvedValue([]),
+      getSiteName: vi.fn().mockReturnValue('Vidioo'),
       ...additionalMethods
     }
   };

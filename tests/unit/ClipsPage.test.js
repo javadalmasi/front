@@ -15,14 +15,30 @@ const mockRouter = {
 
 // Mock route
 const mockRoute = {
-  path: '/',
-  name: 'Home',
-  query: {}
+  path: '/clip/test-clip-id',
+  name: 'ClipsPage',
+  query: {},
+  params: { clipId: 'test-clip-id' }
+};
+
+// Create a wrapper component that extends the original component with mocked methods
+const createComponentWithMocks = (additionalMethods = {}) => {
+  return {
+    ...ClipsPage,
+    methods: {
+      ...ClipsPage.methods,
+      ...additionalMethods
+    }
+  };
 };
 
 describe('ClipsPage.vue', () => {
   it('renders properly', () => {
-    const wrapper = shallowMount(ClipsPage, {
+    const MockedComponent = createComponentWithMocks({
+      apiUrl: vi.fn().mockReturnValue('http://localhost:8000'),
+      fetchJson: vi.fn().mockResolvedValue({ videoId: 'test-video-id' })
+    });
+    const wrapper = shallowMount(MockedComponent, {
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +47,7 @@ describe('ClipsPage.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

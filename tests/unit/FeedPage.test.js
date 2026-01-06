@@ -29,7 +29,19 @@ const createComponentWithMocks = (additionalMethods = {}) => {
       fetchFeed: vi.fn().mockResolvedValue({}),
       getPreferenceString: vi.fn().mockReturnValue('default'),
       isLiveStreamDisabled: vi.fn().mockReturnValue(false),
+      fetchJson: vi.fn().mockResolvedValue([]),
+      fetchDeArrowContent: vi.fn().mockResolvedValue([]),
+      getSiteName: vi.fn().mockReturnValue('Vidioo'),
+      loadMoreVideos: vi.fn(), // Mock the method that's causing the error
+      updateWatched: vi.fn(),
       ...additionalMethods
+    },
+    data() {
+      const originalData = typeof FeedPage.data === 'function' ? FeedPage.data() : {};
+      return {
+        ...originalData,
+        videosStore: [] // Initialize as an empty array instead of null
+      };
     }
   };
 };
@@ -46,6 +58,9 @@ describe('FeedPage.vue', () => {
         }
       }
     });
+
+    // Ensure videosStore is properly initialized as an array
+    wrapper.vm.videosStore = [];
 
     expect(wrapper.exists()).toBe(true);
   });

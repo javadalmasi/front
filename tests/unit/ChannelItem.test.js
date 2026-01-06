@@ -33,7 +33,10 @@ const createComponentWithMocks = (additionalMethods = {}) => {
 
 describe('ChannelItem.vue', () => {
   it('renders properly', () => {
-    const MockedComponent = createComponentWithMocks();
+    const MockedComponent = createComponentWithMocks({
+      fetchSubscriptionStatus: vi.fn().mockResolvedValue(false),
+      numberFormat: vi.fn().mockReturnValue('1K')
+    });
     const wrapper = shallowMount(MockedComponent, {
       props: {
         item: {

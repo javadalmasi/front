@@ -20,9 +20,24 @@ const mockRoute = {
   query: {}
 };
 
+// Create a wrapper component that extends the original component with mocked methods
+const createComponentWithMocks = (additionalMethods = {}) => {
+  return {
+    ...DataManagement,
+    methods: {
+      ...DataManagement.methods,
+      ...additionalMethods
+    }
+  };
+};
+
 describe('DataManagement.vue', () => {
   it('renders properly', () => {
-    const wrapper = shallowMount(DataManagement, {
+    const MockedComponent = createComponentWithMocks({
+      getSiteName: vi.fn().mockReturnValue('Vidioo'),
+      updateCounts: vi.fn().mockResolvedValue()
+    });
+    const wrapper = shallowMount(MockedComponent, {
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +46,7 @@ describe('DataManagement.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

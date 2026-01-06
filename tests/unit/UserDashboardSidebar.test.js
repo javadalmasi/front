@@ -23,6 +23,10 @@ const mockRoute = {
 describe('UserDashboardSidebar.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(UserDashboardSidebar, {
+      props: {
+        sidebarState: 'open',
+        theme: 'light'
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +35,7 @@ describe('UserDashboardSidebar.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

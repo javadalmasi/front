@@ -23,6 +23,9 @@ const mockRoute = {
 describe('ConfirmModal.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(ConfirmModal, {
+      props: {
+        message: 'Are you sure?'
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +34,7 @@ describe('ConfirmModal.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

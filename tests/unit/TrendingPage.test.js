@@ -27,6 +27,10 @@ const createComponentWithMocks = (additionalMethods = {}) => {
     methods: {
       ...TrendingPage.methods,
       getPreferenceString: vi.fn().mockReturnValue('trending'),
+      apiUrl: vi.fn().mockReturnValue('http://localhost:8000'),
+      fetchJson: vi.fn().mockResolvedValue([]),
+      updateWatched: vi.fn(),
+      fetchDeArrowContent: vi.fn(),
       ...additionalMethods
     }
   };

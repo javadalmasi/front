@@ -77,6 +77,8 @@ const ModifiedWatchVideo = {
     // Mock essential methods that the component tries to call
     apiUrl: () => 'http://localhost:8000',
     fetchJson: vi.fn().mockResolvedValue({}),
+    fetchVideo: vi.fn().mockImplementation(() => Promise.resolve({})),
+    getVideoId: vi.fn().mockReturnValue('test-video-id'),
     getPreferenceBoolean: vi.fn().mockReturnValue(true),
     getPreferenceString: vi.fn().mockReturnValue('default'),
     getSiteName: vi.fn().mockReturnValue('vidioo'),

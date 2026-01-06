@@ -23,6 +23,9 @@ const mockRoute = {
 describe('QrCode.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(QrCode, {
+      props: {
+        text: 'https://example.com'
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +34,7 @@ describe('QrCode.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

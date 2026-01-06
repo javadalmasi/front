@@ -15,14 +15,39 @@ const mockRouter = {
 
 // Mock route
 const mockRoute = {
-  path: '/',
-  name: 'Home',
-  query: {}
+  path: '/channel/test-channel',
+  name: 'ChannelPage',
+  query: {},
+  params: { path: 'test-channel' }
+};
+
+// Create a wrapper component that extends the original component with mocked methods
+const createComponentWithMocks = (additionalMethods = {}) => {
+  return {
+    ...ChannelPage,
+    methods: {
+      ...ChannelPage.methods,
+      ...additionalMethods
+    }
+  };
 };
 
 describe('ChannelPage.vue', () => {
   it('renders properly', () => {
-    const wrapper = shallowMount(ChannelPage, {
+    const MockedComponent = createComponentWithMocks({
+      apiUrl: vi.fn().mockReturnValue('http://localhost:8000'),
+      fetchJson: vi.fn().mockResolvedValue({
+        name: 'Test Channel',
+        relatedStreams: [],
+        tabs: []
+      }),
+      getPreferenceBoolean: vi.fn().mockReturnValue(false),
+      getPreferenceString: vi.fn().mockReturnValue('default'),
+      getSiteName: vi.fn().mockReturnValue('Vidioo'),
+      updateWatched: vi.fn(),
+      fetchDeArrowContent: vi.fn()
+    });
+    const wrapper = shallowMount(MockedComponent, {
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +56,7 @@ describe('ChannelPage.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

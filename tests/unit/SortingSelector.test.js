@@ -23,6 +23,9 @@ const mockRoute = {
 describe('SortingSelector.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(SortingSelector, {
+      props: {
+        byKey: 'date'
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +34,7 @@ describe('SortingSelector.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

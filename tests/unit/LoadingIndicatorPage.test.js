@@ -23,6 +23,9 @@ const mockRoute = {
 describe('LoadingIndicatorPage.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(LoadingIndicatorPage, {
+      props: {
+        showContent: true
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +34,7 @@ describe('LoadingIndicatorPage.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

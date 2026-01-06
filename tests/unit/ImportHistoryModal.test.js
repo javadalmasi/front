@@ -20,9 +20,24 @@ const mockRoute = {
   query: {}
 };
 
+// Create a wrapper component that extends the original component with mocked methods
+const createComponentWithMocks = (additionalMethods = {}) => {
+  return {
+    ...ImportHistoryModal,
+    methods: {
+      ...ImportHistoryModal.methods,
+      ...additionalMethods
+    }
+  };
+};
+
 describe('ImportHistoryModal.vue', () => {
   it('renders properly', () => {
-    const wrapper = shallowMount(ImportHistoryModal, {
+    const MockedComponent = createComponentWithMocks({
+      apiUrl: vi.fn().mockReturnValue('http://localhost:8000'),
+      fetchJson: vi.fn().mockResolvedValue({})
+    });
+    const wrapper = shallowMount(MockedComponent, {
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +46,7 @@ describe('ImportHistoryModal.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

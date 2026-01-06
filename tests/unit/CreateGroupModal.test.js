@@ -23,6 +23,9 @@ const mockRoute = {
 describe('CreateGroupModal.vue', () => {
   it('renders properly', () => {
     const wrapper = shallowMount(CreateGroupModal, {
+      props: {
+        onCreateGroup: vi.fn()
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +34,7 @@ describe('CreateGroupModal.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });

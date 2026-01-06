@@ -20,9 +20,27 @@ const mockRoute = {
   query: {}
 };
 
+// Create a wrapper component that extends the original component with mocked methods
+const createComponentWithMocks = (additionalMethods = {}) => {
+  return {
+    ...AddToGroupModal,
+    methods: {
+      ...AddToGroupModal.methods,
+      ...additionalMethods
+    }
+  };
+};
+
 describe('AddToGroupModal.vue', () => {
   it('renders properly', () => {
-    const wrapper = shallowMount(AddToGroupModal, {
+    const MockedComponent = createComponentWithMocks({
+      getChannelGroups: vi.fn().mockResolvedValue([])
+    });
+    const wrapper = shallowMount(MockedComponent, {
+      props: {
+        channelId: 'test-channel-id',
+        onCreateGroup: vi.fn()
+      },
       global: {
         mocks: {
           $route: mockRoute,
@@ -31,7 +49,7 @@ describe('AddToGroupModal.vue', () => {
         }
       }
     });
-    
+
     expect(wrapper.exists()).toBe(true);
   });
 });
