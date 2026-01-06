@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import { debugLogger } from "../utils/DebugLogger";
 import ContentItem from "./ContentItem.vue";
 
 export default {
@@ -247,7 +248,7 @@ export default {
                             throw new Error("Invalid data format");
                         }
                     } catch (e) {
-                        console.error("Error importing data:", e);
+                        debugLogger.error("Error importing data:", e);
                         this.showToast(this.$t("info.import_failed"));
                     }
                 };

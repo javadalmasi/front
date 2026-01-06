@@ -175,6 +175,8 @@ const onImageLoad = (event) => {
 // Method to handle image errors
 const onImageError = (event) => {
     // Don't use placeholder images - just let the image fail gracefully
-    console.warn("Playlist thumbnail failed to load:", event.target.src);
+    import("../utils/DebugLogger").then(({ debugLogger }) => {
+        debugLogger.warn("Playlist thumbnail failed to load:", event.target.src);
+    });
 };
 </script>

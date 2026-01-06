@@ -41,7 +41,9 @@ watch(selectedSort, value => {
             emit("apply", (a, b) => b.uploaderName.localeCompare(a.uploaderName));
             break;
         default:
-            console.error("Unexpected sort value");
+            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                debugLogger.error("Unexpected sort value");
+            });
     }
 });
 </script>

@@ -1,3 +1,5 @@
+import { debugLogger } from "./DebugLogger";
+
 export function replaceWithCdnUrl(originalUrl, proxyUrl, cdnUrl) {
     // Only process if CDN is enabled via environment variable
     if (!import.meta.env.VITE_ENABLE_CDN || import.meta.env.VITE_ENABLE_CDN !== "true") {
@@ -45,7 +47,7 @@ export function replaceWithCdnUrl(originalUrl, proxyUrl, cdnUrl) {
 
         return newUrl;
     } catch (error) {
-        console.error("Error processing CDN URL replacement:", error);
+        debugLogger.error("Error processing CDN URL replacement:", error);
         return originalUrl; // Return original URL if there's an error
     }
 }

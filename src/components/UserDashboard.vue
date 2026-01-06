@@ -160,6 +160,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "UserDashboard",
@@ -205,7 +206,7 @@ export default {
         const subscriptions = this.getLocalSubscriptions() || [];
         this.subscriptionCount = Array.isArray(subscriptions) ? subscriptions.length : 0;
       } catch (e) {
-        console.error("Error getting subscription count:", e);
+        debugLogger.error("Error getting subscription count:", e);
         this.subscriptionCount = 0;
       }
 
@@ -225,13 +226,13 @@ export default {
               resolve(countRequest.result);
             };
             countRequest.onerror = (event) => {
-              console.error("Error counting watch history:", event.target.error);
+              debugLogger.error("Error counting watch history:", event.target.error);
               reject(event.target.error);
             };
           });
           totalHistoryCount += videoHistoryCount;
         } else {
-          console.warn("Database not available for video history count");
+          debugLogger.warn("Database not available for video history count");
         }
 
         // Count search history from localStorage
@@ -239,7 +240,7 @@ export default {
           const searchHistory = this.getSearchHistory() || [];
           totalHistoryCount += Array.isArray(searchHistory) ? searchHistory.length : 0;
         } catch (e) {
-          console.error("Error getting search history count:", e);
+          debugLogger.error("Error getting search history count:", e);
         }
 
         // Count channel history from IndexedDB
@@ -254,19 +255,19 @@ export default {
                 resolve(countRequest.result);
               };
               countRequest.onerror = (event) => {
-                console.error("Error counting channel history:", event.target.error);
+                debugLogger.error("Error counting channel history:", event.target.error);
                 reject(event.target.error);
               };
             });
             totalHistoryCount += channelHistoryCount;
           }
         } catch (e) {
-          console.error("Error getting channel history count:", e);
+          debugLogger.error("Error getting channel history count:", e);
         }
 
         this.historyCount = totalHistoryCount;
       } catch (e) {
-        console.error("Error getting history count:", e);
+        debugLogger.error("Error getting history count:", e);
         this.historyCount = 0;
       }
 
@@ -276,7 +277,7 @@ export default {
         const likes = likesRaw ? JSON.parse(likesRaw) : [];
         this.likesCount = Array.isArray(likes) ? likes.length : 0;
       } catch (e) {
-        console.error("Error getting likes count:", e);
+        debugLogger.error("Error getting likes count:", e);
         this.likesCount = 0;
       }
 
@@ -286,7 +287,7 @@ export default {
         const dislikes = dislikesRaw ? JSON.parse(dislikesRaw) : [];
         this.dislikesCount = Array.isArray(dislikes) ? dislikes.length : 0;
       } catch (e) {
-        console.error("Error getting dislikes count:", e);
+        debugLogger.error("Error getting dislikes count:", e);
         this.dislikesCount = 0;
       }
 
@@ -295,7 +296,7 @@ export default {
         const searchHistory = this.getSearchHistory() || [];
         this.searchHistoryCount = Array.isArray(searchHistory) ? searchHistory.length : 0;
       } catch (e) {
-        console.error("Error getting search history count:", e);
+        debugLogger.error("Error getting search history count:", e);
         this.searchHistoryCount = 0;
       }
 
@@ -307,7 +308,7 @@ export default {
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           this.channelHistoryCount = 0;
           return;
         }
@@ -324,7 +325,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, setting channel history count to 0");
+              debugLogger.warn("Database not ready after waiting, setting channel history count to 0");
               this.channelHistoryCount = 0;
               resolve();
             }
@@ -336,14 +337,14 @@ export default {
 
       // Check if we have access to the database
       if (!window.db) {
-        console.error("Database not available for channel history count");
+        debugLogger.error("Database not available for channel history count");
         this.channelHistoryCount = 0;
         return;
       }
 
       // Check if the channel_history store exists
       if (!window.db.objectStoreNames.contains("channel_history")) {
-        console.error("channel_history object store does not exist");
+        debugLogger.error("channel_history object store does not exist");
         this.channelHistoryCount = 0;
         return;
       }
@@ -359,12 +360,12 @@ export default {
             resolve(countRequest.result);
           };
           countRequest.onerror = (event) => {
-            console.error("Error counting channel history:", event.target.error);
+            debugLogger.error("Error counting channel history:", event.target.error);
             reject(event.target.error);
           };
         });
       } catch (e) {
-        console.error("Error getting channel history count:", e);
+        debugLogger.error("Error getting channel history count:", e);
         this.channelHistoryCount = 0;
       }
     },
@@ -412,7 +413,7 @@ export default {
         
         this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان با موفقیت ایجاد شد');
       } catch (error) {
-        console.error("Backup error:", error);
+        debugLogger.error("Backup error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -463,7 +464,7 @@ export default {
             this.showToast(this.$t('info.import_success') || 'داده‌ها با موفقیت وارد شدند');
             await this.updateCounts();
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن داده‌ها');
           }
         };
@@ -562,7 +563,7 @@ export default {
         this.showToast(this.$t('info.all_data_reset') || 'همه داده‌ها بازنشانی شد');
         await this.updateCounts();
       } catch (error) {
-        console.error("Reset error:", error);
+        debugLogger.error("Reset error:", error);
         this.showToast(this.$t('info.reset_error') || 'خطا در بازنشانی داده‌ها');
       }
     },
@@ -572,7 +573,7 @@ export default {
         this.showToast(this.$t('info.subscriptions_cleared') || 'اشتراک‌ها پاک شدند');
         await this.updateCounts();
       } catch (error) {
-        console.error("Clear subscriptions error:", error);
+        debugLogger.error("Clear subscriptions error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن اشتراک‌ها');
       }
     },
@@ -608,7 +609,7 @@ export default {
         this.showToast(this.$t('info.history_cleared') || 'تاریخچه پاک شد');
         await this.updateCounts();
       } catch (error) {
-        console.error("Clear history error:", error);
+        debugLogger.error("Clear history error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه');
       }
     },
@@ -618,7 +619,7 @@ export default {
         this.showToast(this.$t('info.likes_cleared') || 'پسند شده‌ها پاک شدند');
         await this.updateCounts();
       } catch (error) {
-        console.error("Clear likes error:", error);
+        debugLogger.error("Clear likes error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن پسند شده‌ها');
       }
     },
@@ -628,7 +629,7 @@ export default {
         this.showToast(this.$t('info.dislikes_cleared') || 'پسند نشده‌ها پاک شدند');
         await this.updateCounts();
       } catch (error) {
-        console.error("Clear dislikes error:", error);
+        debugLogger.error("Clear dislikes error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن پسند نشده‌ها');
       }
     },
@@ -691,7 +692,7 @@ export default {
         // Update combined logs after loading activity logs
         this.updateCombinedActivityLogs();
       } catch (error) {
-        console.error("Error loading activity logs:", error);
+        debugLogger.error("Error loading activity logs:", error);
         // Fallback to empty array if there's an error
         this.activityLogs = [];
         this.displayedLogs = [];
@@ -727,11 +728,11 @@ export default {
         };
 
         request.onerror = (e) => {
-          console.error("Error getting recent activity:", e.target.error);
+          debugLogger.error("Error getting recent activity:", e.target.error);
           this.recentVideos = [];
         };
       } catch (e) {
-        console.error("Error getting recent activity:", e);
+        debugLogger.error("Error getting recent activity:", e);
         this.recentVideos = [];
       }
     },
@@ -760,7 +761,7 @@ export default {
         this.showToast(this.$t('info.logs_cleared') || 'گزارش‌ها پاک شدند');
         this.showConfirmClearLogs = false;
       } catch (error) {
-        console.error("Clear logs error:", error);
+        debugLogger.error("Clear logs error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن');
       }
     },
@@ -837,7 +838,7 @@ export default {
         await navigator.clipboard.writeText(jsonStr);
         this.showToast(this.$t('info.copied') || 'کپی شد');
       } catch (err) {
-        console.error('Failed to copy JSON data:', err);
+        debugLogger.error('Failed to copy JSON data:', err);
         this.showToast(this.$t('info.cannot_copy') || 'نمی‌توان کپی کرد');
       }
     },
@@ -846,7 +847,7 @@ export default {
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           return;
         }
 
@@ -862,7 +863,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, continuing with limited functionality");
+              debugLogger.warn("Database not ready after waiting, continuing with limited functionality");
               resolve();
             }
           };
@@ -888,7 +889,7 @@ export default {
 
         this.updateCombinedActivityLogs();
       } catch (error) {
-        console.error("Error loading search history:", error);
+        debugLogger.error("Error loading search history:", error);
         this.searchHistory = [];
       }
     },
@@ -898,7 +899,7 @@ export default {
         if (!window.db) {
           // If IndexedDB is not available in this browser
           if (!("indexedDB" in window)) {
-            console.warn("IndexedDB not supported in this browser");
+            debugLogger.warn("IndexedDB not supported in this browser");
             return;
           }
 
@@ -914,7 +915,7 @@ export default {
                 attempts++;
                 setTimeout(checkDb, 100);
               } else {
-                console.warn("Database not ready after waiting, skipping channel history load");
+                debugLogger.warn("Database not ready after waiting, skipping channel history load");
                 resolve();
               }
             };
@@ -925,13 +926,13 @@ export default {
 
         // Check if we have access to the database
         if (!window.db) {
-          console.error("Database not available for channel history");
+          debugLogger.error("Database not available for channel history");
           return;
         }
 
         // Check if the channel_history store exists
         if (!window.db.objectStoreNames.contains("channel_history")) {
-          console.error("channel_history object store does not exist");
+          debugLogger.error("channel_history object store does not exist");
           return;
         }
 
@@ -963,10 +964,10 @@ export default {
         };
 
         request.onerror = (e) => {
-          console.error("Error getting channel history:", e.target.error);
+          debugLogger.error("Error getting channel history:", e.target.error);
         };
       } catch (error) {
-        console.error("Error loading channel history:", error);
+        debugLogger.error("Error loading channel history:", error);
       }
     },
     updateCombinedActivityLogs() {

@@ -758,6 +758,7 @@ input:checked + .toggle-slider:before {
 </style>
 
 <script>
+import { debugLogger } from "../utils/DebugLogger";
 import ConfirmModal from "./ConfirmModal.vue";
 
 export default {
@@ -903,7 +904,7 @@ export default {
         Object.entries(skipOptions).forEach(([key, value]) => {
           var opt = this.skipOptions.get(key);
           if (opt !== undefined) opt.value = value;
-          else console.log("Unknown sponsor type: " + key);
+          else debugLogger.log("Unknown sponsor type: " + key);
         });
       } else if ((skipList = this.getPreferenceString("selectedSkip")) !== undefined) {
         skipList = skipList.split(",");
@@ -911,7 +912,7 @@ export default {
         skipList.forEach(skip => {
           var opt = this.skipOptions.get(skip);
           if (opt !== undefined) opt.value = "auto";
-          else console.log("Unknown sponsor type: " + skip);
+          else debugLogger.log("Unknown sponsor type: " + skip);
         });
       }
 
@@ -1080,7 +1081,7 @@ export default {
           });
           return result.supported;
         } catch (e) {
-          console.warn("Error checking AV1 support via MediaCapabilities API:", e);
+          debugLogger.warn("Error checking AV1 support via MediaCapabilities API:", e);
         }
       }
 
@@ -1154,7 +1155,7 @@ export default {
         try {
           return JSON.parse(value);
         } catch (e) {
-          console.error(`Error parsing JSON for key ${key}:`, e);
+          debugLogger.error(`Error parsing JSON for key ${key}:`, e);
           return defaultVal;
         }
       } else return defaultVal;

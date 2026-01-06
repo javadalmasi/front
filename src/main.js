@@ -201,7 +201,9 @@ const mixin = {
                 // If it's an array of strings (old format), convert to new format
                 if (Array.isArray(subscriptions) && subscriptions.length > 0 && typeof subscriptions[0] === 'string') {
                     // Convert old format to new format by fetching full data if needed
-                    console.warn("Detected old subscription format, consider updating stored data");
+                    import("./utils/DebugLogger").then(({ debugLogger }) => {
+                        debugLogger.warn("Detected old subscription format, consider updating stored data");
+                    });
                     return subscriptions.map(id => ({ id: id }));
                 }
                 return subscriptions || [];

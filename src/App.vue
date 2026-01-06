@@ -49,6 +49,7 @@ import NavBar from "./components/NavBar.vue";
 import FooterComponent from "./components/FooterComponent.vue";
 import AppSidebar from "./components/Sidebar.vue";
 import UpdateNotification from "./components/UpdateNotification.vue";
+import { debugLogger } from "./utils/DebugLogger";
 
 const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -128,7 +129,7 @@ export default {
             const request = indexedDB.open("vidioo-db", 7);
             request.onupgradeneeded = ev => {
                 const db = request.result;
-                console.log("Upgrading object store.");
+                debugLogger.log("Upgrading object store.");
                 if (!db.objectStoreNames.contains("watch_history")) {
                     const store = db.createObjectStore("watch_history", { keyPath: "videoId" });
                     store.createIndex("video_id_idx", "videoId", { unique: true });
@@ -165,7 +166,7 @@ export default {
             request.onsuccess = e => {
                 window.db = e.target.result;
             };
-        } else console.log("This browser doesn't support IndexedDB");
+        } else debugLogger.log("This browser doesn't support IndexedDB");
 
         const App = this;
 
@@ -398,7 +399,7 @@ export default {
                 // Save back to localStorage
                 localStorage.setItem('userActivityLogs', JSON.stringify(logs));
             } catch (error) {
-                console.error("Error logging activity:", error);
+                debugLogger.error("Error logging activity:", error);
             }
         },
         async logChannelVisit(route) {
@@ -417,7 +418,7 @@ export default {
             if (!window.db) {
                 // If IndexedDB is not available in this browser
                 if (!("indexedDB" in window)) {
-                    console.warn("IndexedDB not supported in this browser");
+                    debugLogger.warn("IndexedDB not supported in this browser");
                     return;
                 }
 
@@ -433,7 +434,7 @@ export default {
                             attempts++;
                             setTimeout(checkDb, 100);
                         } else {
-                            console.warn("Database not ready after waiting, skipping channel history save");
+                            debugLogger.warn("Database not ready after waiting, skipping channel history save");
                             resolve();
                         }
                     };
@@ -444,13 +445,13 @@ export default {
 
             // Check if we have access to the database
             if (!window.db) {
-                console.error("Database not available for channel history");
+                debugLogger.error("Database not available for channel history");
                 return;
             }
 
             // Check if the channel_history store exists
             if (!window.db.objectStoreNames.contains("channel_history")) {
-                console.error("channel_history object store does not exist");
+                debugLogger.error("channel_history object store does not exist");
                 return;
             }
 
@@ -480,11 +481,11 @@ export default {
 
             // Handle transaction completion
             tx.oncomplete = () => {
-                console.log("Channel visit logged to history successfully");
+                debugLogger.log("Channel visit logged to history successfully");
             };
 
             tx.onerror = (event) => {
-                console.error("Error saving channel visit to history:", event.target.error);
+                debugLogger.error("Error saving channel visit to history:", event.target.error);
             };
         },
         getSiteName() {
@@ -493,7 +494,7 @@ export default {
         handlePWAUpdate() {
             // This method will be called when a PWA update is available
             // The UpdateNotification component will handle the UI and refresh logic
-            console.log('PWA update available, notification will be shown');
+            debugLogger.log('PWA update available, notification will be shown');
         }
     },
 };

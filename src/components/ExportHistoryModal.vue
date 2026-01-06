@@ -90,7 +90,9 @@ export default {
                         this.exportAsHistory();
                     })
                     .catch(e => {
-                        console.error(e);
+                        import("../utils/DebugLogger").then(({ debugLogger }) => {
+                            debugLogger.error(e);
+                        });
                     });
             }
         },

@@ -437,6 +437,7 @@
 
 <script>
 import VideoPlayer from "./VideoPlayer.vue";
+import { debugLogger } from "../utils/DebugLogger";
 import ContentItem from "./ContentItem.vue";
 import CommentItem from "./CommentItem.vue";
 import ChaptersBar from "./ChaptersBar.vue";
@@ -592,7 +593,7 @@ export default {
                     tag = decodeURIComponent(tag);
                 } catch (e) {
                     // If decoding fails, use the original tag
-                    console.warn("Could not decode hashtag:", tag);
+                    debugLogger.warn("Could not decode hashtag:", tag);
                 }
 
                 // Clean up tag to remove any potential encoded characters or HTML artifacts that might have been processed incorrectly
@@ -1069,7 +1070,7 @@ export default {
                 }
                 return true;
             } catch (e) {
-                console.error(e);
+                debugLogger.error(e);
             }
             return false;
         },

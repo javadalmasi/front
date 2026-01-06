@@ -322,6 +322,7 @@
 </template>
 
 <script>
+import { debugLogger } from "../utils/DebugLogger";
 import ConfirmModal from "./ConfirmModal.vue";
 import { getOptimalThumbnailUrl, transformThumbnailUrl, getProgressiveThumbnailUrls } from '../utils/ThumbnailUtils.js';
 
@@ -400,11 +401,11 @@ export default {
 
         // Add error handler for proper debugging
         request.onerror = e => {
-          console.error("Error accessing history from IndexedDB:", e.target.error);
+          debugLogger.error("Error accessing history from IndexedDB:", e.target.error);
           this.videos = []; // Ensure it's reset even if there's an error
         };
       } catch (error) {
-        console.error("Error accessing IndexedDB:", error);
+        debugLogger.error("Error accessing IndexedDB:", error);
         this.videos = [];
       }
     }
@@ -496,11 +497,11 @@ export default {
         };
 
         request.onerror = (e) => {
-          console.error("Error getting history data:", e);
+          debugLogger.error("Error getting history data:", e);
           this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
         };
       } catch (error) {
-        console.error("Backup error:", error);
+        debugLogger.error("Backup error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -550,17 +551,17 @@ export default {
               };
 
               addTx.onerror = (e) => {
-                console.error("Error adding history data:", e);
+                debugLogger.error("Error adding history data:", e);
                 this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
               };
             };
 
             clearTx.onerror = (e) => {
-              console.error("Error clearing history:", e);
+              debugLogger.error("Error clearing history:", e);
               this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
             };
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
           }
         };
@@ -636,7 +637,7 @@ export default {
         this.searchHistory = searchHistory;
         this.showToast(this.$t('info.search_removed_from_history') || 'جستجو از تاریخچه حذف شد');
       } catch (error) {
-        console.error("Error removing from search history:", error);
+        debugLogger.error("Error removing from search history:", error);
       }
     },
     clearSearchHistory() {
@@ -645,7 +646,7 @@ export default {
         this.searchHistory = [];
         this.showToast(this.$t('info.search_history_cleared') || 'تاریخچه جستجو پاک شد');
       } catch (error) {
-        console.error("Error clearing search history:", error);
+        debugLogger.error("Error clearing search history:", error);
       }
     },
     onAutoDeleteSearchHistoryChange() {
@@ -681,19 +682,19 @@ export default {
         localStorage.setItem("search_history", JSON.stringify(searchHistory));
         this.searchHistory = searchHistory;
       } catch (error) {
-        console.error("Error applying auto-delete to search history:", error);
+        debugLogger.error("Error applying auto-delete to search history:", error);
       }
     },
     onImageError(event) {
       // Don't use placeholder images - just let the image fail gracefully
-      console.warn("History thumbnail failed to load:", event.target.src);
+      debugLogger.warn("History thumbnail failed to load:", event.target.src);
     },
     async loadChannelHistory() {
       // Wait for database to be ready
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           return;
         }
 
@@ -709,7 +710,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, skipping channel history load");
+              debugLogger.warn("Database not ready after waiting, skipping channel history load");
               resolve();
             }
           };
@@ -720,13 +721,13 @@ export default {
 
       // Check if we have access to the database
       if (!window.db) {
-        console.error("Database not available for channel history");
+        debugLogger.error("Database not available for channel history");
         return;
       }
 
       // Check if the channel_history store exists
       if (!window.db.objectStoreNames.contains("channel_history")) {
-        console.error("channel_history object store does not exist");
+        debugLogger.error("channel_history object store does not exist");
         return;
       }
 
@@ -758,11 +759,11 @@ export default {
 
         // Add error handler for proper debugging
         request.onerror = e => {
-          console.error("Error accessing channel history from IndexedDB:", e.target.error);
+          debugLogger.error("Error accessing channel history from IndexedDB:", e.target.error);
           this.channels = []; // Ensure it's reset even if there's an error
         };
       } catch (error) {
-        console.error("Error accessing channel history IndexedDB:", error);
+        debugLogger.error("Error accessing channel history IndexedDB:", error);
         this.channels = [];
       }
     },
@@ -830,7 +831,7 @@ export default {
           };
         }
       } catch (error) {
-        console.error("Error applying auto-delete to channel history:", error);
+        debugLogger.error("Error applying auto-delete to channel history:", error);
       }
     },
   }

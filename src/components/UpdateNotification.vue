@@ -27,6 +27,7 @@
 
 <script>
 import { registerSW } from 'virtual:pwa-register';
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: 'UpdateNotification',
@@ -52,11 +53,11 @@ export default {
       const { needRefresh, updateServiceWorker } = registerSW({
         onNeedRefresh: () => {
           // Show update notification when new version is available
-          console.log('New version available, showing update notification');
+          debugLogger.log('New version available, showing update notification');
           this.showUpdateNotification = true;
         },
         onRegisteredSW: (swScriptUrl, registration) => {
-          console.log('Service Worker registered with scope:', registration?.scope);
+          debugLogger.log('Service Worker registered with scope:', registration?.scope);
           this.registration = registration;
 
           // Check for updates periodically
@@ -67,7 +68,7 @@ export default {
           }
         },
         onRegisterError: (error) => {
-          console.error('Service Worker registration error:', error);
+          debugLogger.error('Service Worker registration error:', error);
         }
       });
 
@@ -98,7 +99,7 @@ export default {
         // Force refresh the page to get the new version
         window.location.reload(true);
       } catch (error) {
-        console.error('Error during refresh:', error);
+        debugLogger.error('Error during refresh:', error);
         // Fallback: just reload the page
         window.location.reload(true);
       }

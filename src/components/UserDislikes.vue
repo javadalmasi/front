@@ -72,6 +72,7 @@
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
 import { getOptimalThumbnailUrl, transformThumbnailUrl, getProgressiveThumbnailUrls } from '../utils/ThumbnailUtils.js';
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "UserDislikes",
@@ -109,7 +110,7 @@ export default {
         const dislikes = JSON.parse(localStorage.getItem("dislikes") || "[]");
         this.videos = dislikes;
       } catch (error) {
-        console.error("Error fetching dislikes:", error);
+        debugLogger.error("Error fetching dislikes:", error);
         this.showToast(this.$t('info.error_fetching_dislikes') || 'خطا در دریافت ویدیوهای پسند نشده');
         this.videos = [];
       }
@@ -124,7 +125,7 @@ export default {
         this.videos = this.videos.filter(video => video.videoId !== videoId);
         this.showToast(this.$t('info.video_removed_from_dislikes') || 'ویدیو از پسند نشده‌ها حذف شد');
       } catch (error) {
-        console.error("Error removing from dislikes:", error);
+        debugLogger.error("Error removing from dislikes:", error);
         this.showToast(this.$t('info.error_removing_from_dislikes') || 'خطا در حذف از پسند نشده‌ها');
       }
     },
@@ -134,7 +135,7 @@ export default {
         this.videos = [];
         this.showToast(this.$t('info.dislikes_cleared') || 'همه پسند نشده‌ها پاک شدند');
       } catch (error) {
-        console.error("Error clearing dislikes:", error);
+        debugLogger.error("Error clearing dislikes:", error);
         this.showToast(this.$t('info.error_clearing_dislikes') || 'خطا در پاک کردن پسند نشده‌ها');
       }
     },
@@ -155,7 +156,7 @@ export default {
         
         this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان پسند نشده‌ها ایجاد شد');
       } catch (error) {
-        console.error("Backup error:", error);
+        debugLogger.error("Backup error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -175,7 +176,7 @@ export default {
             await this.fetchDislikes(); // Refresh the list
             this.showToast(this.$t('info.import_success') || 'پسند نشده‌ها با موفقیت وارد شدند');
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن پسند نشده‌ها');
           }
         };
@@ -200,7 +201,7 @@ export default {
     },
     onImageError(event) {
       // Don't use placeholder images - just let the image fail gracefully
-      console.warn("Dislike thumbnail failed to load:", event.target.src);
+      debugLogger.warn("Dislike thumbnail failed to load:", event.target.src);
     }
   }
 };

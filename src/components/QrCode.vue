@@ -22,7 +22,9 @@ export default {
     methods: {
         generateQrCode() {
             QRCode.toCanvas(this.$refs.qrCodeCanvas, this.text, error => {
-                if (error) console.error(error);
+                if (error) import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error(error);
+                });
             });
         },
     },

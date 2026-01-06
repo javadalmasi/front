@@ -110,19 +110,25 @@ export default {
                                     else resolve();
                                 } else resolve();
                             } catch (error) {
-                                console.error("Error processing history cursor:", error);
+                                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                                    debugLogger.error("Error processing history cursor:", error);
+                                });
                                 reject(error);
                             }
                         };
                         cursorRequest.onerror = e => {
-                            console.error("Error opening history cursor:", e.target.error);
+                            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                                debugLogger.error("Error opening history cursor:", e.target.error);
+                            });
                             reject(e.target.error);
                         };
                     });
                     await cursorPromise;
                 }
             } catch (error) {
-                console.error("Error initializing watch history:", error);
+                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error("Error initializing watch history:", error);
+                });
             }
         })().then(() => {
             this.loadMoreVideos();

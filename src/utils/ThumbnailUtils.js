@@ -3,6 +3,7 @@
  */
 
 import { findClosestAllowedDimension, determineFormat, findClosestAllowedQuality } from './ImageResizer.js';
+import { debugLogger } from "./DebugLogger";
 
 /**
  * Transforms a YouTube thumbnail URL to the new CDN format
@@ -99,7 +100,7 @@ export function transformThumbnailUrl(originalThumbnailUrl, options = {}) {
             // If we can't extract from the URL, try to get it from options
             // If still not available, return the original URL
             if (!options.videoId) {
-                console.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
+                debugLogger.warn("Could not extract video ID from thumbnail URL:", originalThumbnailUrl);
                 return originalThumbnailUrl;
             }
         }

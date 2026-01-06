@@ -303,6 +303,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "DataManagement",
@@ -347,7 +348,7 @@ export default {
             };
           });
         } catch (e) {
-          console.error("Error getting history count:", e);
+          debugLogger.error("Error getting history count:", e);
           this.historyCount = 0;
         }
       }
@@ -372,7 +373,7 @@ export default {
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           this.channelHistoryCount = 0;
           return;
         }
@@ -389,7 +390,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, setting channel history count to 0");
+              debugLogger.warn("Database not ready after waiting, setting channel history count to 0");
               this.channelHistoryCount = 0;
               resolve();
             }
@@ -401,14 +402,14 @@ export default {
 
       // Check if we have access to the database
       if (!window.db) {
-        console.error("Database not available for channel history count");
+        debugLogger.error("Database not available for channel history count");
         this.channelHistoryCount = 0;
         return;
       }
 
       // Check if the channel_history store exists
       if (!window.db.objectStoreNames.contains("channel_history")) {
-        console.error("channel_history object store does not exist");
+        debugLogger.error("channel_history object store does not exist");
         this.channelHistoryCount = 0;
         return;
       }
@@ -424,12 +425,12 @@ export default {
             resolve(countRequest.result);
           };
           countRequest.onerror = (event) => {
-            console.error("Error counting channel history:", event.target.error);
+            debugLogger.error("Error counting channel history:", event.target.error);
             reject(event.target.error);
           };
         });
       } catch (e) {
-        console.error("Error getting channel history count:", e);
+        debugLogger.error("Error getting channel history count:", e);
         this.channelHistoryCount = 0;
       }
     },
@@ -480,7 +481,7 @@ export default {
 
         this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان با موفقیت ایجاد شد');
       } catch (error) {
-        console.error("Backup all error:", error);
+        debugLogger.error("Backup all error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -510,7 +511,7 @@ export default {
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           return [];
         }
 
@@ -526,7 +527,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, returning empty channel history data");
+              debugLogger.warn("Database not ready after waiting, returning empty channel history data");
               resolve();
             }
           };
@@ -537,13 +538,13 @@ export default {
 
       // Check if we have access to the database
       if (!window.db) {
-        console.error("Database not available for channel history");
+        debugLogger.error("Database not available for channel history");
         return [];
       }
 
       // Check if the channel_history store exists
       if (!window.db.objectStoreNames.contains("channel_history")) {
-        console.error("channel_history object store does not exist");
+        debugLogger.error("channel_history object store does not exist");
         return [];
       }
 
@@ -650,7 +651,7 @@ export default {
             this.showToast(this.$t('info.import_success') || 'داده‌ها با موفقیت وارد شدند');
             await this.updateCounts(); // Refresh the counts
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن داده‌ها');
           }
         };
@@ -678,13 +679,13 @@ export default {
         };
 
         addTx.onerror = (e) => {
-          console.error("Error importing history:", e);
+          debugLogger.error("Error importing history:", e);
           this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
         };
       };
 
       clearTx.onerror = (e) => {
-        console.error("Error clearing history:", e);
+        debugLogger.error("Error clearing history:", e);
         this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه');
       };
     },
@@ -693,7 +694,7 @@ export default {
       if (!window.db) {
         // If IndexedDB is not available in this browser
         if (!("indexedDB" in window)) {
-          console.warn("IndexedDB not supported in this browser");
+          debugLogger.warn("IndexedDB not supported in this browser");
           return;
         }
 
@@ -709,7 +710,7 @@ export default {
               attempts++;
               setTimeout(checkDb, 100);
             } else {
-              console.warn("Database not ready after waiting, skipping channel history import");
+              debugLogger.warn("Database not ready after waiting, skipping channel history import");
               resolve();
             }
           };
@@ -720,13 +721,13 @@ export default {
 
       // Check if we have access to the database
       if (!window.db) {
-        console.error("Database not available for channel history import");
+        debugLogger.error("Database not available for channel history import");
         return;
       }
 
       // Check if the channel_history store exists
       if (!window.db.objectStoreNames.contains("channel_history")) {
-        console.error("channel_history object store does not exist");
+        debugLogger.error("channel_history object store does not exist");
         return;
       }
 
@@ -747,13 +748,13 @@ export default {
         };
 
         addTx.onerror = (e) => {
-          console.error("Error importing channel history:", e);
+          debugLogger.error("Error importing channel history:", e);
           this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه کانال');
         };
       };
 
       clearTx.onerror = (e) => {
-        console.error("Error clearing channel history:", e);
+        debugLogger.error("Error clearing channel history:", e);
         this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن تاریخچه کانال');
       };
     },
@@ -788,7 +789,7 @@ export default {
 
           this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان تاریخچه ایجاد شد');
         }).catch(e => {
-          console.error("Backup history error:", e);
+          debugLogger.error("Backup history error:", e);
           this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان تاریخچه');
         });
       } else {
@@ -889,7 +890,7 @@ export default {
 
           this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان تاریخچه کانال ایجاد شد');
         }).catch(e => {
-          console.error("Backup channel history error:", e);
+          debugLogger.error("Backup channel history error:", e);
           this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان تاریخچه کانال');
         });
       } else {
@@ -918,7 +919,7 @@ export default {
         this.showToast(this.$t('info.preferences_reset') || 'تنظیمات بازنشانی شدند');
         this.showConfirmResetPreferences = false;
       } catch (error) {
-        console.error("Reset preferences error:", error);
+        debugLogger.error("Reset preferences error:", error);
         this.showToast(this.$t('info.reset_error') || 'خطا در بازنشانی تنظیمات');
       }
     },

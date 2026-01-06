@@ -72,6 +72,7 @@
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
 import { getOptimalThumbnailUrl, transformThumbnailUrl, getProgressiveThumbnailUrls } from '../utils/ThumbnailUtils.js';
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "UserLikes",
@@ -109,7 +110,7 @@ export default {
         const likes = JSON.parse(localStorage.getItem("likes") || "[]");
         this.videos = likes;
       } catch (error) {
-        console.error("Error fetching likes:", error);
+        debugLogger.error("Error fetching likes:", error);
         this.showToast(this.$t('info.error_fetching_likes') || 'خطا در دریافت ویدیوهای پسند شده');
         this.videos = [];
       }
@@ -124,7 +125,7 @@ export default {
         this.videos = this.videos.filter(video => video.videoId !== videoId);
         this.showToast(this.$t('info.video_removed_from_likes') || 'ویدیو از پسند شده‌ها حذف شد');
       } catch (error) {
-        console.error("Error removing from likes:", error);
+        debugLogger.error("Error removing from likes:", error);
         this.showToast(this.$t('info.error_removing_from_likes') || 'خطا در حذف از پسند شده‌ها');
       }
     },
@@ -134,7 +135,7 @@ export default {
         this.videos = [];
         this.showToast(this.$t('info.likes_cleared') || 'همه پسند شده‌ها پاک شدند');
       } catch (error) {
-        console.error("Error clearing likes:", error);
+        debugLogger.error("Error clearing likes:", error);
         this.showToast(this.$t('info.error_clearing_likes') || 'خطا در پاک کردن پسند شده‌ها');
       }
     },
@@ -155,7 +156,7 @@ export default {
         
         this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان پسند شده‌ها ایجاد شد');
       } catch (error) {
-        console.error("Backup error:", error);
+        debugLogger.error("Backup error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -175,7 +176,7 @@ export default {
             await this.fetchLikes(); // Refresh the list
             this.showToast(this.$t('info.import_success') || 'پسند شده‌ها با موفقیت وارد شدند');
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن پسند شده‌ها');
           }
         };
@@ -200,7 +201,7 @@ export default {
     },
     onImageError(event) {
       // Don't use placeholder images - just let the image fail gracefully
-      console.warn("Like thumbnail failed to load:", event.target.src);
+      debugLogger.warn("Like thumbnail failed to load:", event.target.src);
     }
   }
 };

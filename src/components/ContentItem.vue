@@ -43,7 +43,9 @@ switch (props.item?.type) {
         compName = PlaylistItem;
         break;
     default:
-        console.error("Unexpected item type: " + props.item.type);
+        import("../utils/DebugLogger").then(({ debugLogger }) => {
+            debugLogger.error("Unexpected item type: " + props.item.type);
+        });
 }
 
 defineExpose({

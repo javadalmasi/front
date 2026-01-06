@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { debugLogger } from "../utils/DebugLogger";
 import ContentItem from "./ContentItem.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 export default {
@@ -166,7 +167,7 @@ export default {
 
                 localStorage.setItem("search_history", JSON.stringify(searchHistory));
             } catch (error) {
-                console.error("Error adding to search history:", error);
+                debugLogger.error("Error adding to search history:", error);
             }
         },
         getSearchHistory() {
@@ -210,7 +211,7 @@ export default {
 
                 return searchHistory;
             } catch (error) {
-                console.error("Error applying auto-delete to search history:", error);
+                debugLogger.error("Error applying auto-delete to search history:", error);
                 return searchHistory; // Return original if error occurs
             }
         },

@@ -99,7 +99,9 @@ export default {
     methods: {
         async updateSubscribedStatus() {
             this.subscribed = await this.fetchSubscriptionStatus(this.channelId);
-            console.log(this.subscribed);
+            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                debugLogger.log(this.subscribed);
+            });
         },
         subscribeHandler() {
             // Pass channel data when subscribing so we can store full information

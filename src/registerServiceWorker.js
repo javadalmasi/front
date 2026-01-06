@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 import { registerSW } from "virtual:pwa-register";
+import { debugLogger } from "./utils/DebugLogger";
 
 if (process.env.NODE_ENV === "production") {
     // Register service worker with update functionality
@@ -10,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
             window.dispatchEvent(new CustomEvent('pwaUpdateAvailable'));
         },
         onRegisteredSW(swScriptUrl, registration) {
-            console.log('Service Worker registered with scope:', registration?.scope);
+            debugLogger.log('Service Worker registered with scope:', registration?.scope);
 
             // Check for updates periodically
             if (registration && registration.active) {
@@ -20,7 +21,7 @@ if (process.env.NODE_ENV === "production") {
             }
         },
         onRegisterError(error) {
-            console.error('Service Worker registration error:', error);
+            debugLogger.error('Service Worker registration error:', error);
         }
     });
 }

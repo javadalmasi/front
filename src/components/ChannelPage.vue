@@ -107,6 +107,7 @@ import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import CollapsableText from "./CollapsableText.vue";
 import AddToGroupModal from "./AddToGroupModal.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
     components: {
@@ -174,7 +175,9 @@ export default {
         },
         onBannerError(event) {
             // Don't use placeholder images - just let the image fail gracefully
-            console.warn("Banner image failed to load:", event.target.src);
+            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                debugLogger.warn("Banner image failed to load:", event.target.src);
+            });
         },
         async fetchSubscribedStatus() {
             if (!this.channel.id) return;
@@ -315,7 +318,9 @@ export default {
                 this.tabs[this.selectedTab].content = this.contentItems;
             }).catch(error => {
                 this.loading = false;
-                console.error('Error loading more tab content:', error);
+                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error('Error loading more tab content:', error);
+                });
                 // Set empty array if there's an error to prevent endless loading state
                 this.contentItems = this.tabs[this.selectedTab].content = [];
             });
@@ -348,7 +353,9 @@ export default {
                     translatedTabName = this.$t("video.shorts");
                     break;
                 default:
-                    console.error(`Tab name "${tabName}" is not translated yet!`);
+                    import("../utils/DebugLogger").then(({ debugLogger }) => {
+                        debugLogger.error(`Tab name "${tabName}" is not translated yet!`);
+                    });
                     break;
             }
             return translatedTabName;
@@ -387,7 +394,9 @@ export default {
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
             }).catch(error => {
                 this.loading = false;
-                console.error('Error loading tab content:', error);
+                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error('Error loading tab content:', error);
+                });
                 // Set empty array if there's an error to prevent endless loading state
                 this.contentItems = this.tabs[index].content = [];
             });
@@ -403,7 +412,9 @@ export default {
             if (!window.db) {
                 // If IndexedDB is not available in this browser
                 if (!("indexedDB" in window)) {
-                    console.warn("IndexedDB not supported in this browser");
+                    import("../utils/DebugLogger").then(({ debugLogger }) => {
+                        debugLogger.warn("IndexedDB not supported in this browser");
+                    });
                     return;
                 }
 
@@ -419,7 +430,9 @@ export default {
                             attempts++;
                             setTimeout(checkDb, 100);
                         } else {
-                            console.warn("Database not ready after waiting, skipping channel history save");
+                            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                                debugLogger.warn("Database not ready after waiting, skipping channel history save");
+                            });
                             resolve();
                         }
                     };
@@ -430,13 +443,17 @@ export default {
 
             // Check if we have access to the database
             if (!window.db) {
-                console.error("Database not available for channel history");
+                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error("Database not available for channel history");
+                });
                 return;
             }
 
             // Check if the channel_history store exists
             if (!window.db.objectStoreNames.contains("channel_history")) {
-                console.error("channel_history object store does not exist");
+                import("../utils/DebugLogger").then(({ debugLogger }) => {
+                    debugLogger.error("channel_history object store does not exist");
+                });
                 return;
             }
 
@@ -458,11 +475,11 @@ export default {
 
             // Handle transaction completion
             tx.oncomplete = () => {
-                console.log("Channel saved to history successfully");
+                debugLogger.log("Channel saved to history successfully");
             };
 
             tx.onerror = (event) => {
-                console.error("Error saving channel to history:", event.target.error);
+                debugLogger.error("Error saving channel to history:", event.target.error);
             };
         },
     },

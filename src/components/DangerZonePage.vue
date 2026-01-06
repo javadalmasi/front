@@ -256,6 +256,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "DangerZonePage",
@@ -308,7 +309,7 @@ export default {
         // Close modal
         this.showConfirmResetAll = false;
       } catch (error) {
-        console.error("Reset all error:", error);
+        debugLogger.error("Reset all error:", error);
         this.showToast(this.$t('info.reset_error') || 'خطا در بازنشانی داده‌ها');
       }
     },
@@ -318,7 +319,7 @@ export default {
         this.showToast(this.$t('info.subscriptions_cleared') || 'اشتراک‌ها پاک شدند');
         this.showConfirmClearSubscriptions = false;
       } catch (error) {
-        console.error("Clear subscriptions error:", error);
+        debugLogger.error("Clear subscriptions error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن اشتراک‌ها');
       }
     },
@@ -332,7 +333,7 @@ export default {
         this.showToast(this.$t('info.history_cleared') || 'تاریخچه تماشا پاک شد');
         this.showConfirmClearHistory = false;
       } catch (error) {
-        console.error("Clear history error:", error);
+        debugLogger.error("Clear history error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه');
       }
     },
@@ -342,7 +343,7 @@ export default {
         this.showToast(this.$t('info.likes_cleared') || 'ویدیوهای پسندیده شده پاک شدند');
         this.showConfirmClearLikes = false;
       } catch (error) {
-        console.error("Clear likes error:", error);
+        debugLogger.error("Clear likes error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن ویدیوهای پسندیده شده');
       }
     },
@@ -352,7 +353,7 @@ export default {
         this.showToast(this.$t('info.dislikes_cleared') || 'ویدیوهای نپسندیده شده پاک شدند');
         this.showConfirmClearDislikes = false;
       } catch (error) {
-        console.error("Clear dislikes error:", error);
+        debugLogger.error("Clear dislikes error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن ویدیوهای نپسندیده شده');
       }
     },
@@ -372,7 +373,7 @@ export default {
         this.showToast(this.$t('info.preferences_reset') || 'تنظیمات بازنشانی شدند');
         this.showConfirmResetPreferences = false;
       } catch (error) {
-        console.error("Reset preferences error:", error);
+        debugLogger.error("Reset preferences error:", error);
         this.showToast(this.$t('info.reset_error') || 'خطا در بازنشانی تنظیمات');
       }
     },
@@ -382,7 +383,7 @@ export default {
         this.showToast(this.$t('info.activity_logs_cleared') || 'گزارش فعالیت‌های اخیر پاک شد');
         this.showConfirmClearActivityLogs = false;
       } catch (error) {
-        console.error("Clear activity logs error:", error);
+        debugLogger.error("Clear activity logs error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن گزارش فعالیت‌ها');
       }
     },
@@ -392,7 +393,7 @@ export default {
         this.showToast(this.$t('info.search_history_cleared') || 'تاریخچه جستجو پاک شد');
         this.showConfirmClearSearchHistory = false;
       } catch (error) {
-        console.error("Clear search history error:", error);
+        debugLogger.error("Clear search history error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه جستجو');
       }
     },
@@ -402,7 +403,7 @@ export default {
         if (!window.db) {
           // If IndexedDB is not available in this browser
           if (!("indexedDB" in window)) {
-            console.warn("IndexedDB not supported in this browser");
+            debugLogger.warn("IndexedDB not supported in this browser");
             this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
             return;
           }
@@ -419,7 +420,7 @@ export default {
                 attempts++;
                 setTimeout(checkDb, 100);
               } else {
-                console.warn("Database not ready after waiting, skipping channel history clear");
+                debugLogger.warn("Database not ready after waiting, skipping channel history clear");
                 resolve();
               }
             };
@@ -430,14 +431,14 @@ export default {
 
         // Check if we have access to the database
         if (!window.db) {
-          console.error("Database not available for channel history clear");
+          debugLogger.error("Database not available for channel history clear");
           this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
           return;
         }
 
         // Check if the channel_history store exists
         if (!window.db.objectStoreNames.contains("channel_history")) {
-          console.error("channel_history object store does not exist");
+          debugLogger.error("channel_history object store does not exist");
           this.showToast(this.$t('info.no_db_available') || 'پایگاه داده در دسترس نیست');
           return;
         }
@@ -449,7 +450,7 @@ export default {
         this.showToast(this.$t('info.channel_history_cleared') || 'تاریخچه کانال پاک شد');
         this.showConfirmClearChannelHistory = false;
       } catch (error) {
-        console.error("Clear channel history error:", error);
+        debugLogger.error("Clear channel history error:", error);
         this.showToast(this.$t('info.clear_error') || 'خطا در پاک کردن تاریخچه کانال');
       }
     },

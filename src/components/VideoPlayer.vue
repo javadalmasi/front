@@ -94,6 +94,7 @@ import { parseTimeParam } from "@/utils/Misc.js";
 import { transformThumbnailUrl, getPlayerThumbnailSettings } from "@/utils/ThumbnailUtils.js";
 import { findClosestAllowedDimension } from "@/utils/ImageResizer.js";
 import ModalComponent from "./ModalComponent.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 const shaka = import("shaka-player/dist/shaka-player.ui.js");
 const hotkeys = import("hotkeys-js");
@@ -500,15 +501,15 @@ export default {
                     // Add error handling for CDN fallback with retry logic
                     localPlayer.addEventListener('error', (event) => {
                         const error = event.detail;
-                        // console.error('Player error:', error); // Disabled error logging
+                        debugLogger.error('Player error:', error);
 
                         // Check if the error is related to network/CDN issues
                         if (error.category === 2 || error.code === 1001 || error.code === 1002) { // NETWORK_ERROR or variants
-                            // console.warn('CDN error detected, switching to fallback CDN...'); // Disabled warning
+                            debugLogger.warn('CDN error detected, switching to fallback CDN...');
 
                             // Check if we've reached the maximum retry attempts
                             if (retryCount >= maxRetries) {
-                                // console.warn('Maximum retry attempts reached, stopping retries'); // Disabled warning
+                                debugLogger.warn('Maximum retry attempts reached, stopping retries');
                                 return;
                             }
 
@@ -531,7 +532,7 @@ export default {
                                 currentCdnUrl = randomCdn;
                                 usedCdnUrls.add(randomCdn);
 
-                                // console.log(`Switched to fallback CDN: ${currentCdnUrl} (Attempt ${retryCount}/${maxRetries})`); // Disabled log
+                                debugLogger.log(`Switched to fallback CDN: ${currentCdnUrl} (Attempt ${retryCount}/${maxRetries})`);
 
                                 // Reload the player with the new CDN
                                 this.$nextTick(() => {
@@ -544,11 +545,11 @@ export default {
                                             this.$refs.videoEl.pause();
                                         }
                                     }).catch(reloadError => {
-                                        // console.error('Failed to reload with fallback CDN:', reloadError); // Disabled error logging
+                                        debugLogger.error('Failed to reload with fallback CDN:', reloadError);
                                     });
                                 });
                             } else {
-                                // console.warn('No more fallback CDN URLs available'); // Disabled warning
+                                debugLogger.warn('No more fallback CDN URLs available');
                             }
                         }
                     });
@@ -620,7 +621,7 @@ export default {
             const time = videoEl.currentTime;
             if (!segment) segment = this.findCurrentSegment(time);
             if (!segment) return;
-            console.log("Skipped segment at " + time);
+            debugLogger.log("Skipped segment at " + time);
             videoEl.currentTime = segment.segment[1];
             segment.skipped = true;
         },
@@ -1023,7 +1024,7 @@ export default {
                     }
                 })
                 .catch(e => {
-                    // console.error(e); // Disabled error logging
+                    debugLogger.error(e);
                     this.error = e.code;
                 });
 
@@ -1033,7 +1034,7 @@ export default {
 
             const seekbar = this.$refs.container.querySelector(".shaka-seek-bar");
             if (!seekbar) {
-                console.warn("Seek bar not found in DOM when updating markers");
+                debugLogger.warn("Seek bar not found in DOM when updating markers");
                 return;
             }
             const array = ["to right"];
@@ -1151,13 +1152,13 @@ export default {
                 let seekBar = document.querySelector(".shaka-seek-bar");
                 // Check if seekBar exists before trying to add event listeners
                 if (!seekBar) {
-                    console.warn("Seek bar not found in DOM when setting up preview");
+                    debugLogger.warn("Seek bar not found in DOM when setting up preview");
                     return;
                 }
 
                 // Check if preview container exists before trying to access it
                 if (!this.$refs.previewContainer) {
-                    console.warn("$refs.previewContainer not found when setting up preview");
+                    debugLogger.warn("$refs.previewContainer not found when setting up preview");
                     return;
                 }
 
@@ -1178,12 +1179,12 @@ export default {
 
             const seekBar = document.querySelector(".shaka-seek-bar");
             if (!seekBar) {
-                console.warn("Seek bar not found in DOM when showing preview");
+                debugLogger.warn("Seek bar not found in DOM when showing preview");
                 return;
             }
 
             if (!this.$refs.previewContainer || !this.$refs.preview) {
-                console.warn("$refs not found when showing preview");
+                debugLogger.warn("$refs not found when showing preview");
                 return;
             }
 
@@ -1304,7 +1305,7 @@ export default {
                     }
                 }
             } catch (error) {
-                // console.warn("Error during player destruction:", error); // Disabled error logging
+                debugLogger.warn("Error during player destruction:", error);
                 // Set to undefined anyway to prevent further issues
                 this.$ui = undefined;
                 this.$player = undefined;

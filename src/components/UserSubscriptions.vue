@@ -71,6 +71,7 @@
 
 <script>
 import ConfirmModal from "./ConfirmModal.vue";
+import { debugLogger } from "../utils/DebugLogger";
 
 export default {
   name: "UserSubscriptions",
@@ -116,7 +117,7 @@ export default {
           this.subscriptions = [];
         }
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        debugLogger.error("Error fetching subscriptions:", error);
         this.showToast(this.$t('info.error_fetching_subscriptions') || 'خطا در دریافت اشتراک‌ها');
         this.subscriptions = [];
       }
@@ -136,7 +137,7 @@ export default {
         await this.fetchSubscriptions(); // Refresh the list
         this.showToast(this.$t('info.unsubscribed_successfully') || 'عضویت لغو شد');
       } catch (error) {
-        console.error("Error unsubscribing:", error);
+        debugLogger.error("Error unsubscribing:", error);
         this.showToast(this.$t('info.error_unsubscribing') || 'خطا در لغو عضویت');
       }
     },
@@ -146,7 +147,7 @@ export default {
         this.subscriptions = [];
         this.showToast(this.$t('info.subscriptions_cleared') || 'همه اشتراک‌ها پاک شدند');
       } catch (error) {
-        console.error("Error clearing subscriptions:", error);
+        debugLogger.error("Error clearing subscriptions:", error);
         this.showToast(this.$t('info.error_clearing_subscriptions') || 'خطا در پاک کردن اشتراک‌ها');
       }
     },
@@ -167,7 +168,7 @@ export default {
         
         this.showToast(this.$t('info.backup_created_successfully') || 'پشتیبان اشتراک‌ها ایجاد شد');
       } catch (error) {
-        console.error("Backup error:", error);
+        debugLogger.error("Backup error:", error);
         this.showToast(this.$t('info.backup_error') || 'خطا در ایجاد پشتیبان');
       }
     },
@@ -187,7 +188,7 @@ export default {
             await this.fetchSubscriptions(); // Refresh the list
             this.showToast(this.$t('info.import_success') || 'اشتراک‌ها با موفقیت وارد شدند');
           } catch (error) {
-            console.error("Import error:", error);
+            debugLogger.error("Import error:", error);
             this.showToast(this.$t('info.import_error') || 'خطا در وارد کردن اشتراک‌ها');
           }
         };
@@ -216,7 +217,7 @@ export default {
     toggleSubscriptionState(channelId, isSubscribed, channelData) {
       // This would typically handle the subscription toggle logic
       // For now, we'll just update the UI and local storage
-      console.log('Toggle subscription for channelId:', channelId, 'isSubscribed:', isSubscribed, 'channelData:', channelData);
+      debugLogger.log('Toggle subscription for channelId:', channelId, 'isSubscribed:', isSubscribed, 'channelData:', channelData);
     },
     async fetchSubscriptionStatus(channelId) {
       // This would check if the user is subscribed to a specific channel

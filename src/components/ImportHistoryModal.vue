@@ -95,7 +95,9 @@ export default {
                                 this.error++;
                             };
                         } catch (error) {
-                            console.error(error);
+                            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                                debugLogger.error(error);
+                            });
                             this.index++;
                             this.error++;
                         }

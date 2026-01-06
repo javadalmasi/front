@@ -278,7 +278,9 @@ export default {
         onImageError(event) {
             // Don't use placeholder images - just let the image fail gracefully
             // You can add alternative error handling here if needed
-            console.warn("Thumbnail failed to load:", event.target.src);
+            import("../utils/DebugLogger").then(({ debugLogger }) => {
+                debugLogger.warn("Thumbnail failed to load:", event.target.src);
+            });
         },
     },
 };
