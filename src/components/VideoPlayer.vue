@@ -139,6 +139,9 @@ export default {
             currentTime: 0,
             seekbarPadding: 2,
             error: 0,
+            // Quality and CDN fallback tracking variables
+            currentQualityIndex: -1, // Track current quality index (-1 means using ABR)
+            availableQualities: [], // Store available qualities
         };
     },
     computed: {
@@ -477,10 +480,18 @@ export default {
                     // Store the current CDN URL for this player instance
                     let currentCdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
 
-                    // Track retry attempts and used CDN URLs
+                    // Track retry attempts, used CDN URLs, and quality fallback state
                     let retryCount = 0;
                     const maxRetries = 20;
                     let usedCdnUrls = new Set(); // Track CDN URLs that have been used
+
+                    // Get available qualities from video streams
+                    if (this.video.videoStreams && this.video.videoStreams.length > 0) {
+                        // Extract unique quality values (height) and sort in descending order (highest first)
+                        const uniqueHeights = [...new Set(this.video.videoStreams.map(stream => stream.height))].sort((a, b) => b - a);
+                        this.availableQualities = uniqueHeights;
+                        debugLogger.log('Available qualities:', this.availableQualities);
+                    }
 
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
                         const uri = request.uris[0];
@@ -501,58 +512,138 @@ export default {
                         }
                     });
 
-                    // Add error handling for CDN fallback with retry logic
+                    // Add error handling for CDN fallback with quality cycling
                     localPlayer.addEventListener('error', (event) => {
                         const error = event.detail;
                         debugLogger.error('Player error:', error);
 
                         // Check if the error is related to network/CDN issues
                         if (error.category === 2 || error.code === 1001 || error.code === 1002) { // NETWORK_ERROR or variants
-                            debugLogger.warn('CDN error detected, switching to fallback CDN...');
+                            debugLogger.warn('CDN error detected, attempting fallback...');
 
-                            // Check if we've reached the maximum retry attempts
-                            if (retryCount >= maxRetries) {
-                                debugLogger.warn('Maximum retry attempts reached, stopping retries');
-                                return;
-                            }
+                            // Check if we have available qualities to cycle through
+                            if (this.availableQualities.length > 0) {
+                                // Get all available CDN URLs
+                                const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
 
-                            retryCount++;
+                                // First, try to get a CDN URL that hasn't been used yet for the current quality
+                                let availableCdnUrls = allCdnUrls.filter(url => !usedCdnUrls.has(url));
 
-                            // Get all available CDN URLs
-                            const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
+                                // If no unused CDN URLs are available for this quality, try to move to next quality
+                                if (availableCdnUrls.length === 0) {
+                                    debugLogger.log('All CDN URLs tried for current quality, moving to next quality...');
 
-                            // First, try to get a CDN URL that hasn't been used yet
-                            let availableCdnUrls = allCdnUrls.filter(url => !usedCdnUrls.has(url));
+                                    // Move to the next quality
+                                    this.currentQualityIndex++;
 
-                            // If no unused CDN URLs are available, use all CDN URLs that are different from the current one
-                            if (availableCdnUrls.length === 0) {
-                                availableCdnUrls = allCdnUrls.filter(url => url !== currentCdnUrl);
-                            }
+                                    // If we've tried all qualities, reset and start over
+                                    if (this.currentQualityIndex >= this.availableQualities.length) {
+                                        debugLogger.log('All qualities and CDN URLs exhausted, resetting...');
+                                        this.currentQualityIndex = 0; // Start from the highest quality again
+                                        usedCdnUrls.clear(); // Reset CDN URL tracking for the new quality
+                                    } else {
+                                        usedCdnUrls.clear(); // Reset CDN URL tracking for the new quality
+                                    }
 
-                            if (availableCdnUrls.length > 0) {
-                                // Select a random CDN URL from available options
-                                const randomCdn = availableCdnUrls[Math.floor(Math.random() * availableCdnUrls.length)];
-                                currentCdnUrl = randomCdn;
-                                usedCdnUrls.add(randomCdn);
+                                    // Get new CDN URLs for the new quality
+                                    availableCdnUrls = allCdnUrls.filter(url => !usedCdnUrls.has(url));
+                                }
 
-                                debugLogger.log(`Switched to fallback CDN: ${currentCdnUrl} (Attempt ${retryCount}/${maxRetries})`);
+                                if (availableCdnUrls.length > 0) {
+                                    // Select a random CDN URL from available options
+                                    const randomCdn = availableCdnUrls[Math.floor(Math.random() * availableCdnUrls.length)];
+                                    currentCdnUrl = randomCdn;
+                                    usedCdnUrls.add(randomCdn);
 
-                                // Reload the player with the new CDN
-                                this.$nextTick(() => {
-                                    const currentTime = this.$player.getPlayheadTime();
-                                    const isPaused = this.$refs.videoEl.paused;
+                                    debugLogger.log(`Switched to fallback CDN: ${currentCdnUrl} for quality index ${this.currentQualityIndex} (quality: ${this.availableQualities[this.currentQualityIndex] || 'auto'})`);
 
-                                    // Reload the same content with the new CDN
-                                    localPlayer.load(uri, currentTime).then(() => {
-                                        if (isPaused) {
-                                            this.$refs.videoEl.pause();
+                                    // Reload the player with the new CDN and potentially new quality
+                                    this.$nextTick(() => {
+                                        const currentTime = this.$player.getPlayheadTime();
+                                        const isPaused = this.$refs.videoEl.paused;
+
+                                        // If we have a specific quality to use, configure the player accordingly
+                                        if (this.currentQualityIndex >= 0 && this.currentQualityIndex < this.availableQualities.length) {
+                                            // Disable ABR to force specific quality
+                                            localPlayer.configure("abr.enabled", false);
+
+                                            // Find the best stream for the selected quality
+                                            const tracks = localPlayer.getVariantTracks()
+                                                .filter(track => track.height === this.availableQualities[this.currentQualityIndex]);
+
+                                            if (tracks.length > 0) {
+                                                // Select the track with the best bandwidth for this quality
+                                                const bestTrack = tracks.reduce((best, current) =>
+                                                    current.bandwidth > best.bandwidth ? current : best
+                                                );
+                                                localPlayer.selectVariantTrack(bestTrack, true);
+                                                debugLogger.log(`Selected quality: ${bestTrack.height}p`);
+                                            }
+                                        } else {
+                                            // Enable ABR for auto quality selection
+                                            localPlayer.configure("abr.enabled", true);
                                         }
-                                    }).catch(reloadError => {
-                                        debugLogger.error('Failed to reload with fallback CDN:', reloadError);
+
+                                        // Reload the same content with the new settings
+                                        localPlayer.load(uri, currentTime).then(() => {
+                                            if (isPaused) {
+                                                this.$refs.videoEl.pause();
+                                            }
+                                            debugLogger.log('Successfully reloaded with new settings');
+                                        }).catch(reloadError => {
+                                            debugLogger.error('Failed to reload with fallback settings:', reloadError);
+                                        });
                                     });
-                                });
+                                } else {
+                                    debugLogger.warn('No more fallback options available');
+                                }
                             } else {
-                                debugLogger.warn('No more fallback CDN URLs available');
+                                debugLogger.warn('No available qualities to cycle through, using original fallback logic');
+
+                                // Check if we've reached the maximum retry attempts
+                                if (retryCount >= maxRetries) {
+                                    debugLogger.warn('Maximum retry attempts reached, stopping retries');
+                                    return;
+                                }
+
+                                retryCount++;
+
+                                // Get all available CDN URLs
+                                const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
+
+                                // First, try to get a CDN URL that hasn't been used yet
+                                let availableCdnUrls = allCdnUrls.filter(url => !usedCdnUrls.has(url));
+
+                                // If no unused CDN URLs are available, use all CDN URLs that are different from the current one
+                                if (availableCdnUrls.length === 0) {
+                                    availableCdnUrls = allCdnUrls.filter(url => url !== currentCdnUrl);
+                                }
+
+                                if (availableCdnUrls.length > 0) {
+                                    // Select a random CDN URL from available options
+                                    const randomCdn = availableCdnUrls[Math.floor(Math.random() * availableCdnUrls.length)];
+                                    currentCdnUrl = randomCdn;
+                                    usedCdnUrls.add(randomCdn);
+
+                                    debugLogger.log(`Switched to fallback CDN: ${currentCdnUrl} (Attempt ${retryCount}/${maxRetries})`);
+
+                                    // Reload the player with the new CDN
+                                    this.$nextTick(() => {
+                                        const currentTime = this.$player.getPlayheadTime();
+                                        const isPaused = this.$refs.videoEl.paused;
+
+                                        // Reload the same content with the new CDN
+                                        localPlayer.load(uri, currentTime).then(() => {
+                                            if (isPaused) {
+                                                this.$refs.videoEl.pause();
+                                            }
+                                        }).catch(reloadError => {
+                                            debugLogger.error('Failed to reload with fallback CDN:', reloadError);
+                                        });
+                                    });
+                                } else {
+                                    debugLogger.warn('No more fallback CDN URLs available');
+                                }
                             }
                         } else {
                             // For non-network errors, only set the error for display if debug mode is enabled
@@ -889,6 +980,20 @@ export default {
             if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo) {
                 // If a specific quality is selected, disable ABR to respect user preference
                 this.$player.configure("abr.enabled", false);
+
+                // Store the user's preferred quality as the starting point for fallback
+                if (this.availableQualities.length > 0) {
+                    this.currentQualityIndex = this.availableQualities.indexOf(quality);
+                    if (this.currentQualityIndex === -1) {
+                        // If the user's preferred quality isn't available, find the closest one
+                        const closestQualityIndex = this.availableQualities.reduce((closestIndex, currentQuality, index) => {
+                            const currentDiff = Math.abs(currentQuality - quality);
+                            const closestDiff = Math.abs(this.availableQualities[closestIndex] - quality);
+                            return currentDiff < closestDiff ? index : closestIndex;
+                        }, 0);
+                        this.currentQualityIndex = closestQualityIndex;
+                    }
+                }
             } else {
                 // Ensure ABR is enabled when no specific quality is selected or no video streams available
                 this.$player.configure("abr.enabled", true);
@@ -960,7 +1065,8 @@ export default {
                         this.$ui.configure("overflowMenuButtons", newOverflowMenuButtons);
                     }
 
-                    if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo) {
+                    // Apply initial quality selection if explicitly set and ABR is disabled
+                    if (qualityExplicitlySet && (hasVideoStreams || isLivestream) && !disableVideo && this.$player.getConfiguration().abr.enabled === false) {
                         var leastDiff = Number.MAX_VALUE;
                         var bestStream = null;
 
