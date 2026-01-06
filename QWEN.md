@@ -139,3 +139,5 @@ Currently, the project has 70 passing tests, with comprehensive coverage of all 
 - When adding new component files, always create corresponding test files in the tests/unit/ directory
 - When adding new utility functions or services, create appropriate unit tests for them
 - When adding new feature files, ensure they are covered by tests to maintain high test coverage
+- After each process of adding or editing files, debugging, or making any changes to the codebase, Qwen must run `pnpm run build` followed by `pnpm run test`
+- Before making any git commits, Qwen must ensure that both `pnpm run build` and `pnpm run test` commands pass successfully
