@@ -720,7 +720,7 @@ export default {
                     };
                 }
             })();
-            if (this.active) this.$refs.videoPlayer.loadVideo();
+            if (this.active && this.$refs.videoPlayer) this.$refs.videoPlayer.loadVideo();
         });
         this.playlistId = this.$route.query.list;
         this.index = Number(this.$route.query.index);
@@ -751,7 +751,7 @@ export default {
             localStorage.setItem("quality", "720");
         }
         
-        if (this.video?.duration) {
+        if (this.video?.duration && this.$refs.videoPlayer) {
             document.title = this.video.title + " - " + this.getSiteName();
             this.$refs.videoPlayer.loadVideo();
         }
@@ -1096,7 +1096,7 @@ export default {
             return this.$route.query.v || this.$route.params.v;
         },
         navigate(time) {
-            this.$refs.videoPlayer.seek(time);
+            if (this.$refs.videoPlayer) this.$refs.videoPlayer.seek(time);
         },
         onTimeUpdate(time) {
             this.currentTime = time;
@@ -1159,7 +1159,9 @@ export default {
                         break;
                 }
             // save the fullscreen state
-            searchParams.set("fullscreen", this.$refs.videoPlayer.$ui.getControls().isFullScreenEnabled());
+            if (this.$refs.videoPlayer && this.$refs.videoPlayer.$ui) {
+                searchParams.set("fullscreen", this.$refs.videoPlayer.$ui.getControls().isFullScreenEnabled());
+            }
             const paramStr = searchParams.toString();
             if (paramStr.length > 0) url += "&" + paramStr;
             this.$router.push(url);
