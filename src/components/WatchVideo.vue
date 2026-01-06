@@ -169,7 +169,7 @@
                             <!-- Like Button -->
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoLiked(video.id) ? 'btn btn-success active' : 'btn btn-secondary'}`"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoLiked(video.id) ? 'btn btn-neutral active' : 'btn btn-secondary'}`"
                                 @click="handleLike"
                                 :title="$t('actions.like')"
                                 :data-title="$t('actions.like')"
@@ -182,7 +182,7 @@
                             <!-- Dislike Button -->
                             <button
                                 v-if="!isLikeDislikeDisabled"
-                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-error active' : 'btn btn-secondary'}`"
+                                :class="`btn-icon flex items-center justify-center w-10 h-10 rounded-full p-0 ${isVideoDisliked(video.id) ? 'btn btn-neutral dislike active' : 'btn btn-secondary'}`"
                                 @click="handleDislike"
                                 :title="$t('actions.dislike')"
                                 :data-title="$t('actions.dislike')"
@@ -1437,16 +1437,16 @@ export default {
 /* No specific subscribed state for btn-danger since when subscribed, it uses btn-unsubscribe class */
 
 .btn-icon.btn-unsubscribe {
-    background-color: #6b7280 !important; /* Gray for unsubscribe (matching btn-secondary from App.vue) */
+    background-color: #2196f3 !important; /* Blue for unsubscribe (changed from gray) */
     color: white !important; /* White text */
-    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2) !important;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-unsubscribe:hover {
-    background-color: #4b5563 !important; /* Darker gray on hover (matching btn-secondary hover from App.vue) */
+    background-color: #1976d2 !important; /* Darker blue on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4) !important;
 }
 
 /* General secondary buttons with consistent color palette */
@@ -1461,6 +1461,68 @@ export default {
     background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
     box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+}
+
+/* Neutral buttons for like/dislike - consistent neutral color that works in both light and dark modes */
+.btn-icon.btn-neutral {
+    background-color: #e0e0e0 !important; /* Light neutral gray */
+    color: #424242 !important; /* Dark gray text */
+    border: 1px solid #bdbdbd !important; /* Subtle border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Dark mode adjustments for neutral buttons */
+.dark .btn-icon.btn-neutral {
+    background-color: #424242 !important; /* Darker gray in dark mode */
+    color: #e0e0e0 !important; /* Lighter text in dark mode */
+    border: 1px solid #616161 !important; /* Darker border in dark mode */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-icon.btn-neutral:hover {
+    background-color: #9e9e9e !important; /* Medium neutral gray on hover */
+    color: white !important;
+    border: 1px solid #757575 !important; /* Slightly darker border on hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    transform: scale(1.05) !important; /* Slight scale on hover */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Dark mode adjustments for hover state */
+.dark .btn-icon.btn-neutral:hover {
+    background-color: #616161 !important; /* Adjusted for dark mode */
+    border: 1px solid #9e9e9e !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.btn-icon.btn-neutral.active {
+    background-color: #4caf50 !important; /* Green when active (for like) */
+    color: white !important;
+    border: 1px solid #388e3c !important; /* Darker green border when active */
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4) !important;
+}
+
+/* Dark mode adjustments for active like button */
+.dark .btn-icon.btn-neutral.active {
+    background-color: #388e3c !important; /* Darker green in dark mode */
+    border: 1px solid #2e7d32 !important; /* Even darker border in dark mode */
+    box-shadow: 0 4px 12px rgba(67, 145, 66, 0.5) !important;
+}
+
+/* Specific styles for dislike button when active */
+.btn-icon.btn-neutral.dislike.active {
+    background-color: #f44336 !important; /* Red when active (for dislike) */
+    color: white !important;
+    border: 1px solid #d32f2f !important; /* Darker red border when active */
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4) !important;
+}
+
+/* Dark mode adjustments for active dislike button */
+.dark .btn-icon.btn-neutral.dislike.active {
+    background-color: #d32f2f !important; /* Darker red in dark mode */
+    border: 1px solid #b71c1c !important; /* Even darker border in dark mode */
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.5) !important;
 }
 
 /* Specialized buttons with function-specific colors */
@@ -1478,16 +1540,16 @@ export default {
 }
 
 .btn-icon.btn-secondary[aria-label*="Share"] {
-    background-color: #f3e5f5 !important; /* Light purple for share */
-    color: #7b1fa2 !important; /* Dark purple text */
-    box-shadow: 0 2px 4px rgba(156, 39, 176, 0.2) !important;
+    background-color: #f5f5f5 !important; /* Light neutral gray for share */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Share"]:hover {
-    background-color: #9c27b0 !important; /* Purple on hover */
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(156, 39, 176, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Download"] {
@@ -1530,29 +1592,29 @@ export default {
 }
 
 .btn-icon.btn-secondary[aria-label*="Watch"] {
-    background-color: #fff8e1 !important; /* Light amber for video mode */
-    color: #f57f17 !important; /* Dark amber text */
-    box-shadow: 0 2px 4px rgba(255, 235, 59, 0.2) !important;
+    background-color: #f5f5f5 !important; /* Light neutral gray for watch */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Watch"]:hover {
-    background-color: #ffeb3b !important; /* Amber on hover */
-    color: #333 !important;
-    box-shadow: 0 4px 8px rgba(255, 235, 59, 0.4) !important;
+    background-color: #757575 !important; /* Medium gray on hover */
+    color: white !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Listen"] {
-    background-color: #e8f5e9 !important; /* Light green for audio mode */
-    color: #2e7d32 !important; /* Dark green text */
-    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2) !important;
+    background-color: #f5f5f5 !important; /* Light neutral gray for listen */
+    color: #424242 !important; /* Dark gray text */
+    box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Listen"]:hover {
-    background-color: #4caf50 !important; /* Green on hover */
+    background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4) !important;
+    box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
 }
 
 /* Hide button text on all devices by default, show only on desktop hover */
