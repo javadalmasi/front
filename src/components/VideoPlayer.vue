@@ -495,11 +495,11 @@ export default {
                     // Add error handling for CDN fallback
                     localPlayer.addEventListener('error', (event) => {
                         const error = event.detail;
-                        console.error('Player error:', error);
+                        // console.error('Player error:', error); // Disabled error logging
 
                         // Check if the error is related to network/CDN issues
                         if (error.category === 2 || error.code === 1001 || error.code === 1002) { // NETWORK_ERROR or variants
-                            console.warn('CDN error detected, switching to fallback CDN...');
+                            // console.warn('CDN error detected, switching to fallback CDN...'); // Disabled warning
 
                             // Get a new random CDN URL that's different from the current one
                             const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
@@ -512,7 +512,7 @@ export default {
                                 const randomFallbackCdn = fallbackCdnUrls[Math.floor(Math.random() * fallbackCdnUrls.length)];
                                 currentCdnUrl = randomFallbackCdn;
 
-                                console.log(`Switched to fallback CDN: ${currentCdnUrl}`);
+                                // console.log(`Switched to fallback CDN: ${currentCdnUrl}`); // Disabled log
 
                                 // Reload the player with the new CDN
                                 this.$nextTick(() => {
@@ -525,11 +525,11 @@ export default {
                                             this.$refs.videoEl.pause();
                                         }
                                     }).catch(reloadError => {
-                                        console.error('Failed to reload with fallback CDN:', reloadError);
+                                        // console.error('Failed to reload with fallback CDN:', reloadError); // Disabled error logging
                                     });
                                 });
                             } else {
-                                console.warn('No more fallback CDN URLs available');
+                                // console.warn('No more fallback CDN URLs available'); // Disabled warning
                             }
                         }
                     });
@@ -999,7 +999,7 @@ export default {
                     }
                 })
                 .catch(e => {
-                    console.error(e);
+                    // console.error(e); // Disabled error logging
                     this.error = e.code;
                 });
 
@@ -1280,7 +1280,7 @@ export default {
                     }
                 }
             } catch (error) {
-                console.warn("Error during player destruction:", error);
+                // console.warn("Error during player destruction:", error); // Disabled error logging
                 // Set to undefined anyway to prevent further issues
                 this.$ui = undefined;
                 this.$player = undefined;
