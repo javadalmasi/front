@@ -814,6 +814,11 @@ export default {
                 }
             });
 
+            // Disable shaka player logging
+            if (this.$shaka && this.$shaka.log) {
+                this.$shaka.log.setLevel(this.$shaka.log.Level.NONE);
+            }
+
             const disableVideo = this.getPreferenceBoolean("listen", false) && !this.video.livestream;
 
             const prefetchLimit = Math.min(Math.max(this.getPreferenceNumber("prefetchLimit", 2), 0), 10);
