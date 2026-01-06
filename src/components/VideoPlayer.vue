@@ -470,6 +470,9 @@ export default {
                     const localPlayer = new this.$shaka.Player();
                     await localPlayer.attach(videoEl);
 
+                    // Store the current CDN URL for this player instance
+                    let currentCdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
+
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
                         const uri = request.uris[0];
                         var url = new URL(uri);
@@ -484,9 +487,50 @@ export default {
 
                         // Apply CDN replacement if enabled
                         if (import.meta.env.VITE_ENABLE_CDN && import.meta.env.VITE_ENABLE_CDN === "true") {
-                            const cdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
-                            const processedUrl = replaceWithCdnUrl(request.uris[0], "", cdnUrl);
+                            const processedUrl = replaceWithCdnUrl(request.uris[0], "", currentCdnUrl);
                             request.uris[0] = processedUrl;
+                        }
+                    });
+
+                    // Add error handling for CDN fallback
+                    localPlayer.addEventListener('error', (event) => {
+                        const error = event.detail;
+                        console.error('Player error:', error);
+
+                        // Check if the error is related to network/CDN issues
+                        if (error.category === 2 || error.code === 1001 || error.code === 1002) { // NETWORK_ERROR or variants
+                            console.warn('CDN error detected, switching to fallback CDN...');
+
+                            // Get a new random CDN URL that's different from the current one
+                            const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
+
+                            // Filter out the current CDN URL to get potential fallbacks
+                            const fallbackCdnUrls = allCdnUrls.filter(url => url !== currentCdnUrl);
+
+                            if (fallbackCdnUrls.length > 0) {
+                                // Select a random fallback CDN URL
+                                const randomFallbackCdn = fallbackCdnUrls[Math.floor(Math.random() * fallbackCdnUrls.length)];
+                                currentCdnUrl = randomFallbackCdn;
+
+                                console.log(`Switched to fallback CDN: ${currentCdnUrl}`);
+
+                                // Reload the player with the new CDN
+                                this.$nextTick(() => {
+                                    const currentTime = this.$player.getPlayheadTime();
+                                    const isPaused = this.$refs.videoEl.paused;
+
+                                    // Reload the same content with the new CDN
+                                    localPlayer.load(uri, currentTime).then(() => {
+                                        if (isPaused) {
+                                            this.$refs.videoEl.pause();
+                                        }
+                                    }).catch(reloadError => {
+                                        console.error('Failed to reload with fallback CDN:', reloadError);
+                                    });
+                                });
+                            } else {
+                                console.warn('No more fallback CDN URLs available');
+                            }
                         }
                     });
 

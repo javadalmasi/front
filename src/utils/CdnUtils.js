@@ -25,8 +25,22 @@ export function replaceWithCdnUrl(originalUrl, proxyUrl, cdnUrl) {
         const pathname = originalUrlObj.pathname; // e.g., '/videoplayback'
         const search = originalUrlObj.search; // e.g., '?bui=...&itag=137&...'
 
+        // Parse CDN URLs from environment variable (comma-separated)
+        let cdnUrls = [];
+        if (typeof cdnUrl === 'string' && cdnUrl.includes(',')) {
+            cdnUrls = cdnUrl.split(',').map(url => url.trim()).filter(url => url);
+        } else if (Array.isArray(cdnUrl)) {
+            cdnUrls = cdnUrl;
+        } else {
+            // Fallback to single URL if not an array or comma-separated string
+            cdnUrls = [cdnUrl];
+        }
+
+        // Select a random CDN URL from the array
+        const randomCdnUrl = cdnUrls[Math.floor(Math.random() * cdnUrls.length)];
+
         // Construct the new URL: CDN URL + subdomain + pathname + remaining query params
-        const cleanCdnUrl = cdnUrl.replace(/\/+$/, ""); // Remove trailing slash from CDN URL
+        const cleanCdnUrl = randomCdnUrl.replace(/\/+$/, ""); // Remove trailing slash from CDN URL
         const newUrl = `${cleanCdnUrl}${cleanCdnUrl.endsWith("/") ? "" : "/"}${subdomain}${pathname}${search}`;
 
         return newUrl;
@@ -34,4 +48,18 @@ export function replaceWithCdnUrl(originalUrl, proxyUrl, cdnUrl) {
         console.error("Error processing CDN URL replacement:", error);
         return originalUrl; // Return original URL if there's an error
     }
+}
+
+// Function to get a random CDN URL from the environment variable
+export function getRandomCdnUrl() {
+    const cdnUrlEnv = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
+
+    let cdnUrls = [];
+    if (typeof cdnUrlEnv === 'string' && cdnUrlEnv.includes(',')) {
+        cdnUrls = cdnUrlEnv.split(',').map(url => url.trim()).filter(url => url);
+    } else {
+        cdnUrls = [cdnUrlEnv];
+    }
+
+    return cdnUrls[Math.floor(Math.random() * cdnUrls.length)];
 }
