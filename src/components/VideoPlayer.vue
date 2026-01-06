@@ -473,6 +473,11 @@ export default {
                     // Store the current CDN URL for this player instance
                     let currentCdnUrl = import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/";
 
+                    // Track retry attempts and used CDN URLs
+                    let retryCount = 0;
+                    const maxRetries = 20;
+                    let usedCdnUrls = new Set(); // Track CDN URLs that have been used
+
                     localPlayer.getNetworkingEngine().registerRequestFilter((_type, request) => {
                         const uri = request.uris[0];
                         var url = new URL(uri);
@@ -492,7 +497,7 @@ export default {
                         }
                     });
 
-                    // Add error handling for CDN fallback
+                    // Add error handling for CDN fallback with retry logic
                     localPlayer.addEventListener('error', (event) => {
                         const error = event.detail;
                         // console.error('Player error:', error); // Disabled error logging
@@ -501,18 +506,32 @@ export default {
                         if (error.category === 2 || error.code === 1001 || error.code === 1002) { // NETWORK_ERROR or variants
                             // console.warn('CDN error detected, switching to fallback CDN...'); // Disabled warning
 
-                            // Get a new random CDN URL that's different from the current one
+                            // Check if we've reached the maximum retry attempts
+                            if (retryCount >= maxRetries) {
+                                // console.warn('Maximum retry attempts reached, stopping retries'); // Disabled warning
+                                return;
+                            }
+
+                            retryCount++;
+
+                            // Get all available CDN URLs
                             const allCdnUrls = (import.meta.env.VITE_CDN_URL || "https://storage.vidioo.ir/gl/").split(',').map(url => url.trim()).filter(url => url);
 
-                            // Filter out the current CDN URL to get potential fallbacks
-                            const fallbackCdnUrls = allCdnUrls.filter(url => url !== currentCdnUrl);
+                            // First, try to get a CDN URL that hasn't been used yet
+                            let availableCdnUrls = allCdnUrls.filter(url => !usedCdnUrls.has(url));
 
-                            if (fallbackCdnUrls.length > 0) {
-                                // Select a random fallback CDN URL
-                                const randomFallbackCdn = fallbackCdnUrls[Math.floor(Math.random() * fallbackCdnUrls.length)];
-                                currentCdnUrl = randomFallbackCdn;
+                            // If no unused CDN URLs are available, use all CDN URLs that are different from the current one
+                            if (availableCdnUrls.length === 0) {
+                                availableCdnUrls = allCdnUrls.filter(url => url !== currentCdnUrl);
+                            }
 
-                                // console.log(`Switched to fallback CDN: ${currentCdnUrl}`); // Disabled log
+                            if (availableCdnUrls.length > 0) {
+                                // Select a random CDN URL from available options
+                                const randomCdn = availableCdnUrls[Math.floor(Math.random() * availableCdnUrls.length)];
+                                currentCdnUrl = randomCdn;
+                                usedCdnUrls.add(randomCdn);
+
+                                // console.log(`Switched to fallback CDN: ${currentCdnUrl} (Attempt ${retryCount}/${maxRetries})`); // Disabled log
 
                                 // Reload the player with the new CDN
                                 this.$nextTick(() => {
