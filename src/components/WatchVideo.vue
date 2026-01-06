@@ -1424,6 +1424,7 @@ export default {
 .btn-icon.btn-danger {
     background-color: #dc2626 !important; /* Red for subscribe (matching btn-danger from App.vue) */
     color: white !important; /* White text */
+    border: 1px solid #b91c1c !important; /* Darker red border */
     box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1431,7 +1432,23 @@ export default {
 .btn-icon.btn-danger:hover {
     background-color: #b91c1c !important; /* Darker red on hover (matching btn-danger hover from App.vue) */
     color: white !important;
+    border: 1px solid #991b1b !important; /* Even darker border on hover */
     box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4) !important;
+}
+
+/* Dark mode adjustments for subscribe button */
+.dark .btn-icon.btn-danger {
+    background-color: #b91c1c !important; /* Adjusted for dark mode */
+    color: white !important; /* White text */
+    border: 1px solid #991b1b !important; /* Darker border in dark mode */
+    box-shadow: 0 2px 4px rgba(185, 28, 28, 0.3) !important;
+}
+
+.dark .btn-icon.btn-danger:hover {
+    background-color: #991b1b !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #7f1d1d !important; /* Even darker border in dark mode */
+    box-shadow: 0 4px 8px rgba(185, 28, 28, 0.4) !important;
 }
 
 /* No specific subscribed state for btn-danger since when subscribed, it uses btn-unsubscribe class */
@@ -1439,6 +1456,7 @@ export default {
 .btn-icon.btn-unsubscribe {
     background-color: #2196f3 !important; /* Blue for unsubscribe (changed from gray) */
     color: white !important; /* White text */
+    border: 1px solid #1976d2 !important; /* Darker blue border */
     box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1446,7 +1464,23 @@ export default {
 .btn-icon.btn-unsubscribe:hover {
     background-color: #1976d2 !important; /* Darker blue on hover */
     color: white !important;
+    border: 1px solid #1565c0 !important; /* Even darker border on hover */
     box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4) !important;
+}
+
+/* Dark mode adjustments for unsubscribe button */
+.dark .btn-icon.btn-unsubscribe {
+    background-color: #1976d2 !important; /* Adjusted for dark mode */
+    color: white !important; /* White text */
+    border: 1px solid #1565c0 !important; /* Darker border in dark mode */
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3) !important;
+}
+
+.dark .btn-icon.btn-unsubscribe:hover {
+    background-color: #1565c0 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #0d47a1 !important; /* Even darker border in dark mode */
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4) !important;
 }
 
 /* General secondary buttons with consistent color palette */
