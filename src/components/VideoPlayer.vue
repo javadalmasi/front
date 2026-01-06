@@ -48,7 +48,7 @@
             <i class="i-material-symbols:skip-next-rounded"></i>
         </button>
         <span
-            v-if="error > 0"
+            v-if="error > 0 && isDebugModeEnabled"
             v-t="{ path: 'player.failed', args: [error] }"
             class="direction-rtl absolute top-8 rounded bg-white/80 p-2 text-lg text-black leading-[1.7] backdrop-blur-lg"
             dir="ltr"
@@ -144,6 +144,9 @@ export default {
     computed: {
         shouldAutoPlay: _this => {
             return _this.getPreferenceBoolean("playerAutoPlay", true) && !_this.isEmbed;
+        },
+        isDebugModeEnabled() {
+            return import.meta.env.VITE_DEBUG_MODE === 'true';
         },
         preferredVideoCodecs: _this => {
             var preferredVideoCodecs = [];
@@ -551,7 +554,15 @@ export default {
                             } else {
                                 debugLogger.warn('No more fallback CDN URLs available');
                             }
+                        } else {
+                            // For non-network errors, only set the error for display if debug mode is enabled
+                            if (import.meta.env.VITE_DEBUG_MODE === 'true') {
+                                this.error = error.code;
+                            }
                         }
+
+                        // Always log the error through our debug logger (which respects the debug mode setting)
+                        // This ensures errors are only logged to console when debug mode is enabled
                     });
 
                     localPlayer.configure(
@@ -1025,7 +1036,10 @@ export default {
                 })
                 .catch(e => {
                     debugLogger.error(e);
-                    this.error = e.code;
+                    // Only set error for display if debug mode is enabled
+                    if (import.meta.env.VITE_DEBUG_MODE === 'true') {
+                        this.error = e.code;
+                    }
                 });
 
             // expand the player to fullscreen when the fullscreen query equals true

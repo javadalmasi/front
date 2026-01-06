@@ -1453,6 +1453,7 @@ export default {
 .btn-icon.btn-secondary {
     background-color: #f5f5f5 !important; /* Light gray for general buttons */
     color: #424242 !important; /* Dark gray text */
+    border: 1px solid #e0e0e0 !important; /* Border for better visibility */
     box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1460,23 +1461,39 @@ export default {
 .btn-icon.btn-secondary:hover {
     background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    border: 1px solid #616161 !important; /* Darker border on hover */
     box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+}
+
+/* Dark mode adjustments for secondary buttons */
+.dark .btn-icon.btn-secondary {
+    background-color: #2d2d2d !important; /* Better dark mode gray */
+    color: #e0e0e0 !important; /* Lighter text in dark mode */
+    border: 1px solid #404040 !important; /* Darker border in dark mode */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary:hover {
+    background-color: #616161 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #757575 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Neutral buttons for like/dislike - consistent neutral color that works in both light and dark modes */
 .btn-icon.btn-neutral {
-    background-color: #e0e0e0 !important; /* Light neutral gray */
+    background-color: #f5f5f5 !important; /* Light neutral gray */
     color: #424242 !important; /* Dark gray text */
-    border: 1px solid #bdbdbd !important; /* Subtle border */
+    border: 1px solid #e0e0e0 !important; /* Subtle border */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Dark mode adjustments for neutral buttons */
 .dark .btn-icon.btn-neutral {
-    background-color: #424242 !important; /* Darker gray in dark mode */
+    background-color: #2d2d2d !important; /* Better dark mode gray */
     color: #e0e0e0 !important; /* Lighter text in dark mode */
-    border: 1px solid #616161 !important; /* Darker border in dark mode */
+    border: 1px solid #404040 !important; /* Darker border in dark mode */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -1529,6 +1546,7 @@ export default {
 .btn-icon.btn-secondary[href*="rss"] {
     background-color: #e3f2fd !important; /* Light blue for RSS */
     color: #1976d2 !important; /* Dark blue text */
+    border: 1px solid #bbdefb !important; /* Blue border */
     box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1536,12 +1554,29 @@ export default {
 .btn-icon.btn-secondary[href*="rss"]:hover {
     background-color: #2196f3 !important; /* Blue on hover */
     color: white !important;
+    border: 1px solid #1976d2 !important; /* Darker blue border on hover */
     box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4) !important;
+}
+
+/* Dark mode adjustments for RSS button */
+.dark .btn-icon.btn-secondary[href*="rss"] {
+    background-color: #1565c0 !important; /* Darker blue in dark mode */
+    color: #e3f2fd !important; /* Lighter text in dark mode */
+    border: 1px solid #1976d2 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[href*="rss"]:hover {
+    background-color: #1976d2 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #2196f3 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Share"] {
     background-color: #f5f5f5 !important; /* Light neutral gray for share */
     color: #424242 !important; /* Dark gray text */
+    border: 1px solid #e0e0e0 !important; /* Neutral border */
     box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1549,12 +1584,29 @@ export default {
 .btn-icon.btn-secondary[aria-label*="Share"]:hover {
     background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    border: 1px solid #616161 !important; /* Darker border on hover */
     box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+}
+
+/* Dark mode adjustments for Share button */
+.dark .btn-icon.btn-secondary[aria-label*="Share"] {
+    background-color: #2d2d2d !important; /* Darker gray in dark mode */
+    color: #e0e0e0 !important; /* Lighter text in dark mode */
+    border: 1px solid #404040 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[aria-label*="Share"]:hover {
+    background-color: #616161 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #757575 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Download"] {
     background-color: #e0f2f1 !important; /* Light teal for download */
     color: #00695c !important; /* Dark teal text */
+    border: 1px solid #b2dfdb !important; /* Teal border */
     box-shadow: 0 2px 4px rgba(0, 188, 212, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1562,12 +1614,29 @@ export default {
 .btn-icon.btn-secondary[aria-label*="Download"]:hover {
     background-color: #00bcd4 !important; /* Teal on hover */
     color: white !important;
+    border: 1px solid #00784e !important; /* Darker teal border on hover */
     box-shadow: 0 4px 8px rgba(0, 188, 212, 0.4) !important;
+}
+
+/* Dark mode adjustments for Download button */
+.dark .btn-icon.btn-secondary[aria-label*="Download"] {
+    background-color: #00695c !important; /* Darker teal in dark mode */
+    color: #e0f2f1 !important; /* Lighter text in dark mode */
+    border: 1px solid #00784e !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(0, 105, 92, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[aria-label*="Download"]:hover {
+    background-color: #00784e !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #00897b !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(0, 105, 92, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[href*="youtube"] {
     background-color: #ffebee !important; /* Light red for YouTube */
     color: #d32f2f !important; /* Dark red text */
+    border: 1px solid #ffcdd2 !important; /* Light red border */
     box-shadow: 0 2px 4px rgba(244, 67, 54, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1575,12 +1644,29 @@ export default {
 .btn-icon.btn-secondary[href*="youtube"]:hover {
     background-color: #f44336 !important; /* YouTube red on hover */
     color: white !important;
+    border: 1px solid #b71c1c !important; /* Darker red border on hover */
     box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4) !important;
+}
+
+/* Dark mode adjustments for YouTube button */
+.dark .btn-icon.btn-secondary[href*="youtube"] {
+    background-color: #b71c1c !important; /* Darker red in dark mode */
+    color: #ffebee !important; /* Lighter text in dark mode */
+    border: 1px solid #c62828 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(183, 28, 28, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[href*="youtube"]:hover {
+    background-color: #c62828 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #d32f2f !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(183, 28, 28, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[href*="odysee"] {
     background-color: #e8eaf6 !important; /* Light indigo for Odysee */
     color: #303f9f !important; /* Dark indigo text */
+    border: 1px solid #c5cae9 !important; /* Light indigo border */
     box-shadow: 0 2px 4px rgba(63, 81, 181, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1588,12 +1674,29 @@ export default {
 .btn-icon.btn-secondary[href*="odysee"]:hover {
     background-color: #3f51b5 !important; /* Indigo on hover */
     color: white !important;
+    border: 1px solid #1a237e !important; /* Darker indigo border on hover */
     box-shadow: 0 4px 8px rgba(63, 81, 181, 0.4) !important;
+}
+
+/* Dark mode adjustments for Odysee button */
+.dark .btn-icon.btn-secondary[href*="odysee"] {
+    background-color: #1a237e !important; /* Darker indigo in dark mode */
+    color: #e8eaf6 !important; /* Lighter text in dark mode */
+    border: 1px solid #283593 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(26, 35, 126, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[href*="odysee"]:hover {
+    background-color: #283593 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #303f9f !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(26, 35, 126, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Watch"] {
     background-color: #f5f5f5 !important; /* Light neutral gray for watch */
     color: #424242 !important; /* Dark gray text */
+    border: 1px solid #e0e0e0 !important; /* Neutral border */
     box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1601,12 +1704,29 @@ export default {
 .btn-icon.btn-secondary[aria-label*="Watch"]:hover {
     background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    border: 1px solid #616161 !important; /* Darker border on hover */
     box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+}
+
+/* Dark mode adjustments for Watch button */
+.dark .btn-icon.btn-secondary[aria-label*="Watch"] {
+    background-color: #2d2d2d !important; /* Darker gray in dark mode */
+    color: #e0e0e0 !important; /* Lighter text in dark mode */
+    border: 1px solid #404040 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[aria-label*="Watch"]:hover {
+    background-color: #616161 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #757575 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 .btn-icon.btn-secondary[aria-label*="Listen"] {
     background-color: #f5f5f5 !important; /* Light neutral gray for listen */
     color: #424242 !important; /* Dark gray text */
+    border: 1px solid #e0e0e0 !important; /* Neutral border */
     box-shadow: 0 2px 4px rgba(158, 158, 158, 0.2) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -1614,7 +1734,23 @@ export default {
 .btn-icon.btn-secondary[aria-label*="Listen"]:hover {
     background-color: #757575 !important; /* Medium gray on hover */
     color: white !important;
+    border: 1px solid #616161 !important; /* Darker border on hover */
     box-shadow: 0 4px 8px rgba(158, 158, 158, 0.4) !important;
+}
+
+/* Dark mode adjustments for Listen button */
+.dark .btn-icon.btn-secondary[aria-label*="Listen"] {
+    background-color: #2d2d2d !important; /* Darker gray in dark mode */
+    color: #e0e0e0 !important; /* Lighter text in dark mode */
+    border: 1px solid #404040 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .btn-icon.btn-secondary[aria-label*="Listen"]:hover {
+    background-color: #616161 !important; /* Adjusted hover color for dark mode */
+    color: white !important;
+    border: 1px solid #757575 !important; /* Adjusted border for dark mode */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Hide button text on all devices by default, show only on desktop hover */
