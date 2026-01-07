@@ -670,14 +670,14 @@ app.directive('t', {
     if (typeof binding.value === 'string') {
       el.textContent = window.i18n.global.t(binding.value);
     } else if (typeof binding.value === 'object' && binding.value.path) {
-      el.textContent = window.i18n.global.t(binding.value.path, binding.value.params || {});
+      el.textContent = window.i18n.global.t(binding.value.path, binding.value.args || binding.value.params || {});
     }
   },
   updated(el, binding) {
     if (typeof binding.value === 'string') {
       el.textContent = window.i18n.global.t(binding.value);
     } else if (typeof binding.value === 'object' && binding.value.path) {
-      el.textContent = window.i18n.global.t(binding.value.path, binding.value.params || {});
+      el.textContent = window.i18n.global.t(binding.value.path, binding.value.args || binding.value.params || {});
     }
   }
 });
